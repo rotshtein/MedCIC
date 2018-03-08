@@ -4,10 +4,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Parameters 
+public class Parameters
 {
-	File configFile = null;
-	Properties props;
+
+	File		configFile	= null;
+	Properties	props;
+
 	public Parameters(String Filename) throws Exception
 	{
 		configFile = new File("config.properties");
@@ -17,40 +19,46 @@ public class Parameters
 			{
 				throw (new Exception("No configuration file"));
 			}
-			
+
 		}
 		FileReader config = new FileReader(configFile);
-	    props = new Properties();
-	    props.load(config);
-	    config.close();
+		props = new Properties();
+		props.load(config);
+		config.close();
 	}
+
 	public String Get(String name)
 	{
-		 return Get(name, "");
+		return Get(name, "");
 	}
-	
+
 	public String Get(String name, String defaultValue)
 	{
-		String value="";
+		String value = "";
 		try
 		{
 			value = props.getProperty(name);
 		}
-		catch(Exception e) {}
-		
+		catch (Exception e)
+		{
+		}
+
 		if (value == null)
 		{
-			try {
-				Set(name,defaultValue);
+			try
+			{
+				Set(name, defaultValue);
 				value = defaultValue;
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return value;
 	}
-	
+
 	public boolean Set(String name, String Value) throws IOException
 	{
 		props.setProperty(name, Value);
@@ -59,5 +67,5 @@ public class Parameters
 		writer.close();
 		return true;
 	}
-	
+
 }
