@@ -1,0 +1,76 @@
+syntax = "proto3";
+package tcc;
+
+/*
+ * 1. To start send StartCommand with the 4 urls and the encapsulation. Wait for Ack or Nak with reasons as reply
+ * 2. To Stop simply send StopCommand and expect to get Ack as reply
+ * 3. The server can initiate status request (StatusRequest) to get status (StatusReply)
+ * 4. During operation an status reply (StatusReply) will be sent periodically and when status is changed
+*/
+
+enum STATUS
+{
+	RUN = 0;
+	STOP = 1;
+	ERROR = 2;
+	WARNING = 3;
+}
+
+enum ENCAPSULATION
+{
+	DI = 0;
+	DI_PLUS = 1;
+	EDMAC = 2;
+	EDMAC2_2928 = 3;
+	EDMAC2_3072 = 4;
+	ESC_532 = 5;
+	ESC_551 = 6;
+	ESC_1104 = 7;
+	ESC_1792 = 8;
+	E2 = 9;
+	ESC_874 = 10;
+}
+
+message StartCommand
+{
+	int32 sequence = 1;
+	string input1_url = 2;
+	string input2_url = 3;
+	string output1_url = 4;
+	string output2_url = 5;
+	ENCAPSULATION encapsulation = 6;
+}
+
+message StopCommand
+{
+	int32 sequence = 1;
+}
+
+message Ack
+{
+	int32 sequence = 1;
+}
+
+message Nak
+{
+	int32 sequence = 1;
+	string message = 2;
+}
+
+message StatusRequest
+{
+	int32 sequence = 1;
+}
+
+message StatusReply
+{
+	int32 sequence = 1;
+	STATUS status = 2;
+	string status_description = 3;
+	bool warning = 4;
+	string warning_message = 5;
+	int32 warning_number = 6;
+	bool error = 7;
+	string error_mMessage = 8;
+	int32 error_number = 9;
+}
