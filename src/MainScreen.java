@@ -100,8 +100,8 @@ public class MainScreen
 		// webs.Start("ws://echo.websocket.org/");
 		// webs.Send("Hello");
 
-		String host = "127.0.0.1";
-		int port = 8887;
+		String host = param.Get("ListenAddress", "127.0.0.1");
+		int port = Integer.parseInt(param.Get("ListenPort", "8887"));
 
 		/*
 		 * m = StatusReply.newBuilder() .setStatus(STATUS.RUN)
