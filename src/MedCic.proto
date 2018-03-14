@@ -1,0 +1,114 @@
+syntax = "proto3";
+package medcic_proto;
+
+/*************/
+/* Version 1 */
+/************/
+
+enum STATUS
+{
+	RUN = 0;
+	STOP = 1;
+	ERROR = 2;
+	WARNING = 3;
+}
+
+enum ENCAPSULATION
+{
+	DI = 0;
+	DI_PLUS = 1;
+	EDMAC = 2;
+	EDMAC2_2928 = 3;
+	EDMAC2_3072 = 4;
+	ESC_532 = 5;
+	ESC_551 = 6;
+	ESC_1104 = 7;
+	ESC_1792 = 8;
+	E2 = 9;
+	ESC_874 = 10;
+}
+
+
+enum OPCODE
+{
+	HEADER = 0;
+	ACK = 1;
+	NACK = 2;
+	START_CMD = 3;
+	STOP_CMD = 4;
+	STATUS_REQUEST = 5;
+	STATUS_REPLAY = 6;
+	STATUS_MESSAGE = 7;
+}
+
+
+/*****************************************************************************************************************************/
+//
+message Header
+{
+	int32 sequence = 1;
+	OPCODE opcode = 2;			// Opcode
+	bytes message_data = 3;
+}
+
+/*****************************************************************************************************************************/
+// This command should be sent to start processing bitstream
+message StartCommand
+{
+	int32 sequence = 1;
+	string input1_url = 2;			// The output url. The format should be udp://<host ip>:port or for the swFE file://<full path with filename and extention>
+	string input2_url = 3;			// see input1_url
+	string output1_url = 4;			// The output url. The format should be udp://<host ip>:port or file://<full path with filename and extention>
+	string output2_url = 5;			// see output1_url
+	ENCAPSULATION encapsulation = 6;
+}
+
+/*****************************************************************************************************************************/
+// This command stops the mediation
+message StopCommand
+{
+	int32 sequence = 1;
+}
+
+/*****************************************************************************************************************************/
+// This replay us sent as responce to START_CMD or STOP_CMD
+message Ack
+{
+	int32 sequence = 1;
+}
+
+/*****************************************************************************************************************************/
+// This replay us sent as responce to START_CMD or STOP_CMD
+message Nack
+{
+	int32 sequence = 1;
+}
+
+/*****************************************************************************************************************************/
+// This should be sent in order to get StatusReplay
+message StatusRequest
+{
+	int32 sequence = 1;
+}
+
+/*****************************************************************************************************************************/
+// This replay is sent as response to StatusRequest, ss event for new warning/error or when ever the status changes, new warning 
+message StatusReplay
+{
+	int32 sequence = 1;
+	STATUS status = 2;
+	string status_description = 3;
+	bool warning = 4;
+	string warning_message = 5;
+	int32 warning_number = 6;
+	bool error = 7;
+	string error_mMessage = 8;
+	int32 error_number = 9;
+}
+
+/*****************************************************************************************************************************/
+// This message is sent to display status text message
+message StatusMessage
+{
+	string message = 1;
+}

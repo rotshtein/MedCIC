@@ -3,15 +3,14 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
-import org.java_websocket.server.WebSocketServer;
-
-import com.google.protobuf.AbstractMessage.Builder;
-
+import medcic_proto.MedCic.ENCAPSULATION;
+import medcic_proto.MedCic.OPCODE;
+import tcc.GuiInterface;
+import tcc.ManagementClient;
 import tcc.ManagementServer;
-import tcc.MedCIC;
-import tcc.MedCIC.STATUS;
-import tcc.MedCIC.StatusReply;
+import tcc.Parameters;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -25,12 +24,15 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
+import java.awt.Font;
 
-public class MainScreen
+public class MainScreen implements GuiInterface
 {
 
 	private JFrame		frame;
@@ -44,8 +46,10 @@ public class MainScreen
 	JButton				btnStart;
 	JLabel				lblStatusbar;
 	Parameters			param;
-	WebSocketServer		server;
-	StatusReply			m;
+	ManagementServer	server;
+	ManagementClient	client;
+	private final JButton btnStop = new JButton("Stop");
+	
 
 	/**
 	 * Launch the application.
@@ -72,8 +76,9 @@ public class MainScreen
 
 	/**
 	 * Create the application.
+	 * @throws URISyntaxException 
 	 */
-	public MainScreen()
+	public MainScreen() throws URISyntaxException
 	{
 		initialize();
 		// txtIn1 ****://###.###.###.###:#####
@@ -96,6 +101,16 @@ public class MainScreen
 		txtOut2.setText(param.Get("url-out-2", "udp://127.0.0.1:5004"));
 		chkCic1.setSelected(param.Get("Cic1", "0").equals("0") ? false : true);
 		chkCic2.setSelected(param.Get("Cic2", "0").equals("0") ? false : true);
+		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) 
+			{
+				client.send(0,OPCODE.STOP_CMD, null);
+			}
+		});
+		btnStop.setBounds(292, 53, 57, 23);
+		
+		frame.getContentPane().add(btnStop);
 		// webs = new Managment();
 		// webs.Start("ws://echo.websocket.org/");
 		// webs.Send("Hello");
@@ -113,11 +128,7 @@ public class MainScreen
 		server = new ManagementServer(new InetSocketAddress(host, port));
 		server.start();
 
-		m = StatusReply.newBuilder().setStatus(STATUS.RUN).setStatusDescription("Seems OK").setError(false)
-				.setWarning(false).build();
-
-		Boolean x = m.getError();
-
+		client = new ManagementClient(new URI("ws://127.0.0.1:8887"), this);
 	}
 
 	class StartAction implements ActionListener
@@ -168,8 +179,23 @@ public class MainScreen
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			String input1="" ,input2="", output1="", output2="";
+			
+			if (chkCic1.isSelected())
+			{
+				input1 = txtIn1.getText();
+				output1 = txtOut1.getText();
+			}
+			
+			if (chkCic2.isSelected())
+			{
+				input2 = txtIn2.getText();
+				output2 = txtOut2.getText();
+			}
 
-			btnStart.setBackground(Color.GREEN);
+			client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
+			//btnStart.setBackground(Color.GREEN);
 		}
 	}
 
@@ -263,9 +289,10 @@ public class MainScreen
 		frame.getContentPane().add(encap);
 
 		btnStart = new JButton("Start");
+		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStart.addActionListener(new StartAction());
 
-		btnStart.setBounds(241, 53, 89, 23);
+		btnStart.setBounds(214, 53, 57, 23);
 		frame.getContentPane().add(btnStart);
 
 		chkCic1 = new JCheckBox("CIC 1");
@@ -294,5 +321,115 @@ public class MainScreen
 		frame.setResizable(false);
 		// create the status bar panel and shove it down the bottom of the frame
 
+	}
+	
+	private ENCAPSULATION toProtobuff(String encap)
+	{
+		switch (encap)
+		{
+		case "D&I++":
+			return ENCAPSULATION.DI_PLUS;
+
+			
+		case "EDMAC":
+			return ENCAPSULATION.EDMAC;
+			
+		case "EDMAC-2 (2928)":
+			return ENCAPSULATION.EDMAC2_2928;
+			
+		case "EDMAC-2 (3072)":
+			return ENCAPSULATION.EDMAC2_3072;
+			
+		case "ESC++        (532)":
+			return ENCAPSULATION.ESC_532;
+			
+		case "ESC++        (551)":
+			return ENCAPSULATION.ESC_551;
+			
+		case "ESC++        (874)":
+			return ENCAPSULATION.ESC_874;
+			
+		case "ESC++      (1104)":
+			return ENCAPSULATION.ESC_1104;
+			
+		case "ESC++      (1792)":
+			return ENCAPSULATION.ESC_1792;
+			
+		case "E2":
+			return ENCAPSULATION.E2;
+			
+		default:
+			return ENCAPSULATION.DI_PLUS;
+		}
+	}
+
+	@Override
+	public void UpdateStatus(String status)
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					UpdateStatus(status);
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		lblStatusbar.setText(status);
+		
+	}
+
+	@Override
+	public void onConnectionChange(Boolean status)
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					onConnectionChange(status);
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		if (status)
+		{
+			btnStart.setBackground(Color.GREEN);
+		}
+		else
+		{
+			btnStart.setBackground(Color.GRAY);
+		}
+		
+		
+	}
+
+	@Override
+	public void OperationCompleted()
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					OperationCompleted();
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		btnStart.setBackground(Color.GRAY);
 	}
 }
