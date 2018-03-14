@@ -84,23 +84,22 @@ public class ManagementParser extends Thread implements GuiInterface
 				SendNck(h, conn);
 			}
 
-			/*
+			
+			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), "./mediation.txt", this);
 			try
 			{
 				Kill();
-				procMon = tx.Start(p.getFrequency(), p.getRate(), p.getGain(), p.getFilename(), p.getLoop());
-				SendStatusMessage("Starting to transmirt " + p.getFilename(), conn);
-				logger.info("Starting to record");
+				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getInput2Url(), p.getOutput1Url(), p.getOutput2Url());
+				SendStatusMessage("Starting ...", conn);
+				logger.info("Starting...");
 				SendAck(h, conn);
-				OperationStarted();
 			}
 			catch (Exception e)
 			{
-				SendStatusMessage("Spectrum exec not found. Please fix the configuration file", conn);
-				logger.error("Spectrum exec not found. Please fix the configuration file,e");
+				SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+				logger.error("Executable not found. Please fix the configuration file",e);
 				SendNck(h, conn);
 			}
-*/
 			break;
 
 		case STOP_CMD:

@@ -153,6 +153,7 @@ public class MainScreen implements GuiInterface
 			}
 
 			String Protocol = (String) encap.getSelectedItem();
+			/*
 			int FrameSize = 0;
 			Pattern pattern = Pattern.compile("(\\()([0-9]*)(\\))");
 			Matcher matcher = pattern.matcher(Protocol);
@@ -170,16 +171,7 @@ public class MainScreen implements GuiInterface
 			Protocol = Protocol.split(" ")[0];
 			lblStatusbar.setText("Protocol=" + Protocol + ", FrameSize=" + FrameSize + " CIC1 is "
 					+ (chkCic1.isSelected() ? "ON" : "OFF") + ", CIC2 is " + (chkCic2.isSelected() ? "ON" : "OFF"));
-			try
-			{
-				Runtime.getRuntime().exec("notepad.exe");
-			}
-			catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+				*/		
 			String input1="" ,input2="", output1="", output2="";
 			
 			if (chkCic1.isSelected())
