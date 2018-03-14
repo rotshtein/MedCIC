@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import java.awt.Font;
@@ -152,7 +151,6 @@ public class MainScreen implements GuiInterface
 				e1.printStackTrace();
 			}
 
-			String Protocol = (String) encap.getSelectedItem();
 			/*
 			int FrameSize = 0;
 			Pattern pattern = Pattern.compile("(\\()([0-9]*)(\\))");
