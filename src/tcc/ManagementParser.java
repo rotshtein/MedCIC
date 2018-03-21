@@ -38,7 +38,6 @@ public class ManagementParser extends Thread implements GuiInterface
 	@Override
 	public void run()
 	{
-
 		while (true)
 		{
 			AbstractMap.SimpleEntry<byte[], WebSocket> request = null;
@@ -84,7 +83,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			}
 
 			
-			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), "./mediation.txt", this);
+			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), null, this);
 			try
 			{
 				Kill();
@@ -147,15 +146,29 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	private void SendAck(Header h, WebSocket conn)
 	{
-		Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.ACK).build();
-		conn.send(hh.toByteArray());
+		try
+		{
+			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.ACK).build();
+			conn.send(hh.toByteArray());
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to send Ack to a connection", e);
+		}
 
 	}
 
 	private void SendNck(Header h, WebSocket conn)
 	{
-		Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.NACK).build();
-		conn.send(hh.toByteArray());
+		try
+		{
+			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.NACK).build();
+			conn.send(hh.toByteArray());
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to send Nack to a connection", e);
+		}
 
 	}
 
@@ -176,13 +189,17 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	private void SendStatusMessage(String message, WebSocket conn)
 	{
-		if (conn != null)
+		try
 		{
 			StatusMessage s = StatusMessage.newBuilder().setMessage(message).build();
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
 					.setMessageData(s.toByteString()).build();
 
 			conn.send(h.toByteArray());
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to send StatusMessage to a connection", e);
 		}
 	}
 
@@ -225,28 +242,54 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public void OperationCompleted(WebSocket conn)
 	{
-		StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
-		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
-				.build();
-
-		conn.send(h.toByteArray());
+		try
+		{
+			StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
+					.build();
+	
+			conn.send(h.toByteArray());
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to send StatusReplay on complition to a connection", e);
+		}
 	}
 
 	public void OperationStarted()
 	{
-		for (WebSocket conn : server.connections())
-		{
-			OperationStarted(conn);
-		}
-	}
-
-	public void OperationStarted(WebSocket conn)
-	{
 		StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
 		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
 				.build();
-
-		conn.send(h.toByteArray());
+		
+		for (WebSocket conn : server.connections())
+		{
+			OperationStarted(conn,h);
+		}
+	}
+	
+	public void OperationStarted(WebSocket conn)
+	{
+		OperationStarted(conn, null);
+	}
+	
+	public void OperationStarted(WebSocket conn, Header h)
+	{
+		try
+		{
+			if (h == null)
+			{
+				StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
+				h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
+						.build();
+			}
+	
+			conn.send(h.toByteArray());
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send StatusReplay on starting operation to a connection", e);
+		}
 	}
 	
 	@Override
@@ -264,5 +307,4 @@ public class ManagementParser extends Thread implements GuiInterface
 		// TODO Auto-generated method stub
 		
 	}
-
 }

@@ -14,11 +14,14 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 
-public class ManagementServer extends WebSocketServer
+public class ManagementServer extends WebSocketServer 
 {
 	Logger logger = Logger.getLogger("ManagementServer");
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue = null;
 	ManagementParser parser;
+	Boolean _stop = false;
+	Thread monitorProcesThread = null;
+	
 	public ManagementServer(InetSocketAddress address)
 	{
 		super(address);
@@ -27,18 +30,55 @@ public class ManagementServer extends WebSocketServer
 			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);
 			parser = new ManagementParser("/MedCic/config.properties", queue, this);
 			parser.start();
+			monitorProcesThread = new Thread(MonitorProcesThread);
+			monitorProcesThread.start();
 		}
 		catch (Exception e)
 		{
 			logger.error("Parse error", e);
 		}
-		
+	}
+
+	public void dispose()
+	{
+		Stop();
+	}
+	
+	public void Stop()
+	{
+		logger.info("Clossing connections");
+		_stop = true;
+		try
+		{
+			this.stop(1);
+			for (WebSocket conn : this.connections())
+			{
+				logger.info("\tClossing connection " + conn.getLocalSocketAddress().getHostString());
+				conn.close();
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Error while closing Web socket server", e);
+		}
+		if (monitorProcesThread != null)
+		{
+			try
+			{
+				monitorProcesThread.join(100);
+			}
+			catch (InterruptedException e)
+			{
+				logger.error("Error while joining the MonitorProcessThread", e);
+			}
+		}
 	}
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake)
 	{
-		conn.send("Welcome to the server!"); // This method sends a message to the new client
+		// conn.send("Welcome to the server!"); // This method sends a message to the
+		// new client
 		// broadcast( "new connection: " + handshake.getResourceDescriptor() ); //This
 		// method sends a message to all clients connected
 		logger.info("new connection to " + conn.getRemoteSocketAddress());
@@ -60,7 +100,17 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onMessage(WebSocket conn, ByteBuffer message)
 	{
-		parser.queue.add(new SimpleEntry<byte[], WebSocket>(message.array(), conn));
+
+		// conn.send("received ByteBuffer from " + conn.getRemoteSocketAddress());
+		// parser.Parse(message.array(), conn);
+		try
+		{
+			queue.put(new SimpleEntry<byte[], WebSocket>(message.array(), conn));
+		}
+		catch (Exception e)
+		{
+			logger.error("Error putting message in parser queue", e);
+		}
 	}
 
 	@Override
@@ -74,5 +124,33 @@ public class ManagementServer extends WebSocketServer
 	{
 		logger.info("server started successfully");
 	}
-
+	
+	
+	 Runnable MonitorProcesThread = new Runnable()
+	 {
+		    public void run()
+		    {
+		    	Boolean LastStatus = parser.isRunning();
+				while (!_stop)
+				{
+					if (LastStatus != parser.isRunning())
+					{
+						LastStatus = parser.isRunning();
+						if (!LastStatus)
+						{
+							parser.UpdateStatus("Process stoped");
+						}
+					}
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch (InterruptedException e)
+					{
+						logger.error("Failed to sleep",e);
+					}
+				}  
+		    }
+	 };
+	
 }

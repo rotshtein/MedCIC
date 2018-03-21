@@ -15,6 +15,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
+import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
@@ -58,11 +59,11 @@ public class ManagementClient extends WebSocketClient
 		Header h = null;
 		try
 		{
-			h = Header.parseFrom(buffer);
+			h = Header.parseFrom(buffer.array());
 
 			if (h != null)
 			{
-				logger.info("Got header. Command = " + h.getOpcode());
+				//logger.debug("Got header. Command = " + h.getOpcode());
 			}
 			// int i = h.getOpcodeValue();
 			switch (h.getOpcode())
@@ -72,11 +73,11 @@ public class ManagementClient extends WebSocketClient
 				break;
 
 			case STOP_CMD:
-				logger.error("Got Stop command");
+				logger.error("Client got Stop command");
 				break;
 
 			case STATUS_REQUEST:
-				logger.error("Got Status request");
+				logger.error("Client got Status request");
 				break;
 
 			case ACK:
@@ -92,14 +93,25 @@ public class ManagementClient extends WebSocketClient
 
 				gui.UpdateStatus(sr.getStatusDescription());
 
-				if (sr.getWarning())
+				if (sr.getError())
+				{
+					gui.UpdateStatus(sr.getErrorMMessage());
+				}
+				else if (sr.getWarning())
 				{
 					gui.UpdateStatus(sr.getWarningMessage());
 				}
 
-				if (sr.getError())
+				
+				if (sr.getStatus() == STATUS.STOP)
 				{
-					gui.UpdateStatus(sr.getErrorMMessage());
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.onConnectionChange(false);
+				}
+				else if (sr.getStatus() == STATUS.RUN)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.onConnectionChange(true);
 				}
 				break;
 

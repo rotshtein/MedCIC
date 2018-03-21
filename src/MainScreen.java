@@ -30,6 +30,8 @@ import java.net.URISyntaxException;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainScreen implements GuiInterface
 {
@@ -238,6 +240,13 @@ public class MainScreen implements GuiInterface
 	private void initialize()
 	{
 		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) 
+			{
+				Stop();
+			}
+		});
 		frame.setBounds(100, 100, 633, 143);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -353,6 +362,13 @@ public class MainScreen implements GuiInterface
 		}
 	}
 
+	private void Stop()
+	{
+		if (server != null)
+		{
+			server.Stop();
+		}
+	}
 	@Override
 	public void UpdateStatus(String status)
 	{
