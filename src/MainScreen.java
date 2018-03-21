@@ -5,8 +5,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
+
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
+import sun.net.dns.ResolverConfiguration.Options;
 import tcc.GuiInterface;
 import tcc.ManagementClient;
 import tcc.ManagementServer;
@@ -35,7 +38,7 @@ import java.awt.event.WindowEvent;
 
 public class MainScreen implements GuiInterface
 {
-
+	Logger logger = Logger.getLogger("MainScreen");
 	private JFrame		frame;
 	JFormattedTextField	txtIn1;
 	JFormattedTextField	txtIn2;
@@ -50,16 +53,23 @@ public class MainScreen implements GuiInterface
 	ManagementServer	server;
 	ManagementClient	client;
 	private final JButton btnStop = new JButton("Stop");
-	
+	static String configurationFilename = "config.properties";
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args)
 	{
+		if (args.length > 2)
+		{
+			if (args[0].equals("-c"))
+			{
+				configurationFilename = args[1];
+			}
+		}
+
 		EventQueue.invokeLater(new Runnable()
 		{
-
 			public void run()
 			{
 				try
@@ -91,9 +101,8 @@ public class MainScreen implements GuiInterface
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
+			logger.error("Failed to open parameter file [config.ini]",e);
 			return;
-			// e.printStackTrace();
 		}
 
 		txtIn1.setText(param.Get("url-in-1", "udp://127.0.0.1:5001"));
@@ -112,24 +121,14 @@ public class MainScreen implements GuiInterface
 		btnStop.setBounds(292, 53, 57, 23);
 		
 		frame.getContentPane().add(btnStop);
-		// webs = new Managment();
-		// webs.Start("ws://echo.websocket.org/");
-		// webs.Send("Hello");
 
 		String host = param.Get("ListenAddress", "127.0.0.1");
 		int port = Integer.parseInt(param.Get("ListenPort", "8887"));
 
-		/*
-		 * m = StatusReply.newBuilder() .setStatus(STATUS.RUN)
-		 * .setStatusDescription("Seems OK") .setError(false) .setWarning(false)
-		 * .build();
-		 * 
-		 * Boolean x = m.getError();
-		 */
-		server = new ManagementServer(new InetSocketAddress(host, port));
+		server = new ManagementServer(new InetSocketAddress(host, port), param.getFilename());
 		server.start();
-
-		client = new ManagementClient(new URI("ws://127.0.0.1:8887"), this);
+		String serverUri = param.Get("ServerUri", "ws://127.0.0.1:8887");
+		client = new ManagementClient(new URI(serverUri), this);
 	}
 
 	class StartAction implements ActionListener
@@ -187,13 +186,11 @@ public class MainScreen implements GuiInterface
 			}
 
 			client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
-			//btnStart.setBackground(Color.GREEN);
 		}
 	}
 
 	class UrlVerifier extends InputVerifier
 	{
-
 		public boolean verify(JComponent input)
 		{
 			if (!(input instanceof JFormattedTextField)) return true;
@@ -217,8 +214,7 @@ public class MainScreen implements GuiInterface
 						catch (Exception ex)
 						{
 						}
-						JOptionPane.showMessageDialog(null,
-								"Wrong URL format.:port should be a number between 1 and 65535");
+						JOptionPane.showMessageDialog(null,"Wrong URL format.:port should be a number between 1 and 65535");
 						return false;
 					}
 				}
@@ -227,10 +223,8 @@ public class MainScreen implements GuiInterface
 					return true;
 				}
 			}
-			JOptionPane.showMessageDialog(null,
-					"Wrong URL format. Should be udp://ip:port or file://<file path and name>");
+			JOptionPane.showMessageDialog(null,"Wrong URL format. Should be udp://ip:port or file://<file path and name>");
 			return false;
-
 		}
 	}
 

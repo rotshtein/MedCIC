@@ -42,8 +42,8 @@ public class ManagementClient extends WebSocketClient
 	@Override
 	public void onOpen(ServerHandshake handshakedata)
 	{
+		gui.UpdateStatus("Connected to the server");
 		logger.info("Connected");
-
 	}
 
 	@Override
@@ -55,7 +55,6 @@ public class ManagementClient extends WebSocketClient
 	@Override
 	public void onMessage(ByteBuffer buffer)
 	{
-	
 		Header h = null;
 		try
 		{
@@ -137,17 +136,14 @@ public class ManagementClient extends WebSocketClient
 	public void onClose(int code, String reason, boolean remote)
 	{
 		logger.info("Disconnected");
+		gui.UpdateStatus("Connection to the server closed!");
 	}
 
 	@Override
 	public void onError(Exception ex)
 	{
+		gui.UpdateStatus("Websocket error received from the server");
 		logger.error("Wensocket error", ex);
-	}
-
-	public Boolean SendRecordCommand()
-	{
-		return false;
 	}
 
 	public Boolean SendStartCommand(ENCAPSULATION encap, String input1_url, String input2_url, String output1_url, String output2_url)
@@ -167,10 +163,18 @@ public class ManagementClient extends WebSocketClient
 	
 	public Boolean SendStopCommand()
 	{
-		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STOP_CMD).build();
-
-		this.send(h.toByteArray());
-		send(0, OPCODE.STOP_CMD, null);
+		try
+		{
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STOP_CMD).build();
+	
+			this.send(h.toByteArray());
+			send(0, OPCODE.STOP_CMD, null);
+		}
+		catch (Exception e)
+		{
+			logger.error("Send SendStopCommand error", e);
+			return false;
+		}
 		return true;
 	}
 
@@ -180,16 +184,24 @@ public class ManagementClient extends WebSocketClient
 		gotNck = false;
 		
 		Header h = null;
-		if (data != null)
+		try
 		{
-			h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).setMessageData(data).build();
+			if (data != null)
+			{
+				h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).setMessageData(data).build();
+			}
+			else
+			{
+				h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).build();
+			}
+			
+			this.send(h.toByteArray());
 		}
-		else
+		catch (Exception e)
 		{
-			h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).build();
+			logger.error("Send error", e);
 		}
-
-		this.send(h.toByteArray());
+		
 	}
 
 	public Boolean WaitForAck(long milliseconds)

@@ -21,14 +21,16 @@ public class ManagementServer extends WebSocketServer
 	ManagementParser parser;
 	Boolean _stop = false;
 	Thread monitorProcesThread = null;
+	String paramFile = null;
 	
-	public ManagementServer(InetSocketAddress address)
+	public ManagementServer(InetSocketAddress address, String ParamFile)
 	{
 		super(address);
+		paramFile = ParamFile;
 		try
 		{
 			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);
-			parser = new ManagementParser("/MedCic/config.properties", queue, this);
+			parser = new ManagementParser(ParamFile, queue, this);
 			parser.start();
 			monitorProcesThread = new Thread(MonitorProcesThread);
 			monitorProcesThread.start();

@@ -68,5 +68,10 @@ public class Parameters
 		writer.close();
 		return true;
 	}
+	
+	public String getFilename()
+	{
+		return configFile.getAbsolutePath();
+	}
 
 }
