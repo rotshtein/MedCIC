@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
-import sun.net.dns.ResolverConfiguration.Options;
 import tcc.GuiInterface;
 import tcc.ManagementClient;
 import tcc.ManagementServer;
