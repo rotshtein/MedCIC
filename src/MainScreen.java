@@ -35,6 +35,9 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import lego.BlockConfiguration;
+import lego.ISSUE_TYPE;
+
 public class MainScreen implements GuiInterface
 {
 	Logger logger = Logger.getLogger("MainScreen");
