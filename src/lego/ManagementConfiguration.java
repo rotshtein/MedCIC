@@ -42,9 +42,10 @@ public class ManagementConfiguration
 	
 	public String toString()
 	{
-		String msg = "mgmt 1\n\r";
-		msg += "mgmtserver " + server + "\n\r";
-		msg += "mgmtport " + port + "\n\r";
+		final String NewLine = System.getProperty("line.separator");
+		String msg = "mgmt 1" + NewLine;
+		msg += "mgmtserver " + server + NewLine;
+		msg += "mgmtport " + port + NewLine;
 		
 		return msg;
 	}

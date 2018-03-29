@@ -85,16 +85,20 @@ public class ModuleConfiguration
 	
 	public String toString()
 	{
-		String msg = PATH + " " + path + "\n\r";
-		msg += MODULE + " " + module + "\n\r";
-		msg += PARAMS + " " + params + "\n\r";
+		final String NewLine = System.getProperty("line.separator");
+		String msg = PATH + " " + path + NewLine;
+		msg += MODULE + " " + module + NewLine;
+		if (params != null)
+		{
+			msg += PARAMS + " " + params + NewLine;
+		}
 		int i = 1;
 		for (String o : out)
 		{
-			msg += OUT + i +" " + o + "\n\r";
+			msg += OUT + i +" " + o + NewLine;
 			i++;
 		}
-		msg += POS + " " + pos + "\n\r";
+		msg += POS + " " + pos + NewLine;
 		
 		return msg;
 	}

@@ -5,7 +5,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 
 
-public class BlockConfiguration
+public class ConfigurationMessage
 {
 	/*
 	public final String ISSUE_MSG_ACTIVE_STRING 	= "Active";
@@ -32,9 +32,9 @@ public class BlockConfiguration
 	public	int 		isinput;
 	public	int			isoutput; 
 	
-	public BlockConfiguration() {}	
+	public ConfigurationMessage() {}	
 	
-	public BlockConfiguration(ISSUE_TYPE t, String Path) 
+	public ConfigurationMessage(ISSUE_TYPE t, String Path) 
 	{
 		if (Path == null)
 			Path = "1";
@@ -72,10 +72,10 @@ public class BlockConfiguration
 	}
 	
 	
-	public static BlockConfiguration fromJson(String JasonString) throws Exception
+	public static ConfigurationMessage fromJson(String JasonString) throws Exception
 	{
 		ObjectMapper mapper = new ObjectMapper();
-		BlockConfiguration object = mapper.readValue(JasonString, BlockConfiguration.class);
+		ConfigurationMessage object = mapper.readValue(JasonString, ConfigurationMessage.class);
 	    return object;
 	}
 	
