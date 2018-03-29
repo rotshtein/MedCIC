@@ -24,7 +24,7 @@ public class Mediate extends Operation
 
 			try
 			{
-				String vars[] =	{ super.exe_file, encap.getValueDescriptor().toString(),
+				String [] vars =	{ super.exe_file, encap.getValueDescriptor().toString(),
 						InputUrl1, InputUrl2,OutputUrl1, OutputUrl2};
 				p = super.StartAction(vars);
 			}

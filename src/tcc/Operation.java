@@ -26,7 +26,7 @@ public abstract class Operation implements Runnable
 		operation = Operation;
 	}
 
-	public ProcMon StartAction(String vars[]) throws Exception
+	public ProcMon StartAction(String [] vars) throws Exception
 	{
 		if (new File(exe_file).exists())
 		{
