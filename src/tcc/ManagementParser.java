@@ -8,6 +8,7 @@ import org.java_websocket.WebSocket;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
@@ -26,6 +27,8 @@ public class ManagementParser extends Thread implements GuiInterface
 	ProcMon														procMon				= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
+	Thread Cic1Thread = null;
+	Thread Cic2Thread = null;
 
 	public ManagementParser(String ParametersFile, BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue,
 			ManagementServer server) throws Exception
@@ -69,7 +72,39 @@ public class ManagementParser extends Thread implements GuiInterface
 			SendNck(h, conn);
 			break;
 
-	
+		case AUTO_START_CMD:
+			AutomaticStartCommand AuroRun = null;
+			try
+			{
+				AuroRun = AutomaticStartCommand.parseFrom(h.getMessageData());
+			}
+			catch (InvalidProtocolBufferException e)
+			{
+				logger.error("Failed to parse Automatic Start Command", e);
+				SendNck(h, conn);
+			}
+			
+			if (AuroRun.getInput1Url() != null &  AuroRun.getInput1Url() != "")
+			{
+				
+			}
+			
+			if (AuroRun.getInput2Url() != null &  AuroRun.getInput2Url() != "")
+			{
+				
+			}
+			/* 
+			 * Start thread to:
+			 * 1. Get sample file
+			 * 2. Identify
+			 * 3. Run production
+			 * 
+			 *  Terminate the thread on processes on STOP if running
+			 *  run thread per CIC => 2 threads
+			 */
+			
+			break;
+			
 		case START_CMD:
 			StartCommand p = null;
 			try
@@ -78,7 +113,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			}
 			catch (InvalidProtocolBufferException e)
 			{
-				logger.error("Failed to parse PlayCommand", e);
+				logger.error("Failed to parse Start Command", e);
 				SendNck(h, conn);
 			}
 

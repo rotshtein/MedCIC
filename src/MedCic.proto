@@ -34,11 +34,12 @@ enum OPCODE
 	HEADER = 0;
 	ACK = 1;
 	NACK = 2;
-	START_CMD = 3;
-	STOP_CMD = 4;
-	STATUS_REQUEST = 5;
-	STATUS_REPLAY = 6;
-	STATUS_MESSAGE = 7;
+	AUTO_START_CMD = 3;
+	START_CMD = 4;
+	STOP_CMD = 5;
+	STATUS_REQUEST = 6;
+	STATUS_REPLAY = 7;
+	STATUS_MESSAGE = 8;
 }
 
 
@@ -50,6 +51,17 @@ message Header
 	OPCODE opcode = 2;			// Opcode
 	bytes message_data = 3;
 }
+
+/*****************************************************************************************************************************/
+// This command should be sent to start processing bitstream
+message AutomaticStartCommand
+{
+	string input1_url = 1;			// The output url. The format should be udp://<host ip>:port or for the swFE file://<full path with filename and extention>
+	string input2_url = 2;			// see input1_url
+	string output1_url = 3;			// The output url. The format should be udp://<host ip>:port or file://<full path with filename and extention>
+	string output2_url = 4;			// see output1_url
+}
+
 
 /*****************************************************************************************************************************/
 // This command should be sent to start processing bitstream
