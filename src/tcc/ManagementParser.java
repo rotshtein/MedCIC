@@ -83,7 +83,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			}
 
 			
-			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), null, this);
+			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), this);
 			try
 			{
 				Kill();

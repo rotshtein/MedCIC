@@ -12,16 +12,14 @@ public abstract class Operation implements Runnable
 	String			exe_file	= "";
 	Process			p			= null;
 	ProcMon			procMon;
-	String			messageFile;
 	GuiInterface	gui;
 	String			operation;
 	Thread			procMonThread;
 	Thread			feedbackFileThread;
 
-	public Operation(String Exe, String messageFile, GuiInterface gui, String Operation)
+	public Operation(String Exe, GuiInterface gui, String Operation)
 	{
 		exe_file = Exe;
-		this.messageFile = messageFile;
 		this.gui = gui;
 		operation = Operation;
 	}
@@ -69,42 +67,8 @@ public abstract class Operation implements Runnable
 	@Override
 	public void run()
 	{
-		FeedbackFile ff = null;
-		String message;
-
-		for (int i = 0; i < 10; i++)
-		{
-			try
-			{
-				ff = new FeedbackFile(messageFile);
-			}
-			catch (Exception e)
-			{
-				try
-				{
-					Thread.sleep(500);
-				}
-				catch (InterruptedException e1)
-				{
-
-				}
-			}
-		}
-		if (ff == null)
-		{
-			gui.UpdateStatus("Faild in open feedback file");
-			logger.error("Faild in open feedback file");
-			return;
-		}
 		while (p.isAlive())
 		{
-			// Read feedback file
-			if ((message = ff.GetNext()) != null)
-			{
-				// Update status bar
-				gui.UpdateStatus(message);
-			}
-
 			// call complete and exit when ended
 			if (isComplete())
 			{

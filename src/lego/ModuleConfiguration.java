@@ -35,12 +35,12 @@ public class ModuleConfiguration
 			
 			if (line.toLowerCase().startsWith(MODULE.toLowerCase()))
 			{
-				path = val[0];
+				module = val[0];
 			}
 
 			if (line.toLowerCase().startsWith(PARAMS.toLowerCase()))
 			{
-				path = val[0];
+				params = val[0];
 			}
 
 			if (line.toLowerCase().startsWith(OUT.toLowerCase()))
@@ -93,12 +93,18 @@ public class ModuleConfiguration
 			msg += PARAMS + " " + params + NewLine;
 		}
 		int i = 1;
-		for (String o : out)
+		if (out != null & out[0] != "")
 		{
-			msg += OUT + i +" " + o + NewLine;
-			i++;
+			for (String o : out)
+			{
+				msg += OUT + i +" " + o + NewLine;
+				i++;
+			}
 		}
-		msg += POS + " " + pos + NewLine;
+		if (pos != null ^ pos != "")
+		{
+			msg += POS + " " + pos + NewLine;
+		}
 		
 		return msg;
 	}

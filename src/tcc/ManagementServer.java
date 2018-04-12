@@ -118,7 +118,8 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onError(WebSocket conn, Exception ex)
 	{
-		logger.error("an error occured on connection " + conn.getRemoteSocketAddress(), ex);
+		
+		logger.error("an error occured on connection " , ex);
 	}
 
 	@Override

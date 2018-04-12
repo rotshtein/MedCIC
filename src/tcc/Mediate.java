@@ -11,9 +11,9 @@ public class Mediate extends Operation
 
 	final static Logger logger = Logger.getLogger("Record");
 
-	public Mediate(String MediateExe, String messageFile, GuiInterface gui)
+	public Mediate(String MediateExe, GuiInterface gui)
 	{
-		super(MediateExe, messageFile, gui, "Record");
+		super(MediateExe, gui, "Production");
 	}
 
 	public ProcMon Start(ENCAPSULATION encap, String InputUrl1, String InputUrl2, String OutputUrl1, String OutputUrl2) throws Exception
