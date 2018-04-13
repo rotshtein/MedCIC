@@ -49,7 +49,6 @@ public class MainScreen implements GuiInterface
 	JCheckBox			chkCic2;
 	JButton				btnStart;
 	JLabel				lblStatusbar;
-	Parameters			param;
 	ManagementServer	server;
 	ManagementClient	client;
 	private final JButton btnStop = new JButton("Stop");
@@ -60,6 +59,7 @@ public class MainScreen implements GuiInterface
 	 */
 	public static void main(String[] args)
 	{
+		
 		if (args.length > 2)
 		{
 			if (args[0].equals("-c"))
@@ -95,22 +95,13 @@ public class MainScreen implements GuiInterface
 		// txtIn1 ****://###.###.###.###:#####
 		// MaskFormatter formatter = new MaskFormatter("****://###.###.###.###:#####");
 		// txtIn1.setFormatterFactory(forrmatter);
-		try
-		{
-			param = new Parameters("config.ini");
-		}
-		catch (Exception e)
-		{
-			logger.error("Failed to open parameter file [config.ini]",e);
-			return;
-		}
 
-		txtIn1.setText(param.Get("url-in-1", "udp://127.0.0.1:5001"));
-		txtIn2.setText(param.Get("url-in-2", "udp://127.0.0.1:5002"));
-		txtOut1.setText(param.Get("url-out-1", "udp://127.0.0.1:5003"));
-		txtOut2.setText(param.Get("url-out-2", "udp://127.0.0.1:5004"));
-		chkCic1.setSelected(param.Get("Cic1", "0").equals("0") ? false : true);
-		chkCic2.setSelected(param.Get("Cic2", "0").equals("0") ? false : true);
+		txtIn1.setText(Parameters.Get("url-in-1", "udp://127.0.0.1:5001"));
+		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
+		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
+		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
+		chkCic1.setSelected(Parameters.Get("Cic1", "0").equals("0") ? false : true);
+		chkCic2.setSelected(Parameters.Get("Cic2", "0").equals("0") ? false : true);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
@@ -122,12 +113,12 @@ public class MainScreen implements GuiInterface
 		
 		frame.getContentPane().add(btnStop);
 
-		String host = param.Get("ListenAddress", "127.0.0.1");
-		int port = Integer.parseInt(param.Get("ListenPort", "8887"));
+		String host = Parameters.Get("ListenAddress", "127.0.0.1");
+		int port = Integer.parseInt(Parameters.Get("ListenPort", "8887"));
 
-		server = new ManagementServer(new InetSocketAddress(host, port), param.getFilename());
+		server = new ManagementServer(new InetSocketAddress(host, port));
 		server.start();
-		String serverUri = param.Get("ServerUri", "ws://127.0.0.1:8887");
+		String serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
 		client = new ManagementClient(new URI(serverUri), this);
 	}
 
@@ -139,38 +130,18 @@ public class MainScreen implements GuiInterface
 
 			try
 			{
-				param.Set("url-in-1", txtIn1.getText());
-				param.Set("url-in-2", txtIn2.getText());
-				param.Set("url-out-1", txtOut1.getText());
-				param.Set("url-out-2", txtOut2.getText());
-				param.Set("Cic1", (chkCic1.isSelected() ? "1" : "0"));
-				param.Set("Cic2", (chkCic2.isSelected() ? "1" : "0"));
+				Parameters.Set("url-in-1", txtIn1.getText());
+				Parameters.Set("url-in-2", txtIn2.getText());
+				Parameters.Set("url-out-1", txtOut1.getText());
+				Parameters.Set("url-out-2", txtOut2.getText());
+				Parameters.Set("Cic1", (chkCic1.isSelected() ? "1" : "0"));
+				Parameters.Set("Cic2", (chkCic2.isSelected() ? "1" : "0"));
 			}
 			catch (IOException e1)
 			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				logger.error("Failed to save parameters", e1);
 			}
 
-			/*
-			int FrameSize = 0;
-			Pattern pattern = Pattern.compile("(\\()([0-9]*)(\\))");
-			Matcher matcher = pattern.matcher(Protocol);
-			if (matcher.find())
-			{
-				try
-				{
-					FrameSize = Integer.parseInt(matcher.group(2));
-				}
-				catch (Exception e)
-				{
-					FrameSize = -1;
-				}
-			}
-			Protocol = Protocol.split(" ")[0];
-			lblStatusbar.setText("Protocol=" + Protocol + ", FrameSize=" + FrameSize + " CIC1 is "
-					+ (chkCic1.isSelected() ? "ON" : "OFF") + ", CIC2 is " + (chkCic2.isSelected() ? "ON" : "OFF"));
-				*/		
 			String input1="" ,input2="", output1="", output2="";
 			
 			if (chkCic1.isSelected())
@@ -184,8 +155,14 @@ public class MainScreen implements GuiInterface
 				input2 = txtIn2.getText();
 				output2 = txtOut2.getText();
 			}
-
-			client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
+			if (((String)(encap.getSelectedItem())).toLowerCase().startsWith("auto"))
+			{
+				client.SendAutomatucStartCommand(input1,input2, output1, output2);
+			}
+			else
+			{
+				client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
+			}
 		}
 	}
 
@@ -300,6 +277,7 @@ public class MainScreen implements GuiInterface
 		lblStatusbar.setBounds(0, 89, frame.getWidth() - 5, 14);
 		frame.getContentPane().add(lblStatusbar, BorderLayout.SOUTH);
 
+		encap.addItem("Auto Detect");
 		encap.addItem("D&I++");
 		encap.addItem("EDMAC");
 		encap.addItem("EDMAC-2 (2928)");

@@ -16,24 +16,21 @@ import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
 
-
 public class ManagementParser extends Thread implements GuiInterface
 {
 
-	Logger														logger				= Logger
-			.getLogger("ManagmentParser");
-	ManagementServer											server				= null;
-	Parameters													param				= null;
+	Logger				logger	= Logger.getLogger("ManagmentParser");
+	ManagementServer	server	= null;
+	// Parameters param = null;
 	ProcMon														procMon				= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
-	Thread Cic1Thread = null;
-	Thread Cic2Thread = null;
+	Thread														Cic1Thread			= null;
+	Thread														Cic2Thread			= null;
 
-	public ManagementParser(String ParametersFile, BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue,
-			ManagementServer server) throws Exception
+	public ManagementParser(BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue, ManagementServer server)
+			throws Exception
 	{
-		param = new Parameters(ParametersFile);
 		this.queue = queue;
 		this.server = server;
 	}
@@ -83,28 +80,25 @@ public class ManagementParser extends Thread implements GuiInterface
 				logger.error("Failed to parse Automatic Start Command", e);
 				SendNck(h, conn);
 			}
-			
-			if (AuroRun.getInput1Url() != null &  AuroRun.getInput1Url() != "")
+
+			if (AuroRun.getInput1Url() != null & AuroRun.getInput1Url() != "")
 			{
-				
+
 			}
-			
-			if (AuroRun.getInput2Url() != null &  AuroRun.getInput2Url() != "")
+
+			if (AuroRun.getInput2Url() != null & AuroRun.getInput2Url() != "")
 			{
-				
+
 			}
-			/* 
-			 * Start thread to:
-			 * 1. Get sample file
-			 * 2. Identify
-			 * 3. Run production
+			/*
+			 * Start thread to: 1. Get sample file 2. Identify 3. Run production
 			 * 
-			 *  Terminate the thread on processes on STOP if running
-			 *  run thread per CIC => 2 threads
+			 * Terminate the thread on processes on STOP if running run thread per CIC => 2
+			 * threads
 			 */
-			
+
 			break;
-			
+
 		case START_CMD:
 			StartCommand p = null;
 			try
@@ -117,12 +111,12 @@ public class ManagementParser extends Thread implements GuiInterface
 				SendNck(h, conn);
 			}
 
-			
-			Mediate med = new Mediate(param.Get("MediationExe", "notepad.exe"), this);
+			Mediate med = new Mediate(Parameters.Get("MediationExe", "notepad.exe"), this);
 			try
 			{
 				Kill();
-				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getInput2Url(), p.getOutput1Url(), p.getOutput2Url());
+				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getInput2Url(), p.getOutput1Url(),
+						p.getOutput2Url());
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
@@ -130,7 +124,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			catch (Exception e)
 			{
 				SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-				logger.error("Executable not found. Please fix the configuration file",e);
+				logger.error("Executable not found. Please fix the configuration file", e);
 				SendNck(h, conn);
 			}
 			break;
@@ -161,8 +155,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			if (procMon != null)
 			{
 				sr = StatusReplay.newBuilder().setError(false).setErrorMMessage("").setWarning(false)
-						.setWarningMessage("")
-						.setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
+						.setWarningMessage("").setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
 			}
 			else
 			{
@@ -186,7 +179,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.ACK).build();
 			conn.send(hh.toByteArray());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			logger.error("Failed to send Ack to a connection", e);
 		}
@@ -200,7 +193,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.NACK).build();
 			conn.send(hh.toByteArray());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			logger.error("Failed to send Nack to a connection", e);
 		}
@@ -232,7 +225,7 @@ public class ManagementParser extends Thread implements GuiInterface
 
 			conn.send(h.toByteArray());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			logger.error("Failed to send StatusMessage to a connection", e);
 		}
@@ -280,12 +273,12 @@ public class ManagementParser extends Thread implements GuiInterface
 		try
 		{
 			StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
-			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
-					.build();
-	
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
+					.setMessageData(s.toByteString()).build();
+
 			conn.send(h.toByteArray());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			logger.error("Failed to send StatusReplay on complition to a connection", e);
 		}
@@ -296,18 +289,18 @@ public class ManagementParser extends Thread implements GuiInterface
 		StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
 		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
 				.build();
-		
+
 		for (WebSocket conn : server.connections())
 		{
-			OperationStarted(conn,h);
+			OperationStarted(conn, h);
 		}
 	}
-	
+
 	public void OperationStarted(WebSocket conn)
 	{
 		OperationStarted(conn, null);
 	}
-	
+
 	public void OperationStarted(WebSocket conn, Header h)
 	{
 		try
@@ -318,7 +311,7 @@ public class ManagementParser extends Thread implements GuiInterface
 				h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
 						.build();
 			}
-	
+
 			conn.send(h.toByteArray());
 		}
 		catch (Exception e)
@@ -326,7 +319,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			logger.error("Failed to send StatusReplay on starting operation to a connection", e);
 		}
 	}
-	
+
 	@Override
 	public void UpdateStatus(String status)
 	{
@@ -340,6 +333,6 @@ public class ManagementParser extends Thread implements GuiInterface
 	public void onConnectionChange(Boolean status)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 }

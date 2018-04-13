@@ -5,11 +5,13 @@ import lego.ScriptFile;
 public class GetSamples extends Operation
 {
 	ScriptFile scriptFile = null;
+	static String Exe = Parameters.Get("GetSamplesExe", "C:\\programs\\lego\\bin\\BuildingBlock.exe");
 	
-	public GetSamples(String Exe,  GuiInterface gui, String Operation)
+	public GetSamples(GuiInterface gui)
 	{
 		super(Exe, gui, "Geting Sample for Identification");
 	}
+	
 	
 	public ProcMon Start(String SourceUri, String ConfigFile, String Server, int Port) throws Exception
 	{

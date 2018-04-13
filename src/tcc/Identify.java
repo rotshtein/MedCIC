@@ -5,8 +5,9 @@ import lego.ScriptFile;
 public class Identify extends Operation
 {
 	ScriptFile scriptFile = null;
+	static String Exe = Parameters.Get("IdentificationExe", "C:\\programs\\lego\\bin\\IDBlock.exe");
 	
-	public Identify (String Exe,  GuiInterface gui, String Operation)
+	public Identify (GuiInterface gui)
 	{
 		super(Exe, gui, "Identify");
 	}

@@ -4,16 +4,42 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 
-public class Parameters
+public final class Parameters
 {
+	static Logger logger				= Logger.getLogger("Parameters");
+	static File		configFile	= null;
+	static Properties	props;
 
-	File		configFile	= null;
-	Properties	props;
+	
+	private static void Init()
+	{
+		try
+		{
+			configFile = new File("config.properties");
+			if (!configFile.exists())
+			{
+				if (!configFile.createNewFile())
+				{
+					throw (new Exception("No configuration file"));
+				}
+			}
+			FileReader config = new FileReader(configFile);
+			props = new Properties();
+			props.load(config);
+		config.close();
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to open configuration file \"" + configFile.getAbsolutePath() + "\"",e);
+		}
+	}
 
+	/*
 	public Parameters(String Filename) throws Exception
 	{
-		configFile = new File("config.properties");
+		configFile = new File(Filename);
 		if (!configFile.exists())
 		{
 			if (!configFile.createNewFile())
@@ -27,14 +53,20 @@ public class Parameters
 		props.load(config);
 		config.close();
 	}
-
-	public String Get(String name)
+*/
+	
+	public static String Get(String name)
 	{
 		return Get(name, "");
 	}
 
-	public String Get(String name, String defaultValue)
+	public static String Get(String name, String defaultValue)
 	{
+		if (props == null)
+		{
+			Init();
+		}
+		
 		String value = "";
 		try
 		{
@@ -60,8 +92,13 @@ public class Parameters
 		return value;
 	}
 
-	public boolean Set(String name, String Value) throws IOException
+	public static boolean Set(String name, String Value) throws IOException
 	{
+		if (props == null)
+		{
+			Init();
+		}
+		
 		props.setProperty(name, Value);
 		FileWriter writer = new FileWriter(configFile);
 		props.store(writer, "mediation settings");
@@ -69,8 +106,12 @@ public class Parameters
 		return true;
 	}
 	
-	public String getFilename()
+	public static String getFilename()
 	{
+		if (props == null)
+		{
+			Init();
+		}
 		return configFile.getAbsolutePath();
 	}
 

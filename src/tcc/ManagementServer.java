@@ -23,14 +23,13 @@ public class ManagementServer extends WebSocketServer
 	Thread monitorProcesThread = null;
 	String paramFile = null;
 	
-	public ManagementServer(InetSocketAddress address, String ParamFile)
+	public ManagementServer(InetSocketAddress address)
 	{
 		super(address);
-		paramFile = ParamFile;
 		try
 		{
 			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);
-			parser = new ManagementParser(ParamFile, queue, this);
+			parser = new ManagementParser(queue, this);
 			parser.start();
 			monitorProcesThread = new Thread(MonitorProcesThread);
 			monitorProcesThread.start();
