@@ -1,12 +1,12 @@
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import lego.MessageParser;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
@@ -18,7 +18,6 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import javax.swing.JComboBox;
@@ -34,6 +33,7 @@ import javax.swing.JCheckBox;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JTextArea;
 
 
 public class MainScreen implements GuiInterface
@@ -48,11 +48,12 @@ public class MainScreen implements GuiInterface
 	JCheckBox			chkCic1;
 	JCheckBox			chkCic2;
 	JButton				btnStart;
-	JLabel				lblStatusbar;
 	ManagementServer	server;
 	ManagementClient	client;
 	private final JButton btnStop = new JButton("Stop");
 	static String configurationFilename = "config.properties";
+	private final JTextArea textArea = new JTextArea();
+	MessageParser messageParser = null;
 
 	/**
 	 * Launch the application.
@@ -112,6 +113,9 @@ public class MainScreen implements GuiInterface
 		btnStop.setBounds(292, 53, 57, 23);
 		
 		frame.getContentPane().add(btnStop);
+		textArea.setBounds(20, 92, 597, 208);
+		
+		frame.getContentPane().add(textArea);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
 		int port = Integer.parseInt(Parameters.Get("ListenPort", "8887"));
@@ -120,6 +124,17 @@ public class MainScreen implements GuiInterface
 		server.start();
 		String serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
 		client = new ManagementClient(new URI(serverUri), this);
+		
+		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
+		try
+		{
+			messageParser = new MessageParser(this, ManagementPort);
+			messageParser.start();
+		}
+		catch (Exception e1)
+		{
+			logger.error("Failed to run UDP server for messages from the modules", e1);
+		} 
 	}
 
 	class StartAction implements ActionListener
@@ -218,7 +233,7 @@ public class MainScreen implements GuiInterface
 				Stop();
 			}
 		});
-		frame.setBounds(100, 100, 633, 143);
+		frame.setBounds(100, 100, 633, 340);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -272,10 +287,6 @@ public class MainScreen implements GuiInterface
 		chkCic2 = new JCheckBox("CIC 2");
 		chkCic2.setBounds(562, 53, 97, 23);
 		frame.getContentPane().add(chkCic2);
-
-		lblStatusbar = new JLabel("Application Started");
-		lblStatusbar.setBounds(0, 89, frame.getWidth() - 5, 14);
-		frame.getContentPane().add(lblStatusbar, BorderLayout.SOUTH);
 
 		encap.addItem("Auto Detect");
 		encap.addItem("D&I++");
@@ -358,8 +369,7 @@ public class MainScreen implements GuiInterface
 			return;
 		}
 		// Now edit your gui objects
-		lblStatusbar.setText(status);
-		
+		textArea.append(status);
 	}
 
 	@Override

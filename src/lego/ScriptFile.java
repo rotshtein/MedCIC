@@ -14,51 +14,53 @@ import medcic_proto.MedCic.ENCAPSULATION;
 
 public class ScriptFile
 {
-	static final Logger	logger	= Logger.getLogger("ScriptFile");
-	List<ModuleConfiguration> moduleList = new ArrayList<ModuleConfiguration>();
-	ManagementConfiguration management = null;
-	
-	public ScriptFile() {}
-	
-	public ScriptFile(String Filename) throws FileNotFoundException, IOException 
+
+	static final Logger			logger		= Logger.getLogger("ScriptFile");
+	List<ModuleConfiguration>	moduleList	= new ArrayList<ModuleConfiguration>();
+	ManagementConfiguration		management	= null;
+
+	public ScriptFile()
 	{
-		try (BufferedReader br = new BufferedReader(new FileReader(Filename))) 
+	}
+
+	public ScriptFile(String Filename) throws FileNotFoundException, IOException
+	{
+		try (BufferedReader br = new BufferedReader(new FileReader(Filename)))
 		{
-		    String line;
-		    String TextBlock = "";
-		    while ((line = br.readLine()) != null) 
-		    {
-		    	if (line.trim().startsWith("#"))
-		    		continue;
-		    	
-		    	TextBlock += line;
-		    	if (line.trim().isEmpty())
-		    	{
-		    		if (TextBlock.toLowerCase().startsWith("path"))
-		    		{
-		    			ModuleConfiguration b = new ModuleConfiguration(TextBlock);
-		    			AddModule(b);
-		    		}
-		    		else
-		    		{
-		    			setManagement(new ManagementConfiguration(TextBlock));
-		    		}
-		    		TextBlock = "";
-		    	}
-		    }
+			String line;
+			String TextBlock = "";
+			while ((line = br.readLine()) != null)
+			{
+				if (line.trim().startsWith("#")) continue;
+
+				TextBlock += line;
+				if (line.trim().isEmpty())
+				{
+					if (TextBlock.toLowerCase().startsWith("path"))
+					{
+						ModuleConfiguration b = new ModuleConfiguration(TextBlock);
+						AddModule(b);
+					}
+					else
+					{
+						setManagement(new ManagementConfiguration(TextBlock));
+					}
+					TextBlock = "";
+				}
+			}
 		}
 	}
-	
+
 	public void AddModule(ModuleConfiguration module)
 	{
 		moduleList.add(module);
 	}
-	
+
 	public void setManagement(ManagementConfiguration mngmnt)
 	{
 		management = mngmnt;
 	}
-	
+
 	public Boolean Write(String Filename)
 	{
 		PrintWriter out = null;
@@ -70,119 +72,120 @@ public class ScriptFile
 		{
 			return false;
 		}
-		
+
 		for (ModuleConfiguration m : moduleList)
 		{
 			out.print(m.toString());
 			out.println();
 		}
-		
+
 		out.print(management.toString());
-		
+
 		out.close();
-		
+
 		return true;
 	}
-	
+
 	public Boolean BuildRecordToFileScript(String SourceUri, String ConfigFile, String Server, int Port)
 	{
 		AddModule(new ModuleConfiguration("1", "udpserver", SourceUri, "1.1"));
 		AddModule(new ModuleConfiguration("1.1", "cesrawinput", null, "1.1.1"));
 		AddModule(new ModuleConfiguration("1.1.1", "bitoutput", ConfigFile + ",bin", ""));
-	
+
 		setManagement(new ManagementConfiguration(Server, Port));
-		
+
 		Write(ConfigFile);
-		
+
 		return true;
 	}
-	
-	public static ScriptFile BuildProductionScript(ENCAPSULATION Encapsolation, String SourceUri, String DestUri, String ConfigFile, String Server, int Port)
+
+	public static ScriptFile BuildProductionScript(ENCAPSULATION Encapsolation, String SourceUri, String DestUri,
+			String ConfigFile, String Server, int Port)
 	{
 		ScriptFile NewScript = new ScriptFile();
-		NewScript.AddModule(new ModuleConfiguration("1", "udpserver", ModuleConfiguration.UriToParam(SourceUri) , "1.1"));	
+		NewScript
+				.AddModule(new ModuleConfiguration("1", "udpserver", ModuleConfiguration.UriToParam(SourceUri), "1.1"));
 		NewScript.AddModule(new ModuleConfiguration("1.1", "cesrawinput", null, "1.1.1"));
-		
+
 		String module = null;
 		String parameters = null;
-		
+
 		switch (Encapsolation)
 		{
 		case DI:
 			logger.warn("DI - encapsulation not supporeted");
 			module = null;
 			break;
-		
-		case DI_PLUS: //"DI++":
+
+		case DI_PLUS: // "DI++":
 			module = "dropinsertpp";
 			parameters = "synclength=20,syncword=0xfa85c0,width=2944,mode=cut,0-24,600-610,1186-1196,1772-1782,2358-2368";
 			break;
-			
-		case EDMAC: //"EDMAC":
+
+		case EDMAC: // "EDMAC":
 			module = "edmac1";
 			parameters = "synclength=12,syncword=0xe8c0,width=1008,mode=cut,0-12,204-213,405-414,606-615,807-816";
 			break;
-			
-		case EDMAC2_2928: //"EDMAC-2 (2928)":
+
+		case EDMAC2_2928: // "EDMAC-2 (2928)":
 			module = "edmac2";
 			parameters = "synclength=12,syncword=0xe8c0,width=2928,mode=cut,0-12,204-213,405-414,606-615,807-816";
 			break;
-			
-		case EDMAC2_3072: //"EDMAC-2 (3072)":
+
+		case EDMAC2_3072: // "EDMAC-2 (3072)":
 			module = "edmac3072";
 			parameters = "synclength=12,syncword=0xe8c0,width=3072,mode=cut,0-12,204-213,405-414,606-615,807-816";
 			break;
-			
-		case ESC_532: //"ESC++        (532)":
+
+		case ESC_532: // "ESC++ (532)":
 			module = "escplusplus532";
 			parameters = "synclength=12,syncword=0xe8c0,width=532,mode=cut,0-12,20-27,36-45";
 			break;
-			
-		case ESC_874://"ESC++        (874)":
+
+		case ESC_874:// "ESC++ (874)":
 			module = "escplusplus874";
 			parameters = "synclength=12,syncword=0xe8c0,width=874,mode=cut,0-12,20-28,36-45,146-155,255-264,364-373,473-482,582-591,691-700,800-809";
 			break;
-			
-		case ESC_1104: //"ESC++      (1104)":
+
+		case ESC_1104: // "ESC++ (1104)":
 			module = "escplusplus1104";
 			parameters = "synclength=12,syncword=0xe8c0,width=1104,mode=cut,0-12,20-28,36-45,174-183,312-321,450-459,588-597,726-735,864-873,1002-1011";
 			break;
-			
-		case ESC_1792: //"ESC++      (1792)":
+
+		case ESC_1792: // "ESC++ (1792)":
 			module = "escplusplus1792";
 			parameters = "synclength=12,syncword=0xe8c0,width=1792,mode=cut,0-12,20-27,36-45";
 			break;
-			
-		case ESC_551: //"ESC++        (551)":
+
+		case ESC_551: // "ESC++ (551)":
 			logger.warn("ESC_551 - encapsulation not supporeted");
 			module = null;
 			break;
-			
-		case E2://"E2":
+
+		case E2:// "E2":
 			logger.warn("E2 - encapsulation not supporeted");
 			module = null;
 			break;
-			
+
 		case UNRECOGNIZED:
 		default:
 			logger.warn("UNRECOGNIZED - encapsulation not supporeted");
 			module = null;
 			break;
 		}
-		
-		if (module == null)
-			return null;
-		
-		NewScript.AddModule(new ModuleConfiguration("1.1.1", module, parameters , "1.1.1.1"));
-		
-		NewScript.AddModule(new ModuleConfiguration("1.1.1.1", "cesrawoutput", null, "1.1.1.1.1"));
-		NewScript.AddModule(new ModuleConfiguration("1.1.1.1.1", "udpclient",  ModuleConfiguration.UriToParam(DestUri), ""));
-		
+
+		if (module == null) return null;
+
+		NewScript.AddModule(new ModuleConfiguration("1.1.1", module, parameters, "1.1.1.1"));
+
+		NewScript.AddModule(new ModuleConfiguration("1.1.1.1", "cesrawout", null, "1.1.1.1.1"));
+		NewScript.AddModule(
+				new ModuleConfiguration("1.1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri), ""));
+
 		NewScript.setManagement(new ManagementConfiguration(Server, Port));
-		
+
 		NewScript.Write(ConfigFile);
 		return NewScript;
 	}
-	
-	
+
 }

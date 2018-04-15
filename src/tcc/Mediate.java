@@ -1,6 +1,5 @@
 package tcc;
 
-
 import java.io.File;
 import org.apache.log4j.Logger;
 
@@ -19,16 +18,18 @@ public class Mediate extends Operation
 		super(MediateExe, gui, "Production");
 	}
 
-	public ProcMon Start(ENCAPSULATION encap, String InputUrl, String OutputUrl1, String ConfigFilename) throws Exception
+	public ProcMon Start(ENCAPSULATION encap, String InputUrl, String OutputUrl1, String ConfigFilename)
+			throws Exception
 	{
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
 		{
-				ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename, "127.0.0.1", 11001);
+			ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename, "127.0.0.1", 11001);
 
 			try
 			{
-				String [] vars =	{ super.exe_file, ConfigFilename};
+				String[] vars =
+				{ super.exe_file, ConfigFilename };
 				p = super.StartAction(vars);
 			}
 			catch (Exception ex)

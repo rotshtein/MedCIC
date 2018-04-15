@@ -1,4 +1,5 @@
 package tcc;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -8,11 +9,11 @@ import org.apache.log4j.Logger;
 
 public final class Parameters
 {
-	static Logger logger				= Logger.getLogger("Parameters");
-	static File		configFile	= null;
+
+	static Logger		logger		= Logger.getLogger("Parameters");
+	static File			configFile	= null;
 	static Properties	props;
 
-	
 	private static void Init()
 	{
 		try
@@ -28,33 +29,23 @@ public final class Parameters
 			FileReader config = new FileReader(configFile);
 			props = new Properties();
 			props.load(config);
-		config.close();
+			config.close();
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to open configuration file \"" + configFile.getAbsolutePath() + "\"",e);
+			logger.error("Failed to open configuration file \"" + configFile.getAbsolutePath() + "\"", e);
 		}
 	}
 
 	/*
-	public Parameters(String Filename) throws Exception
-	{
-		configFile = new File(Filename);
-		if (!configFile.exists())
-		{
-			if (!configFile.createNewFile())
-			{
-				throw (new Exception("No configuration file"));
-			}
+	 * public Parameters(String Filename) throws Exception { configFile = new
+	 * File(Filename); if (!configFile.exists()) { if (!configFile.createNewFile())
+	 * { throw (new Exception("No configuration file")); }
+	 * 
+	 * } FileReader config = new FileReader(configFile); props = new Properties();
+	 * props.load(config); config.close(); }
+	 */
 
-		}
-		FileReader config = new FileReader(configFile);
-		props = new Properties();
-		props.load(config);
-		config.close();
-	}
-*/
-	
 	public static String Get(String name)
 	{
 		return Get(name, "");
@@ -66,7 +57,7 @@ public final class Parameters
 		{
 			Init();
 		}
-		
+
 		String value = "";
 		try
 		{
@@ -98,14 +89,14 @@ public final class Parameters
 		{
 			Init();
 		}
-		
+
 		props.setProperty(name, Value);
 		FileWriter writer = new FileWriter(configFile);
 		props.store(writer, "mediation settings");
 		writer.close();
 		return true;
 	}
-	
+
 	public static String getFilename()
 	{
 		if (props == null)

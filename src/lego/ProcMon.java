@@ -11,14 +11,14 @@ public class ProcMon implements Runnable
 	private volatile boolean	_complete	= false;
 	String						description	= "";
 
-	public ProcMon(String [] vars, String description) throws Exception
+	public ProcMon(String[] vars, String description) throws Exception
 	{
 		this(Runtime.getRuntime().exec(vars, null), description);
 	}
-	
+
 	public ProcMon(Process proc)
 	{
-		this(proc,"No description");
+		this(proc, "No description");
 	}
 
 	public ProcMon(Process proc, String description)
@@ -28,7 +28,7 @@ public class ProcMon implements Runnable
 		Thread t = new Thread(this);
 		t.start();
 	}
-	
+
 	public boolean isComplete()
 	{
 		return _complete;

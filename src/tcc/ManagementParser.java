@@ -1,13 +1,11 @@
 package tcc;
 
+import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.concurrent.BlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.java_websocket.WebSocket;
-
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
@@ -22,8 +20,8 @@ public class ManagementParser extends Thread implements GuiInterface
 	Logger				logger	= Logger.getLogger("ManagmentParser");
 	ManagementServer	server	= null;
 	// Parameters param = null;
-	ProcMon														procMon1				= null;
-	ProcMon														procMon2				= null;
+	ProcMon														procMon1			= null;
+	ProcMon														procMon2			= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
 	Thread														Cic1Thread			= null;
@@ -41,18 +39,32 @@ public class ManagementParser extends Thread implements GuiInterface
 	{
 		while (true)
 		{
-			AbstractMap.SimpleEntry<byte[], WebSocket> request = null;
 			try
 			{
-				request = queue.take();
+				if (Thread.interrupted())
+				{
+					logger.debug("Management Parser thread interrupted");
+					break;
+				}
+
+				AbstractMap.SimpleEntry<byte[], WebSocket> request = null;
+				try
+				{
+					request = queue.take();
+				}
+				catch (InterruptedException e)
+				{
+					logger.error("Error getting request from queue", e);
+					continue;
+				}
+				Parse(request.getKey(), request.getValue());
 			}
-			catch (InterruptedException e)
+			catch (Exception e)
 			{
-				logger.error("Error getting request from queue", e);
-				continue;
+				logger.error("Thread exception", e);
 			}
-			Parse(request.getKey(), request.getValue());
 		}
+		logger.debug("Management Parser thread exit");
 	}
 
 	public void Parse(byte[] buffer, WebSocket conn)
@@ -115,9 +127,12 @@ public class ManagementParser extends Thread implements GuiInterface
 			Mediate med = new Mediate(Parameters.Get("MediationExe", "notepad.exe"), this);
 			try
 			{
+				String ScriptPath = Parameters.Get("ScriptPath", "C:\\programs\\lego\\config");
 				Kill();
-				procMon1= med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), "cic1Script.lego");
-				procMon2= med.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(), "cic2Script.lego");
+				procMon1 = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),
+						Paths.get(ScriptPath, "cic1Script.lego").toString());
+				procMon2 = med.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(),
+						Paths.get(ScriptPath, "cic2Script.lego").toString());
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
@@ -152,7 +167,7 @@ public class ManagementParser extends Thread implements GuiInterface
 					SendStatusMessage("Process 1 not running", conn);
 				}
 			}
-			
+
 			if (procMon2 != null)
 			{
 				if (!procMon2.isComplete())
@@ -257,12 +272,20 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public Boolean isRunning()
 	{
-		if (procMon1 == null & procMon2 == null)
+		if (procMon1 != null)
 		{
-			return false;
+			if (!procMon1.isComplete() & procMon2 == null)
+			{
+				return !procMon1.isComplete();
+			}
 		}
 
-		return !procMon1.isComplete() | !procMon2.isComplete();
+		if (procMon2 != null)
+		{
+			return !procMon2.isComplete();
+		}
+
+		return false;
 	}
 
 	public void Kill()
@@ -279,7 +302,7 @@ public class ManagementParser extends Thread implements GuiInterface
 				procMon1.kill();
 			}
 		}
-		
+
 		if (procMon2 != null)
 		{
 			if (!procMon2.isComplete())

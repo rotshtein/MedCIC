@@ -1,6 +1,5 @@
 package tcc;
 
-
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.AbstractMap;
@@ -13,16 +12,17 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-
-public class ManagementServer extends WebSocketServer 
+public class ManagementServer extends WebSocketServer
 {
-	Logger logger = Logger.getLogger("ManagementServer");
-	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue = null;
-	ManagementParser parser;
-	Boolean _stop = false;
-	Thread monitorProcesThread = null;
-	String paramFile = null;
-	
+
+	Logger														logger				= Logger
+			.getLogger("ManagementServer");
+	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
+	ManagementParser											parser;
+	Boolean														_stop				= false;
+	Thread														monitorProcesThread	= null;
+	String														paramFile			= null;
+
 	public ManagementServer(InetSocketAddress address)
 	{
 		super(address);
@@ -44,7 +44,7 @@ public class ManagementServer extends WebSocketServer
 	{
 		Stop();
 	}
-	
+
 	public void Stop()
 	{
 		logger.info("Clossing connections");
@@ -88,7 +88,8 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote)
 	{
-		logger.info("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+		logger.info(
+				"closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
 	}
 
 	@Override
@@ -117,8 +118,8 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onError(WebSocket conn, Exception ex)
 	{
-		
-		logger.error("an error occured on connection " , ex);
+
+		logger.error("an error occured on connection ", ex);
 	}
 
 	@Override
@@ -126,33 +127,33 @@ public class ManagementServer extends WebSocketServer
 	{
 		logger.info("server started successfully");
 	}
-	
-	
-	 Runnable MonitorProcesThread = new Runnable()
-	 {
-		    public void run()
-		    {
-		    	Boolean LastStatus = parser.isRunning();
-				while (!_stop)
+
+	Runnable MonitorProcesThread = new Runnable()
+	{
+
+		public void run()
+		{
+			Boolean LastStatus = parser.isRunning();
+			while (!_stop)
+			{
+				if (LastStatus != parser.isRunning())
 				{
-					if (LastStatus != parser.isRunning())
+					LastStatus = parser.isRunning();
+					if (!LastStatus)
 					{
-						LastStatus = parser.isRunning();
-						if (!LastStatus)
-						{
-							parser.UpdateStatus("Process stoped");
-						}
+						parser.UpdateStatus("Process stoped");
 					}
-					try
-					{
-						Thread.sleep(1000);
-					}
-					catch (InterruptedException e)
-					{
-						logger.error("Failed to sleep",e);
-					}
-				}  
-		    }
-	 };
-	
+				}
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e)
+				{
+					logger.error("Failed to sleep", e);
+				}
+			}
+		}
+	};
+
 }

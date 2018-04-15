@@ -1,7 +1,5 @@
 package tcc;
 
-
-
 import java.net.URI;
 import java.nio.ByteBuffer;
 
@@ -20,8 +18,6 @@ import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
-
-
 
 public class ManagementClient extends WebSocketClient
 {
@@ -43,7 +39,7 @@ public class ManagementClient extends WebSocketClient
 	@Override
 	public void onOpen(ServerHandshake handshakedata)
 	{
-		gui.UpdateStatus("Connected to the server");
+		gui.UpdateStatus("Connected to the server" + System.getProperty("line.separator"));
 		logger.info("Connected");
 	}
 
@@ -63,7 +59,7 @@ public class ManagementClient extends WebSocketClient
 
 			if (h != null)
 			{
-				//logger.debug("Got header. Command = " + h.getOpcode());
+				// logger.debug("Got header. Command = " + h.getOpcode());
 			}
 			// int i = h.getOpcodeValue();
 			switch (h.getOpcode())
@@ -102,7 +98,6 @@ public class ManagementClient extends WebSocketClient
 					gui.UpdateStatus(sr.getWarningMessage());
 				}
 
-				
 				if (sr.getStatus() == STATUS.STOP)
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
@@ -147,41 +142,32 @@ public class ManagementClient extends WebSocketClient
 		logger.error("Wensocket error", ex);
 	}
 
-	public Boolean SendAutomatucStartCommand( String input1_url, String input2_url, String output1_url, String output2_url)
+	public Boolean SendAutomatucStartCommand(String input1_url, String input2_url, String output1_url,
+			String output2_url)
 	{
-		AutomaticStartCommand sc = AutomaticStartCommand.newBuilder()
-				.setInput1Url(input1_url)
-				.setInput2Url(input2_url)
-				.setOutput1Url(output1_url)
-				.setOutput2Url(output2_url)
-				.build();
-		
-		
+		AutomaticStartCommand sc = AutomaticStartCommand.newBuilder().setInput1Url(input1_url).setInput2Url(input2_url)
+				.setOutput1Url(output1_url).setOutput2Url(output2_url).build();
+
 		send(0, OPCODE.AUTO_START_CMD, sc.toByteString());
 		return true;
 	}
-	
-	public Boolean SendStartCommand(ENCAPSULATION encap, String input1_url, String input2_url, String output1_url, String output2_url)
+
+	public Boolean SendStartCommand(ENCAPSULATION encap, String input1_url, String input2_url, String output1_url,
+			String output2_url)
 	{
-		StartCommand sc = StartCommand.newBuilder()
-				.setEncapsulation(encap)
-				.setInput1Url(input1_url)
-				.setInput2Url(input2_url)
-				.setOutput1Url(output1_url)
-				.setOutput2Url(output2_url)
-				.build();
-		
-		
+		StartCommand sc = StartCommand.newBuilder().setEncapsulation(encap).setInput1Url(input1_url)
+				.setInput2Url(input2_url).setOutput1Url(output1_url).setOutput2Url(output2_url).build();
+
 		send(0, OPCODE.START_CMD, sc.toByteString());
 		return true;
 	}
-	
+
 	public Boolean SendStopCommand()
 	{
 		try
 		{
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STOP_CMD).build();
-	
+
 			this.send(h.toByteArray());
 			send(0, OPCODE.STOP_CMD, null);
 		}
@@ -197,26 +183,26 @@ public class ManagementClient extends WebSocketClient
 	{
 		gotAck = false;
 		gotNck = false;
-		
+
 		Header h = null;
 		try
 		{
 			if (data != null)
 			{
-				h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).setMessageData(data).build();
+				h = Header.newBuilder().setSequence(Sequence).setOpcode(opcode).setMessageData(data).build();
 			}
 			else
 			{
-				h= Header.newBuilder().setSequence(Sequence).setOpcode(opcode).build();
+				h = Header.newBuilder().setSequence(Sequence).setOpcode(opcode).build();
 			}
-			
+
 			this.send(h.toByteArray());
 		}
 		catch (Exception e)
 		{
 			logger.error("Send error", e);
 		}
-		
+
 	}
 
 	public Boolean WaitForAck(long milliseconds)

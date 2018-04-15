@@ -54,4 +54,3 @@ public class ProcMon implements Runnable
 		logger.info("Exiting procMon thread");
 	}
 }
-
