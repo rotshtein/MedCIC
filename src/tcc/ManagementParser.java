@@ -22,7 +22,8 @@ public class ManagementParser extends Thread implements GuiInterface
 	Logger				logger	= Logger.getLogger("ManagmentParser");
 	ManagementServer	server	= null;
 	// Parameters param = null;
-	ProcMon														procMon				= null;
+	ProcMon														procMon1				= null;
+	ProcMon														procMon2				= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
 	Thread														Cic1Thread			= null;
@@ -115,8 +116,8 @@ public class ManagementParser extends Thread implements GuiInterface
 			try
 			{
 				Kill();
-				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getInput2Url(), p.getOutput1Url(),
-						p.getOutput2Url());
+				procMon1= med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), "cic1Script.lego");
+				procMon2= med.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(), "cic2Script.lego");
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
@@ -131,31 +132,49 @@ public class ManagementParser extends Thread implements GuiInterface
 
 		case STOP_CMD:
 			SendAck(h, conn);
-			if (procMon == null)
+			if (procMon1 == null & procMon2 == null)
 			{
 				SendStatusMessage("Process not running", conn);
 				return;
 			}
 
-			if (!procMon.isComplete())
+			if (procMon1 != null)
 			{
-				logger.warn("Killing process. [ " + procMon.description + " ]");
-				SendStatusMessage("Killing process. [ " + procMon.description + " ]", conn);
-				procMon.kill();
-				OperationCompleted();
+				if (!procMon1.isComplete())
+				{
+					logger.warn("Killing process. [ " + procMon1.description + " ]");
+					SendStatusMessage("Killing process. [ " + procMon1.description + " ]", conn);
+					procMon1.kill();
+					OperationCompleted();
+				}
+				else
+				{
+					SendStatusMessage("Process 1 not running", conn);
+				}
 			}
-			else
+			
+			if (procMon2 != null)
 			{
-				SendStatusMessage("Process not running", conn);
+				if (!procMon2.isComplete())
+				{
+					logger.warn("Killing process. [ " + procMon1.description + " ]");
+					SendStatusMessage("Killing process. [ " + procMon1.description + " ]", conn);
+					procMon1.kill();
+					OperationCompleted();
+				}
+				else
+				{
+					SendStatusMessage("Process 2 not running", conn);
+				}
 			}
 			break;
 
 		case STATUS_REQUEST:
 			StatusReplay sr = null;
-			if (procMon != null)
+			if (procMon1 != null)
 			{
 				sr = StatusReplay.newBuilder().setError(false).setErrorMMessage("").setWarning(false)
-						.setWarningMessage("").setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
+						.setWarningMessage("").setStatus(procMon1.isComplete() ? STATUS.STOP : STATUS.RUN).build();
 			}
 			else
 			{
@@ -238,25 +257,37 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public Boolean isRunning()
 	{
-		if (procMon == null)
+		if (procMon1 == null & procMon2 == null)
 		{
 			return false;
 		}
 
-		return !procMon.isComplete();
+		return !procMon1.isComplete() | !procMon2.isComplete();
 	}
 
 	public void Kill()
 	{
-		if (procMon == null)
+		if ((procMon1 == null) & (procMon2 == null))
 		{
 			return;
 		}
 
-		if (!procMon.isComplete())
+		if (procMon1 != null)
 		{
-			procMon.kill();
+			if (!procMon1.isComplete())
+			{
+				procMon1.kill();
+			}
 		}
+		
+		if (procMon2 != null)
+		{
+			if (!procMon2.isComplete())
+			{
+				procMon2.kill();
+			}
+		}
+
 	}
 
 	@Override

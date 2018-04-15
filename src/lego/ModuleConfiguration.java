@@ -3,8 +3,12 @@ package lego;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class ModuleConfiguration
 {
+	static Logger				logger	= Logger.getLogger("ModuleConfiguration");
+	
 	final String PATH = "path";
 	final String MODULE = "module";
 	final String PARAMS = "param";
@@ -59,29 +63,37 @@ public class ModuleConfiguration
 	
 	public ModuleConfiguration()
 	{
-		this("","","",new String[0],"");
+		this("","","",new String[0]);
 	}
 	
 	public ModuleConfiguration(String Path, String Module, String Params, String Out)
 	{
-		this(Path, Module, Params, new String []{Out}, "1,1");
+		this(Path, Module, Params, new String []{Out});
 	}
+	
 	
 	public ModuleConfiguration(String Path, String Module, String Params, String []Out)
-	{
-		this(Path, Module, Params, Out, "1,1");
-	}
-	
-	public ModuleConfiguration(String Path, String Module, String Params, String []Out, String Pos)
 	{
 		
 		path = Path;
 		module = Module;
 		params = Params;
 		out = Out;
-		pos = Pos;
 	}
 	
+	public static String UriToParam(String Uri)
+	{
+		try
+		{
+			return Uri.split(":")[0] + "," +  Uri.split(":")[1];
+		}
+		catch (Exception e)
+		{
+			logger.error("Illigal Uri", e);
+		}
+		
+		return null;
+	}
 	
 	public String toString()
 	{
@@ -97,13 +109,12 @@ public class ModuleConfiguration
 		{
 			for (String o : out)
 			{
-				msg += OUT + i +" " + o + NewLine;
+				if (o != "")
+				{
+					msg += OUT + i +" " + o + NewLine;
+				}
 				i++;
 			}
-		}
-		if (pos != null ^ pos != "")
-		{
-			msg += POS + " " + pos + NewLine;
 		}
 		
 		return msg;

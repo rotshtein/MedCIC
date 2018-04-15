@@ -4,7 +4,10 @@ package tcc;
 import java.io.File;
 import org.apache.log4j.Logger;
 
+import lego.ModuleConfiguration;
+import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
+import sun.font.Script;
 
 public class Mediate extends Operation
 {
@@ -16,16 +19,16 @@ public class Mediate extends Operation
 		super(MediateExe, gui, "Production");
 	}
 
-	public ProcMon Start(ENCAPSULATION encap, String InputUrl1, String InputUrl2, String OutputUrl1, String OutputUrl2) throws Exception
+	public ProcMon Start(ENCAPSULATION encap, String InputUrl, String OutputUrl1, String ConfigFilename) throws Exception
 	{
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
 		{
+				ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename, "127.0.0.1", 11001);
 
 			try
 			{
-				String [] vars =	{ super.exe_file, encap.getValueDescriptor().toString(),
-						InputUrl1, InputUrl2,OutputUrl1, OutputUrl2};
+				String [] vars =	{ super.exe_file, ConfigFilename};
 				p = super.StartAction(vars);
 			}
 			catch (Exception ex)
