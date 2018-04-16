@@ -18,10 +18,14 @@ public class MessageParser extends Thread
 	UdpServer						server		= null;
 	Boolean							stopThread	= false;
 
+	
+	
+	
+	
 	public MessageParser(GuiInterface Gui) throws Exception
 	{
 		this(Gui, 11001);
-		Parameters.Set("ManagementPort", "11001");
+		Parameters.Set("ManagementPort", Parameters.Get("ManagementPort", "11001"));
 	}
 
 	public MessageParser(GuiInterface Gui, int Port) throws Exception
@@ -78,25 +82,19 @@ public class MessageParser extends Thread
 					logger.error("Failed to parse message", e);
 				}
 
-				/*
-				 * if (cm.issue == ISSUE_TYPE.ISSUE_MSG_ERROR.Val() || cm.issue ==
-				 * ISSUE_TYPE.ISSUE_MSG_WARNING.Val() || cm.issue ==
-				 * ISSUE_TYPE.ISSUE_MSG_NOTICE.Val() || cm.issue ==
-				 * ISSUE_TYPE.ISSUE_MSG_INFO.Val() || cm.issue ==
-				 * ISSUE_TYPE.ISSUE_MSG_DEBUG.Val() || cm.issue ==
-				 * ISSUE_TYPE.ISSUE_MSG_TRACE.Val() )
-				 */
+				if (cm.path.equals("0"))
+				{
+					continue;
+				}
+				
 			
 				if (gui != null)
 				{
-					String status = cm.issuestring;
-					if (cm.message != null & cm.message != "")
-					{
-						status += " -> " + cm.message;
-					}
-					
-					status += System.getProperty("line.separator");
-					gui.UpdateStatus(status);
+				    String status = cm.StatusMessage();
+				    if (status != null)
+				    {
+				    	gui.UpdateStatus(status);
+				    }
 				}
 			}
 			catch (Exception e)

@@ -2,6 +2,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -52,7 +54,8 @@ public class MainScreen implements GuiInterface
 	ManagementClient	client;
 	private final JButton btnStop = new JButton("Stop");
 	static String configurationFilename = "config.properties";
-	private final JTextArea textArea = new JTextArea();
+	private final JTextArea textArea;// = new JTextArea();
+	JScrollPane jsp;
 	MessageParser messageParser = null;
 
 	/**
@@ -86,6 +89,8 @@ public class MainScreen implements GuiInterface
 		});
 	}
 
+	
+	
 	/**
 	 * Create the application.
 	 * @throws URISyntaxException 
@@ -111,11 +116,27 @@ public class MainScreen implements GuiInterface
 			}
 		});
 		btnStop.setBounds(292, 53, 57, 23);
-		
 		frame.getContentPane().add(btnStop);
-		textArea.setBounds(20, 92, 597, 208);
 		
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setLineWrap(true);
+		textArea.setBounds(10, 92, 607, 208);
+		
+		textArea.setSize(607,208);
+		textArea.setLineWrap(true);
+	    textArea.setEditable(false);
+	    textArea.setVisible(true);
+		
+	    //JScrollPane scroll = new JScrollPane (textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+	   
+	    
+	    //jsp = new JScrollPane(textArea, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		//jsp = new JScrollPane(textArea);
+		 //JScrollBar bar = new JScrollBar();  
+		 //jsp.add(bar);  
 		frame.getContentPane().add(textArea);
+		//frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
 		int port = Integer.parseInt(Parameters.Get("ListenPort", "8887"));
@@ -301,6 +322,7 @@ public class MainScreen implements GuiInterface
 		encap.addItem("E2");
 
 		frame.setResizable(false);
+		frame.setVisible(true);
 		// create the status bar panel and shove it down the bottom of the frame
 
 	}
@@ -363,7 +385,7 @@ public class MainScreen implements GuiInterface
 				@Override
 				public void run()
 				{
-					UpdateStatus(status);
+					UpdateStatus(status + System.getProperty("line.separator"));
 				}
 			});
 			return;

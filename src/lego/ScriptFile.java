@@ -179,8 +179,9 @@ public class ScriptFile
 		NewScript.AddModule(new ModuleConfiguration("1.1.1", module, parameters, "1.1.1.1"));
 
 		NewScript.AddModule(new ModuleConfiguration("1.1.1.1", "cesrawout", null, "1.1.1.1.1"));
+		//NewScript.AddModule(new ModuleConfiguration("1.1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri), ""));
 		NewScript.AddModule(
-				new ModuleConfiguration("1.1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri), ""));
+				new ModuleConfiguration("1.1.1.1.1", "packetoutput", "", ""));
 
 		NewScript.setManagement(new ManagementConfiguration(Server, Port));
 

@@ -1,6 +1,7 @@
 package tcc;
 
 import java.io.File;
+import java.lang.ProcessBuilder.Redirect;
 
 import org.apache.log4j.Logger;
 
@@ -32,18 +33,19 @@ public abstract class Operation implements Runnable
 			{
 
 				ProcessBuilder builder = new ProcessBuilder(vars);
-				// builder.redirectOutput(new File("out.txt"));
-				// builder.redirectError(new File("out.txt"));
+				builder.redirectInput(Redirect.INHERIT)
+				   .redirectOutput(Redirect.INHERIT)
+				   .redirectError(Redirect.INHERIT);
+				 builder.redirectOutput(new File("out.txt"));
+				 builder.redirectError(new File("out.txt"));
 				p = builder.start(); // may throw IOException
 
-				// while (!p.isAlive());
-
 				procMon = new ProcMon(p, operation);
-				procMonThread = new Thread(procMon, operation + "procMon");
+				procMonThread = new Thread(procMon, operation + " procMon");
 				procMonThread.start();
 
-				feedbackFileThread = new Thread(this, operation + "feedback reader");
-				feedbackFileThread.start();
+				//feedbackFileThread = new Thread(this, operation + " feedback reader");
+				//feedbackFileThread.start();
 			}
 			catch (Exception ex)
 			{
@@ -67,6 +69,7 @@ public abstract class Operation implements Runnable
 	@Override
 	public void run()
 	{
+		while (!p.isAlive());
 		while (p.isAlive())
 		{
 			// call complete and exit when ended

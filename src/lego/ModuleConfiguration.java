@@ -116,7 +116,7 @@ public class ModuleConfiguration
 		final String NewLine = System.getProperty("line.separator");
 		String msg = PATH + " " + path + NewLine;
 		msg += MODULE + " " + module + NewLine;
-		if (params != null)
+		if (params != null & params != "")
 		{
 			msg += PARAMS + " " + params + NewLine;
 		}

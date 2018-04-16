@@ -2,11 +2,8 @@ package tcc;
 
 import java.io.File;
 import org.apache.log4j.Logger;
-
-import lego.ModuleConfiguration;
 import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
-import sun.font.Script;
 
 public class Mediate extends Operation
 {
@@ -15,8 +12,14 @@ public class Mediate extends Operation
 
 	public Mediate(String MediateExe, GuiInterface gui)
 	{
-		super(MediateExe, gui, "Production");
+		this(MediateExe, gui, "Production");
 	}
+	
+	public Mediate(String MediateExe, GuiInterface gui, String description)
+	{
+		super(MediateExe, gui, description);
+	}
+
 
 	public ProcMon Start(ENCAPSULATION encap, String InputUrl, String OutputUrl1, String ConfigFilename)
 			throws Exception
@@ -24,7 +27,9 @@ public class Mediate extends Operation
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
 		{
-			ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename, "127.0.0.1", 11001);
+			ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename,  
+					Parameters.Get("ManagementHost", "127.0.0.1"),
+					Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
 
 			try
 			{

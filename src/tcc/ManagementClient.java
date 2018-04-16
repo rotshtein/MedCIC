@@ -39,7 +39,7 @@ public class ManagementClient extends WebSocketClient
 	@Override
 	public void onOpen(ServerHandshake handshakedata)
 	{
-		gui.UpdateStatus("Connected to the server" + System.getProperty("line.separator"));
+		gui.UpdateStatus("Connected to the server");
 		logger.info("Connected");
 	}
 

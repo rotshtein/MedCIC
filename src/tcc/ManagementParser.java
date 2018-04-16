@@ -124,14 +124,17 @@ public class ManagementParser extends Thread implements GuiInterface
 				SendNck(h, conn);
 			}
 
-			Mediate med = new Mediate(Parameters.Get("MediationExe", "notepad.exe"), this);
 			try
 			{
+				String MediationExe = Parameters.Get("MediationExe", "notepad.exe");
+				Mediate med1 = new Mediate(MediationExe, this,"Production CIC-1");
+				Mediate med2 = new Mediate(MediationExe, this, "Production CIC-2");
+				
 				String ScriptPath = Parameters.Get("ScriptPath", "C:\\programs\\lego\\config");
 				Kill();
-				procMon1 = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),
+				procMon1 = med1.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),
 						Paths.get(ScriptPath, "cic1Script.lego").toString());
-				procMon2 = med.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(),
+				procMon2 = med2.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(),
 						Paths.get(ScriptPath, "cic2Script.lego").toString());
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
@@ -166,21 +169,23 @@ public class ManagementParser extends Thread implements GuiInterface
 				{
 					SendStatusMessage("Process 1 not running", conn);
 				}
+				procMon1 = null;
 			}
 
 			if (procMon2 != null)
 			{
 				if (!procMon2.isComplete())
 				{
-					logger.warn("Killing process. [ " + procMon1.description + " ]");
-					SendStatusMessage("Killing process. [ " + procMon1.description + " ]", conn);
-					procMon1.kill();
+					logger.warn("Killing process. [ " + procMon2.description + " ]");
+					SendStatusMessage("Killing process. [ " + procMon2.description + " ]", conn);
+					procMon2.kill();
 					OperationCompleted();
 				}
 				else
 				{
 					SendStatusMessage("Process 2 not running", conn);
 				}
+				procMon2 = null;
 			}
 			break;
 
