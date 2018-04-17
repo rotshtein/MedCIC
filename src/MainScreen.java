@@ -36,6 +36,9 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
+import javax.swing.JPanel;
+import java.awt.FlowLayout;
+import javax.swing.JTextPane;
 
 
 public class MainScreen implements GuiInterface
@@ -54,9 +57,10 @@ public class MainScreen implements GuiInterface
 	ManagementClient	client;
 	private final JButton btnStop = new JButton("Stop");
 	static String configurationFilename = "config.properties";
-	private final JTextArea textArea;// = new JTextArea();
 	JScrollPane jsp;
 	MessageParser messageParser = null;
+	private final JTextArea textArea = new JTextArea();
+	private JScrollPane scrollPane;
 
 	/**
 	 * Launch the application.
@@ -118,24 +122,10 @@ public class MainScreen implements GuiInterface
 		btnStop.setBounds(292, 53, 57, 23);
 		frame.getContentPane().add(btnStop);
 		
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setLineWrap(true);
-		textArea.setBounds(10, 92, 607, 208);
-		
-		textArea.setSize(607,208);
-		textArea.setLineWrap(true);
-	    textArea.setEditable(false);
-	    textArea.setVisible(true);
-		
-	    //JScrollPane scroll = new JScrollPane (textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-	   
-	    
-	    //jsp = new JScrollPane(textArea, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		//jsp = new JScrollPane(textArea);
-		 //JScrollBar bar = new JScrollBar();  
-		 //jsp.add(bar);  
-		frame.getContentPane().add(textArea);
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 85, 607, 215);
+		frame.getContentPane().add(scrollPane);
+		scrollPane.setViewportView(textArea);
 		//frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
@@ -302,11 +292,11 @@ public class MainScreen implements GuiInterface
 		frame.getContentPane().add(btnStart);
 
 		chkCic1 = new JCheckBox("CIC 1");
-		chkCic1.setBounds(562, 10, 97, 23);
+		chkCic1.setBounds(562, 10, 59, 23);
 		frame.getContentPane().add(chkCic1);
 
 		chkCic2 = new JCheckBox("CIC 2");
-		chkCic2.setBounds(562, 53, 97, 23);
+		chkCic2.setBounds(562, 53, 59, 23);
 		frame.getContentPane().add(chkCic2);
 
 		encap.addItem("Auto Detect");
@@ -441,5 +431,8 @@ public class MainScreen implements GuiInterface
 		}
 		// Now edit your gui objects
 		btnStart.setBackground(Color.GRAY);
+	}
+	public JTextArea getTextArea() {
+		return textArea;
 	}
 }
