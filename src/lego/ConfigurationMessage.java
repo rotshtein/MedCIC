@@ -1,5 +1,7 @@
 package lego;
 
+import javax.print.attribute.standard.Severity;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -82,6 +84,46 @@ public class ConfigurationMessage
 		return object;
 	}
 	
+	public Severity getSavirity()
+	{
+		Severity savity = null;
+		
+		if (path.equals("0"))
+		{
+			if (!((isinput !=ConfigurationMessage.ISSUE_MSG_ERROR) & (isinput !=ConfigurationMessage.ISSUE_MSG_FATAL)))
+				return savity;
+		}
+		
+		switch (issue)
+		{
+			case ISSUE_MSG_ERROR:
+			case ISSUE_MSG_FATAL:
+				savity = Severity.ERROR; 
+				break;
+				
+			case ISSUE_MSG_WARNING:
+				logger.warn("Got warning message from " + path + ", " + module + ":" + message);
+				savity = Severity.WARNING;
+				break;
+				
+			case ISSUE_MSG_START:
+			case ISSUE_MSG_DONE:
+			case ISSUE_MSG_SYNC:
+			case ISSUE_MSG_LOST_SYNC:
+				savity = Severity.REPORT;
+				break;
+				
+			case ISSUE_MSG_ACTIVE:
+			case ISSUE_MSG_NOTICE: 
+			case ISSUE_MSG_INFO: 
+			case ISSUE_MSG_DEBUG: 
+			case ISSUE_MSG_TRACE:
+			default:
+				break;				
+		}
+		return savity;
+	}
+	
 	public String StatusMessage()
 	{
 		String issuePrefix = "";
@@ -129,8 +171,6 @@ public class ConfigurationMessage
 		{
 			status += " -> " + message;
 		}
-		
-		
 		
 		return status;
 	}

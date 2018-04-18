@@ -81,15 +81,14 @@ public class MessageParser extends Thread
 				{
 					logger.error("Failed to parse message", e);
 				}
+				
+				logger.debug("Lego message" + new String(pkt.getData()));
 
-				if (cm.path.equals("0"))
+				if (cm.getSavirity() == null)
 				{
-					if ( !(cm.isinput !=ConfigurationMessage.ISSUE_MSG_ERROR) & 
-							!(cm.isinput !=ConfigurationMessage.ISSUE_MSG_FATAL) )
 					continue;
 				}
 				
-			
 				if (gui != null)
 				{
 				    String status = cm.StatusMessage();

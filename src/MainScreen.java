@@ -54,6 +54,8 @@ public class MainScreen implements GuiInterface
 	MessageParser messageParser = null;
 	private final JTextArea textArea = new JTextArea();
 	private JScrollPane scrollPane;
+	private final JButton btnClear = new JButton("Clear");
+	private final JButton btnSave = new JButton("Save");
 
 	/**
 	 * Launch the application.
@@ -117,6 +119,20 @@ public class MainScreen implements GuiInterface
 		scrollPane.setBounds(10, 85, 607, 215);
 		frame.getContentPane().add(scrollPane);
 		scrollPane.setViewportView(textArea);
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textArea.setText("");
+			}
+		});
+		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnClear.setBounds(86, 311, 57, 23);
+		
+		frame.getContentPane().add(btnClear);
+		btnSave.setEnabled(false);
+		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnSave.setBounds(485, 311, 57, 23);
+		
+		frame.getContentPane().add(btnSave);
 		//frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
@@ -220,6 +236,7 @@ public class MainScreen implements GuiInterface
 	private void initialize()
 	{
 		frame = new JFrame();
+		frame.setResizable(false);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) 
@@ -227,7 +244,7 @@ public class MainScreen implements GuiInterface
 				Stop();
 			}
 		});
-		frame.setBounds(100, 100, 633, 340);
+		frame.setBounds(100, 100, 633, 369);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -285,8 +302,6 @@ public class MainScreen implements GuiInterface
 		encap.addItem("ESC++      (1104)");
 		encap.addItem("ESC++      (1792)");
 		encap.addItem("E2");
-
-		frame.setResizable(false);
 		frame.setVisible(true);
 		// create the status bar panel and shove it down the bottom of the frame
 
