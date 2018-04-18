@@ -2,7 +2,6 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
@@ -31,14 +30,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.awt.event.ActionEvent;
-import javax.swing.JCheckBox;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
-import javax.swing.JPanel;
-import java.awt.FlowLayout;
-import javax.swing.JTextPane;
 
 
 public class MainScreen implements GuiInterface
@@ -50,8 +45,6 @@ public class MainScreen implements GuiInterface
 	JFormattedTextField	txtOut1;
 	JFormattedTextField	txtOut2;
 	JComboBox<String>	encap;
-	JCheckBox			chkCic1;
-	JCheckBox			chkCic2;
 	JButton				btnStart;
 	ManagementServer	server;
 	ManagementClient	client;
@@ -110,8 +103,6 @@ public class MainScreen implements GuiInterface
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
 		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
-		chkCic1.setSelected(Parameters.Get("Cic1", "0").equals("0") ? false : true);
-		chkCic2.setSelected(Parameters.Get("Cic2", "0").equals("0") ? false : true);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
@@ -119,7 +110,7 @@ public class MainScreen implements GuiInterface
 				client.send(0,OPCODE.STOP_CMD, null);
 			}
 		});
-		btnStop.setBounds(292, 53, 57, 23);
+		btnStop.setBounds(328, 53, 57, 23);
 		frame.getContentPane().add(btnStop);
 		
 		scrollPane = new JScrollPane();
@@ -160,8 +151,6 @@ public class MainScreen implements GuiInterface
 				Parameters.Set("url-in-2", txtIn2.getText());
 				Parameters.Set("url-out-1", txtOut1.getText());
 				Parameters.Set("url-out-2", txtOut2.getText());
-				Parameters.Set("Cic1", (chkCic1.isSelected() ? "1" : "0"));
-				Parameters.Set("Cic2", (chkCic2.isSelected() ? "1" : "0"));
 			}
 			catch (IOException e1)
 			{
@@ -170,17 +159,11 @@ public class MainScreen implements GuiInterface
 
 			String input1="" ,input2="", output1="", output2="";
 			
-			if (chkCic1.isSelected())
-			{
-				input1 = txtIn1.getText();
-				output1 = txtOut1.getText();
-			}
+			input1 = txtIn1.getText();
+			output1 = txtOut1.getText();
+			input2 = txtIn2.getText();
+			output2 = txtOut2.getText();
 			
-			if (chkCic2.isSelected())
-			{
-				input2 = txtIn2.getText();
-				output2 = txtOut2.getText();
-			}
 			if (((String)(encap.getSelectedItem())).toLowerCase().startsWith("auto"))
 			{
 				client.SendAutomatucStartCommand(input1,input2, output1, output2);
@@ -252,7 +235,7 @@ public class MainScreen implements GuiInterface
 		txtIn1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtIn1.setToolTipText("test tooltip");
 		txtIn1.setText("udp://127.0.0.0.1:1000");
-		txtIn1.setBounds(10, 11, 172, 20);
+		txtIn1.setBounds(10, 11, 197, 20);
 		frame.getContentPane().add(txtIn1);
 		txtIn1.setInputVerifier(new UrlVerifier());
 
@@ -260,7 +243,7 @@ public class MainScreen implements GuiInterface
 		txtIn2.setToolTipText("test tooltip");
 		txtIn2.setText("udp://127.0.0.0.2:1000");
 		txtIn2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtIn2.setBounds(10, 54, 172, 20);
+		txtIn2.setBounds(10, 54, 197, 20);
 		frame.getContentPane().add(txtIn2);
 		txtIn2.setInputVerifier(new UrlVerifier());
 
@@ -268,7 +251,7 @@ public class MainScreen implements GuiInterface
 		txtOut1.setToolTipText("test tooltip");
 		txtOut1.setText("udp://127.0.0.0.3:1000");
 		txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtOut1.setBounds(384, 11, 172, 20);
+		txtOut1.setBounds(420, 9, 197, 20);
 		frame.getContentPane().add(txtOut1);
 		txtOut1.setInputVerifier(new UrlVerifier());
 
@@ -276,28 +259,20 @@ public class MainScreen implements GuiInterface
 		txtOut2.setToolTipText("test tooltip");
 		txtOut2.setText("udp://127.0.0.0.4:1000");
 		txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtOut2.setBounds(384, 54, 172, 20);
+		txtOut2.setBounds(420, 54, 197, 20);
 		frame.getContentPane().add(txtOut2);
 		txtOut2.setInputVerifier(new UrlVerifier());
 
 		encap = new JComboBox<String>();
-		encap.setBounds(214, 11, 135, 20);
+		encap.setBounds(250, 11, 135, 20);
 		frame.getContentPane().add(encap);
 
 		btnStart = new JButton("Start");
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStart.addActionListener(new StartAction());
 
-		btnStart.setBounds(214, 53, 57, 23);
+		btnStart.setBounds(250, 53, 57, 23);
 		frame.getContentPane().add(btnStart);
-
-		chkCic1 = new JCheckBox("CIC 1");
-		chkCic1.setBounds(562, 10, 59, 23);
-		frame.getContentPane().add(chkCic1);
-
-		chkCic2 = new JCheckBox("CIC 2");
-		chkCic2.setBounds(562, 53, 59, 23);
-		frame.getContentPane().add(chkCic2);
 
 		encap.addItem("Auto Detect");
 		encap.addItem("D&I++");

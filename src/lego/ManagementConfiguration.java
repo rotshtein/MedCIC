@@ -1,5 +1,7 @@
 package lego;
 
+import tcc.Parameters;
+
 public class ManagementConfiguration
 {
 
@@ -29,7 +31,19 @@ public class ManagementConfiguration
 
 	ManagementConfiguration()
 	{
-		this("127.0.0.1", 11000);
+		String host = Parameters.Get("ManagementHost");
+		int port = Integer.parseInt(Parameters.Get("ManagementPort"));
+		
+		if ((port > 0) & (host != null) & (host != ""))
+		{
+			server = host;
+			this.port = port;
+		}
+		else
+		{
+			server = "127.0.0.1";
+			port=11001;
+		}
 	}
 
 	ManagementConfiguration(String Server, int Port)

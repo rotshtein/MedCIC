@@ -84,6 +84,8 @@ public class MessageParser extends Thread
 
 				if (cm.path.equals("0"))
 				{
+					if ( !(cm.isinput !=ConfigurationMessage.ISSUE_MSG_ERROR) & 
+							!(cm.isinput !=ConfigurationMessage.ISSUE_MSG_FATAL) )
 					continue;
 				}
 				

@@ -21,16 +21,18 @@ public class Mediate extends Operation
 	}
 
 
-	public ProcMon Start(ENCAPSULATION encap, String InputUrl, String OutputUrl1, String ConfigFilename)
+	public ProcMon Start(ENCAPSULATION encap, 
+			String InputUrl1, String OutputUrl1,
+			String InputUrl2, String OutputUrl2, 
+			String ConfigFilename)
 			throws Exception
 	{
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
 		{
-			ScriptFile.BuildProductionScript(encap, InputUrl, OutputUrl1, ConfigFilename,  
-					Parameters.Get("ManagementHost", "127.0.0.1"),
-					Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
-
+			ScriptFile sf = new ScriptFile(ConfigFilename, Parameters.Get("ManagementHost", "127.0.0.1"),Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
+			sf.BuildProductionScript(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2);
+			sf.Write();
 			try
 			{
 				String[] vars =

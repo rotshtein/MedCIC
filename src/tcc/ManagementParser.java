@@ -20,8 +20,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	Logger				logger	= Logger.getLogger("ManagmentParser");
 	ManagementServer	server	= null;
 	// Parameters param = null;
-	ProcMon														procMon1			= null;
-	ProcMon														procMon2			= null;
+	ProcMon														procMon			= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
 	Thread														Cic1Thread			= null;
@@ -127,15 +126,12 @@ public class ManagementParser extends Thread implements GuiInterface
 			try
 			{
 				String MediationExe = Parameters.Get("MediationExe", "notepad.exe");
-				Mediate med1 = new Mediate(MediationExe, this,"Production CIC-1");
-				Mediate med2 = new Mediate(MediationExe, this, "Production CIC-2");
+				Mediate med = new Mediate(MediationExe, this,"CIC Production");
 				
 				String ScriptPath = Parameters.Get("ScriptPath", "C:\\programs\\lego\\config");
 				Kill();
-				procMon1 = med1.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),
-						Paths.get(ScriptPath, "cic1Script.lego").toString());
-				procMon2 = med2.Start(p.getEncapsulation(), p.getInput2Url(), p.getOutput2Url(),
-						Paths.get(ScriptPath, "cic2Script.lego").toString());
+				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),p.getInput2Url(), p.getOutput2Url(),
+						Paths.get(ScriptPath, "cicScript.lego").toString());
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
@@ -150,51 +146,32 @@ public class ManagementParser extends Thread implements GuiInterface
 
 		case STOP_CMD:
 			SendAck(h, conn);
-			if (procMon1 == null & procMon2 == null)
+			if (procMon == null)
 			{
 				SendStatusMessage("Process not running", conn);
 				return;
 			}
 
-			if (procMon1 != null)
+			if (!procMon.isComplete())
 			{
-				if (!procMon1.isComplete())
-				{
-					logger.warn("Killing process. [ " + procMon1.description + " ]");
-					SendStatusMessage("Killing process. [ " + procMon1.description + " ]", conn);
-					procMon1.kill();
-					OperationCompleted();
-				}
-				else
-				{
-					SendStatusMessage("Process 1 not running", conn);
-				}
-				procMon1 = null;
+				logger.warn("Killing process. [ " + procMon.description + " ]");
+				SendStatusMessage("Killing process. [ " + procMon.description + " ]", conn);
+				procMon.kill();
+				OperationCompleted();
 			}
-
-			if (procMon2 != null)
+			else
 			{
-				if (!procMon2.isComplete())
-				{
-					logger.warn("Killing process. [ " + procMon2.description + " ]");
-					SendStatusMessage("Killing process. [ " + procMon2.description + " ]", conn);
-					procMon2.kill();
-					OperationCompleted();
-				}
-				else
-				{
-					SendStatusMessage("Process 2 not running", conn);
-				}
-				procMon2 = null;
+				SendStatusMessage("Process not running", conn);
 			}
+			procMon = null;
 			break;
 
 		case STATUS_REQUEST:
 			StatusReplay sr = null;
-			if (procMon1 != null)
+			if (procMon != null)
 			{
 				sr = StatusReplay.newBuilder().setError(false).setErrorMMessage("").setWarning(false)
-						.setWarningMessage("").setStatus(procMon1.isComplete() ? STATUS.STOP : STATUS.RUN).build();
+						.setWarningMessage("").setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
 			}
 			else
 			{
@@ -277,17 +254,12 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public Boolean isRunning()
 	{
-		if (procMon1 != null)
+		if (procMon != null)
 		{
-			if (!procMon1.isComplete() & procMon2 == null)
+			if (!procMon.isComplete())
 			{
-				return !procMon1.isComplete();
+				return !procMon.isComplete();
 			}
-		}
-
-		if (procMon2 != null)
-		{
-			return !procMon2.isComplete();
 		}
 
 		return false;
@@ -295,27 +267,15 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public void Kill()
 	{
-		if ((procMon1 == null) & (procMon2 == null))
+		if (procMon == null)
 		{
 			return;
 		}
 
-		if (procMon1 != null)
+		if (!procMon.isComplete())
 		{
-			if (!procMon1.isComplete())
-			{
-				procMon1.kill();
-			}
+			procMon.kill();
 		}
-
-		if (procMon2 != null)
-		{
-			if (!procMon2.isComplete())
-			{
-				procMon2.kill();
-			}
-		}
-
 	}
 
 	@Override

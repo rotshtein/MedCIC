@@ -33,7 +33,10 @@ public class ProcMon implements Runnable
 	{
 		if (!_complete)
 		{
-			_proc.destroy();
+			if (_proc != null)
+			{
+				_proc.destroy();
+			}
 			return true;
 		}
 		return false;

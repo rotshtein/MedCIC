@@ -10,14 +10,19 @@ public class Identify extends Operation
 
 	public Identify(GuiInterface gui)
 	{
-		super(Exe, gui, "Identify");
+		this(gui, "Identify");
+	}
+	
+	public Identify(GuiInterface gui, String Description)
+	{
+		super(Exe, gui, Description);
 	}
 
 	public ProcMon Start(String SampleFilename, String ConfigFile, String Server, int Port) throws Exception
 	{
 		scriptFile = new ScriptFile();
 
-		return StartAction(new String[]
-		{ "IDBlock.exe", SampleFilename });
+		String IdetifyExe = Parameters.Get("IdentificationExe","C\\:programs\\lego\\bin\\IdBlock.exe");
+		return StartAction(new String[]	{ IdetifyExe, SampleFilename, ConfigFile });
 	}
 }

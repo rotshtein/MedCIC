@@ -29,22 +29,22 @@ public class ConfigurationMessage
 	public int		isinput;
 	public int		isoutput;
 	
-	static final int ISSUE_MSG_ACTIVE = 1;
-	static final int ISSUE_MSG_START = 2; 
-	static final int ISSUE_MSG_PAUSE = 3; 
-	static final int ISSUE_MSG_DONE = 4; 
-	static final int ISSUE_MSG_RESTART = 5; 
-	static final int ISSUE_MSG_PING = 6; 
-	static final int ISSUE_MSG_UNPAUSE = 7; 
-	static final int ISSUE_MSG_SYNC = 8; 
-	static final int ISSUE_MSG_LOST_SYNC = 9; 
-	static final int ISSUE_MSG_FATAL = 100; 
-	static final int ISSUE_MSG_ERROR = 110; 
-	static final int ISSUE_MSG_WARNING = 120; 
-	static final int ISSUE_MSG_NOTICE = 130; 
-	static final int ISSUE_MSG_INFO = 140; 
-	static final int ISSUE_MSG_DEBUG = 150; 
-	static final int ISSUE_MSG_TRACE = 160;
+	public static final int ISSUE_MSG_ACTIVE = 1;
+	public static final int ISSUE_MSG_START = 2; 
+	public static final int ISSUE_MSG_PAUSE = 3; 
+	public static final int ISSUE_MSG_DONE = 4; 
+	public static final int ISSUE_MSG_RESTART = 5; 
+	public static final int ISSUE_MSG_PING = 6; 
+	public static final int ISSUE_MSG_UNPAUSE = 7; 
+	public static final int ISSUE_MSG_SYNC = 8; 
+	public static final int ISSUE_MSG_LOST_SYNC = 9; 
+	public static final int ISSUE_MSG_FATAL = 100; 
+	public static final int ISSUE_MSG_ERROR = 110; 
+	public static final int ISSUE_MSG_WARNING = 120; 
+	public static final int ISSUE_MSG_NOTICE = 130; 
+	public static final int ISSUE_MSG_INFO = 140; 
+	public static final int ISSUE_MSG_DEBUG = 150; 
+	public static final int ISSUE_MSG_TRACE = 160;
 
 	public ConfigurationMessage()
 	{

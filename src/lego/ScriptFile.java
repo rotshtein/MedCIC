@@ -7,20 +7,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-
 import medcic_proto.MedCic.ENCAPSULATION;
+
 
 public class ScriptFile
 {
-
+	
 	static final Logger			logger		= Logger.getLogger("ScriptFile");
 	List<ModuleConfiguration>	moduleList	= new ArrayList<ModuleConfiguration>();
 	ManagementConfiguration		management	= null;
+	String configFilename = "cobfig.lego";
 
 	public ScriptFile()
 	{
+		setManagement(new ManagementConfiguration());
 	}
 
 	public ScriptFile(String Filename) throws FileNotFoundException, IOException
@@ -50,6 +51,12 @@ public class ScriptFile
 			}
 		}
 	}
+	
+	public ScriptFile(String ConfigFilename, String managementHost, int Port) throws FileNotFoundException, IOException
+	{
+		configFilename = ConfigFilename;
+		setManagement(new ManagementConfiguration(managementHost,Port));
+	}
 
 	public void AddModule(ModuleConfiguration module)
 	{
@@ -59,6 +66,11 @@ public class ScriptFile
 	public void setManagement(ManagementConfiguration mngmnt)
 	{
 		management = mngmnt;
+	}
+	
+	public Boolean Write()
+	{
+		return Write(configFilename);
 	}
 
 	public Boolean Write(String Filename)
@@ -85,27 +97,39 @@ public class ScriptFile
 
 		return true;
 	}
-
-	public Boolean BuildRecordToFileScript(String SourceUri, String ConfigFile, String Server, int Port)
+	
+	public Boolean BuildRecordToFileScript(	 String SourceUri, String IdFile)
 	{
-		AddModule(new ModuleConfiguration("1", "udpserver", SourceUri, "1.1"));
-		AddModule(new ModuleConfiguration("1.1", "cesrawinput", null, "1.1.1"));
-		AddModule(new ModuleConfiguration("1.1.1", "bitoutput", ConfigFile + ",bin", ""));
+		return BuildRecordToFileScript("1",SourceUri, IdFile);
+	}
 
-		setManagement(new ManagementConfiguration(Server, Port));
-
-		Write(ConfigFile);
+	public Boolean BuildRecordToFileScript(	String Path, String SourceUri, String IdFile)
+	{
+		AddModule(new ModuleConfiguration(Path, "udpserver", SourceUri, Path + ".1"));
+		AddModule(new ModuleConfiguration(Path + ".1", "cesrawinput", null, Path + ".1.1"));
+		AddModule(new ModuleConfiguration(Path + ".1.1", "bitoutput",IdFile, ""));
 
 		return true;
 	}
-
-	public static ScriptFile BuildProductionScript(ENCAPSULATION Encapsolation, String SourceUri, String DestUri,
-			String ConfigFile, String Server, int Port)
+	
+	public Boolean BuildRecordToFileScript(	String Source1Uri, String IdFile1,
+											String Source2Uri, String IdFile2)
 	{
-		ScriptFile NewScript = new ScriptFile();
-		NewScript
-				.AddModule(new ModuleConfiguration("1", "udpserver", ModuleConfiguration.UriToParam(SourceUri), "1.1"));
-		NewScript.AddModule(new ModuleConfiguration("1.1", "cesrawinput", null, "1.1.1"));
+		BuildRecordToFileScript("1", Source1Uri, IdFile1);
+		BuildRecordToFileScript("2", Source2Uri, IdFile2);
+		return true;
+	}
+
+	
+	public Boolean BuildProductionScript(String Path, ENCAPSULATION Encapsolation, 
+			String SourceUri, String DestUri)
+			
+	{
+		AddModule(new ModuleConfiguration(Path, "udpserver", ModuleConfiguration.UriToParam(SourceUri), Path +".1"));
+		
+		//NewScript.AddModule(new ModuleConfiguration(Path +".1", "cesrawinput", null, Path +".1.1"));
+		AddModule(new ModuleConfiguration(Path +".1", "cese1input", "e1", Path +".1.1"));
+		
 
 		String module = null;
 		String parameters = null;
@@ -176,17 +200,22 @@ public class ScriptFile
 
 		if (module == null) return null;
 
-		NewScript.AddModule(new ModuleConfiguration("1.1.1", module, parameters, "1.1.1.1"));
+		AddModule(new ModuleConfiguration(Path +".1.1", module, parameters, Path +".1.1.1"));
+		AddModule(new ModuleConfiguration(Path +".1.1.1", "cesrawout", null, Path +".1.1.1.1"));
+		AddModule(new ModuleConfiguration(Path +".1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri), Path +".1.1.1.1,1"));
+		AddModule(new ModuleConfiguration(Path +".1.1.1.1,1", "packet2null", "", ""));
 
-		NewScript.AddModule(new ModuleConfiguration("1.1.1.1", "cesrawout", null, "1.1.1.1.1"));
-		//NewScript.AddModule(new ModuleConfiguration("1.1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri), ""));
-		NewScript.AddModule(
-				new ModuleConfiguration("1.1.1.1.1", "packetoutput", "", ""));
-
-		NewScript.setManagement(new ManagementConfiguration(Server, Port));
-
-		NewScript.Write(ConfigFile);
-		return NewScript;
+		return true;
+	}
+	
+	
+	public Boolean BuildProductionScript(ENCAPSULATION Encapsolation, 
+			String Source1Uri, String Dest1Uri,
+			String Source2Uri, String Dest2Uri)
+	{
+		BuildProductionScript("1", Encapsolation,  Source1Uri, Dest1Uri);
+		BuildProductionScript("2", Encapsolation,  Source2Uri, Dest2Uri);
+		return true;
 	}
 
 }

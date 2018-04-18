@@ -16,7 +16,7 @@ public abstract class Operation implements Runnable
 	GuiInterface	gui;
 	String			operation;
 	Thread			procMonThread;
-	Thread			feedbackFileThread;
+	Boolean 		stopThread	= false;
 
 	public Operation(String Exe, GuiInterface gui, String Operation)
 	{
@@ -36,8 +36,9 @@ public abstract class Operation implements Runnable
 				builder.redirectInput(Redirect.INHERIT)
 				   .redirectOutput(Redirect.INHERIT)
 				   .redirectError(Redirect.INHERIT);
-				 builder.redirectOutput(new File("out.txt"));
-				 builder.redirectError(new File("out.txt"));
+				
+				builder.redirectOutput(new File("out-"+ Thread.currentThread().getId()+".txt"));
+				builder.redirectError(new File("out-"+ Thread.currentThread().getId()+".txt"));
 				p = builder.start(); // may throw IOException
 
 				procMon = new ProcMon(p, operation);
@@ -69,14 +70,17 @@ public abstract class Operation implements Runnable
 	@Override
 	public void run()
 	{
-		while (!p.isAlive());
-		while (p.isAlive())
+		stopThread = false;
+		
+		while (!p.isAlive() & !stopThread);
+		
+		while (p.isAlive() & !stopThread)
 		{
 			// call complete and exit when ended
 			if (isComplete())
 			{
-				gui.UpdateStatus("End transmitting file");
-				logger.info("End transmitting file");
+				gui.UpdateStatus(operation + "ended");
+				logger.info(operation + "ended");
 				break;
 			}
 
@@ -86,11 +90,9 @@ public abstract class Operation implements Runnable
 			}
 			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("InterruptedException received", e);
 			}
 		}
 		logger.info("Exiting feednbak file thread");
-
 	}
 }

@@ -10,22 +10,32 @@ public class GetSamples extends Operation
 
 	public GetSamples(GuiInterface gui)
 	{
-		super(Exe, gui, "Geting Sample for Identification");
+		this(gui, "Geting Sample for Identification");
 	}
 
-	public ProcMon Start(String SourceUri, String ConfigFile, String Server, int Port) throws Exception
+	public GetSamples(GuiInterface gui, String Description)
 	{
-		scriptFile = new ScriptFile();
+		super(Exe, gui, Description);
+	}
 
-		if (scriptFile.BuildRecordToFileScript(SourceUri, ConfigFile, Server, Port))
-		{
-			return StartAction(new String[]
-			{ "ProcessBlock", ConfigFile });
-		}
-		else
-		{
-			return null;
-		}
+	public ProcMon Start(	String SourceUri, String IdFile, String ConfigFile, String Server, int Port) throws Exception
+	{
+		scriptFile = new ScriptFile(ConfigFile, Server, Port);
+		
+		scriptFile.BuildRecordToFileScript(SourceUri, SourceUri);
+		scriptFile.Write();
+		return StartAction(new String[]	{ "ProcessBlock", ConfigFile });
+	}
+
+	public ProcMon Start(	String Source1Uri, String IdFile1,
+							String Source2Uri, String IdFile2,
+							String ConfigFile, String Server, int Port) throws Exception
+	{
+		
+		scriptFile = new ScriptFile();
+		scriptFile.BuildRecordToFileScript(Source1Uri, IdFile1, Source2Uri, IdFile2);
+		scriptFile.Write();
+		return StartAction(new String[] { "ProcessBlock", ConfigFile });
 	}
 
 }
