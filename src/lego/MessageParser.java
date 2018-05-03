@@ -12,16 +12,12 @@ import tcc.Parameters;
 public class MessageParser extends Thread
 {
 
-	Logger							logger		= Logger.getLogger("MessageParser");
+	static final Logger				logger		= Logger.getLogger("MessageParser");
 	GuiInterface					gui			= null;
 	BlockingQueue<DatagramPacket>	queue		= null;
 	UdpServer						server		= null;
 	Boolean							stopThread	= false;
 
-	
-	
-	
-	
 	public MessageParser(GuiInterface Gui) throws Exception
 	{
 		this(Gui, 11001);
@@ -40,6 +36,7 @@ public class MessageParser extends Thread
 	{
 		stopThread = true;
 		server.Stop();
+		server = null;
 	}
 
 	@Override
@@ -51,12 +48,12 @@ public class MessageParser extends Thread
 		{
 			try
 			{
-				if (Thread.interrupted()) 
+				if (Thread.interrupted())
 				{
 					logger.debug("Message Parser thread interrupted");
-				    break;
+					break;
 				}
-				
+
 				DatagramPacket pkt = null;
 				try
 				{
@@ -67,11 +64,11 @@ public class MessageParser extends Thread
 					logger.error("Failed to take packet for the queue", e);
 				}
 
-				if (pkt == null) 
+				if (pkt == null)
 				{
 					continue;
 				}
-	
+
 				ConfigurationMessage cm = null;
 				try
 				{
@@ -81,21 +78,34 @@ public class MessageParser extends Thread
 				{
 					logger.error("Failed to parse message", e);
 				}
-				
+
 				logger.debug("Lego message" + new String(pkt.getData()));
 
 				if (cm.getSavirity() == null)
 				{
 					continue;
 				}
-				
+
 				if (gui != null)
 				{
-				    String status = cm.StatusMessage();
-				    if (status != null)
-				    {
-				    	gui.UpdateStatus(status);
-				    }
+					switch (cm.issue)
+					{
+					case ConfigurationMessage.ISSUE_MSG_START:
+
+						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
+						{
+							gui.UpdateStatus(cm.StatusMessage());
+						}
+						break;
+
+					default:
+						String status = cm.StatusMessage();
+						if (status != null)
+						{
+							gui.UpdateStatus(status);
+						}
+						break;
+					}
 				}
 			}
 			catch (Exception e)

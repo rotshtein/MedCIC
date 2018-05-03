@@ -3,6 +3,7 @@ package lego;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,16 +15,20 @@ public class UdpServer extends Thread
 {
 
 	Logger							logger		= Logger.getLogger("UdpServer");
-	DatagramSocket					socket		= null;
-	private final static int		PACKETSIZE	= 255;
+	static DatagramSocket			socket		= null;
+	static final  int				PACKETSIZE	= 255;
 	Boolean							stopThread	= false;
 	BlockingQueue<DatagramPacket>	queue		= null;
 	GuiInterface					gui			= null;
 
 	public UdpServer(int Port, BlockingQueue<DatagramPacket> Queue, GuiInterface Gui) throws Exception
 	{
-		socket = new DatagramSocket(Port);
-		socket.setSoTimeout(500);
+		if (socket == null)
+		{
+			socket = new DatagramSocket(null);
+			socket.bind(new InetSocketAddress("0.0.0.0", Port));
+			socket.setSoTimeout(500);
+		}
 		queue = Queue;
 		gui = Gui;
 		logger.info("UDP Server started listtning on port " + Port);
@@ -32,6 +37,16 @@ public class UdpServer extends Thread
 	public void Stop()
 	{
 		stopThread = true;
+		try
+		{
+			this.wait(1000);
+		}
+		catch (InterruptedException e)
+		{
+			logger.error("Failed to close a thread", e);
+		}
+		socket.close();
+		socket = null;
 	}
 
 	@Override
@@ -42,14 +57,14 @@ public class UdpServer extends Thread
 		{
 			try
 			{
-				if (Thread.interrupted()) 
+				if (Thread.interrupted())
 				{
 					logger.debug("UdpServer thread interrupted");
-				    break;
+					break;
 				}
-				
+
 				DatagramPacket packet = new DatagramPacket(new byte[PACKETSIZE], PACKETSIZE);
-	
+
 				try
 				{
 					// Receive a packet (blocking) with 500 mSec timeout
@@ -63,7 +78,7 @@ public class UdpServer extends Thread
 				{
 					logger.error("Error while receiving packet", e);
 				}
-	
+
 				try
 				{
 					queue.add(packet);
@@ -75,7 +90,7 @@ public class UdpServer extends Thread
 			}
 			catch (Exception e)
 			{
-				logger.error("Thread exception" , e);
+				logger.error("Thread exception", e);
 			}
 		}
 		logger.debug("UdpServer thread exit");

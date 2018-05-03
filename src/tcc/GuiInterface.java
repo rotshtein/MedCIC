@@ -8,4 +8,11 @@ public interface GuiInterface
 	void UpdateStatus(final String status);
 
 	void OperationCompleted();
+	
+	void OperationStarted();
+	
+	void OperationInSync();
+	
+	void OperationOutOfSync();
+	
 }

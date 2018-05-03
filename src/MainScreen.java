@@ -36,6 +36,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
 
 
+
 public class MainScreen implements GuiInterface
 {
 	Logger logger = Logger.getLogger("MainScreen");
@@ -51,11 +52,12 @@ public class MainScreen implements GuiInterface
 	private final JButton btnStop = new JButton("Stop");
 	static String configurationFilename = "config.properties";
 	JScrollPane jsp;
-	MessageParser messageParser = null;
+	//MessageParser messageParser = null;
 	private final JTextArea textArea = new JTextArea();
 	private JScrollPane scrollPane;
 	private final JButton btnClear = new JButton("Clear");
 	private final JButton btnSave = new JButton("Save");
+	private Color back = Color.LIGHT_GRAY; 
 
 	/**
 	 * Launch the application.
@@ -105,6 +107,7 @@ public class MainScreen implements GuiInterface
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
 		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
+		btnStop.setBounds(328, 55, 57, 23);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
@@ -112,25 +115,24 @@ public class MainScreen implements GuiInterface
 				client.send(0,OPCODE.STOP_CMD, null);
 			}
 		});
-		btnStop.setBounds(328, 53, 57, 23);
 		frame.getContentPane().add(btnStop);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 85, 607, 215);
+		scrollPane.setBounds(10, 89, 607, 215);
 		frame.getContentPane().add(scrollPane);
 		scrollPane.setViewportView(textArea);
+		btnClear.setBounds(81, 315, 74, 23);
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textArea.setText("");
 			}
 		});
 		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnClear.setBounds(86, 311, 57, 23);
 		
 		frame.getContentPane().add(btnClear);
+		btnSave.setBounds(465, 315, 89, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnSave.setBounds(485, 311, 57, 23);
 		
 		frame.getContentPane().add(btnSave);
 		//frame.getContentPane().add(scroll);
@@ -142,7 +144,7 @@ public class MainScreen implements GuiInterface
 		server.start();
 		String serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
 		client = new ManagementClient(new URI(serverUri), this);
-		
+		/*
 		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
 		try
 		{
@@ -152,7 +154,8 @@ public class MainScreen implements GuiInterface
 		catch (Exception e1)
 		{
 			logger.error("Failed to run UDP server for messages from the modules", e1);
-		} 
+		} */
+		back = textArea.getBackground();
 	}
 
 	class StartAction implements ActionListener
@@ -236,7 +239,6 @@ public class MainScreen implements GuiInterface
 	private void initialize()
 	{
 		frame = new JFrame();
-		frame.setResizable(false);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) 
@@ -244,51 +246,50 @@ public class MainScreen implements GuiInterface
 				Stop();
 			}
 		});
-		frame.setBounds(100, 100, 633, 369);
+		frame.setBounds(100, 100, 633, 384);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
 		txtIn1 = new JFormattedTextField();
+		txtIn1.setBounds(10, 13, 197, 20);
 		txtIn1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtIn1.setToolTipText("test tooltip");
 		txtIn1.setText("udp://127.0.0.0.1:1000");
-		txtIn1.setBounds(10, 11, 197, 20);
 		frame.getContentPane().add(txtIn1);
 		txtIn1.setInputVerifier(new UrlVerifier());
 
 		txtIn2 = new JFormattedTextField();
+		txtIn2.setBounds(10, 56, 197, 20);
 		txtIn2.setToolTipText("test tooltip");
 		txtIn2.setText("udp://127.0.0.0.2:1000");
 		txtIn2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtIn2.setBounds(10, 54, 197, 20);
 		frame.getContentPane().add(txtIn2);
 		txtIn2.setInputVerifier(new UrlVerifier());
 
 		txtOut1 = new JFormattedTextField();
+		txtOut1.setBounds(420, 11, 197, 20);
 		txtOut1.setToolTipText("test tooltip");
 		txtOut1.setText("udp://127.0.0.0.3:1000");
 		txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtOut1.setBounds(420, 9, 197, 20);
 		frame.getContentPane().add(txtOut1);
 		txtOut1.setInputVerifier(new UrlVerifier());
 
 		txtOut2 = new JFormattedTextField();
+		txtOut2.setBounds(420, 56, 197, 20);
 		txtOut2.setToolTipText("test tooltip");
 		txtOut2.setText("udp://127.0.0.0.4:1000");
 		txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtOut2.setBounds(420, 54, 197, 20);
 		frame.getContentPane().add(txtOut2);
 		txtOut2.setInputVerifier(new UrlVerifier());
 
 		encap = new JComboBox<String>();
-		encap.setBounds(250, 11, 135, 20);
+		encap.setBounds(250, 11, 135, 22);
 		frame.getContentPane().add(encap);
 
 		btnStart = new JButton("Start");
+		btnStart.setBounds(250, 55, 57, 23);
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStart.addActionListener(new StartAction());
-
-		btnStart.setBounds(250, 53, 57, 23);
 		frame.getContentPane().add(btnStart);
 
 		encap.addItem("Auto Detect");
@@ -353,6 +354,8 @@ public class MainScreen implements GuiInterface
 		{
 			server.Stop();
 		}
+		
+		
 	}
 	@Override
 	public void UpdateStatus(String status)
@@ -410,7 +413,6 @@ public class MainScreen implements GuiInterface
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
-
 				@Override
 				public void run()
 				{
@@ -420,9 +422,74 @@ public class MainScreen implements GuiInterface
 			return;
 		}
 		// Now edit your gui objects
-		btnStart.setBackground(Color.GRAY);
+		btnStart.setBackground(back);
 	}
-	public JTextArea getTextArea() {
+	
+	public JTextArea getTextArea() 
+	{
 		return textArea;
+	}
+
+
+
+	@Override
+	public void OperationStarted()
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					OperationStarted();
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		btnStart.setBackground(Color.ORANGE);
+	}
+
+
+
+	@Override
+	public void OperationInSync()
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					OperationInSync();
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		btnStart.setBackground(Color.GREEN);
+	}
+
+
+
+	@Override
+	public void OperationOutOfSync()
+	{
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					OperationOutOfSync();
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		btnStart.setBackground(Color.GRAY);
 	}
 }

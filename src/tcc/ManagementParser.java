@@ -6,6 +6,8 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.log4j.Logger;
 import org.java_websocket.WebSocket;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import lego.MessageParser;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
@@ -17,20 +19,44 @@ import medcic_proto.MedCic.StatusReplay;
 public class ManagementParser extends Thread implements GuiInterface
 {
 
-	Logger				logger	= Logger.getLogger("ManagmentParser");
-	ManagementServer	server	= null;
-	// Parameters param = null;
-	ProcMon														procMon			= null;
+	static final Logger											logger				= Logger
+			.getLogger("ManagmentParser");
+	ManagementServer											server				= null;
+	ProcMon														procMon				= null;
 	Boolean														connectionStatus	= false;
 	BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>>	queue				= null;
 	Thread														Cic1Thread			= null;
 	Thread														Cic2Thread			= null;
+	MessageParser												messageParser		= null;
 
 	public ManagementParser(BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue, ManagementServer server)
 			throws Exception
 	{
 		this.queue = queue;
 		this.server = server;
+		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
+		try
+		{
+			if (messageParser != null)
+			{
+				Stop();
+			}
+			messageParser = new MessageParser(this, ManagementPort);
+			messageParser.start();
+		}
+		catch (Exception e1)
+		{
+			logger.error("Failed to run UDP server for messages from the modules", e1);
+		}
+	}
+
+	public void Stop()
+	{
+		if (messageParser != null)
+		{
+			messageParser.Stop();
+		}
+		messageParser = null;
 	}
 
 	@Override
@@ -126,12 +152,12 @@ public class ManagementParser extends Thread implements GuiInterface
 			try
 			{
 				String MediationExe = Parameters.Get("MediationExe", "notepad.exe");
-				Mediate med = new Mediate(MediationExe, this,"CIC Production");
-				
+				Mediate med = new Mediate(MediationExe, this, "CIC Production");
+
 				String ScriptPath = Parameters.Get("ScriptPath", "C:\\programs\\lego\\config");
 				Kill();
-				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(),p.getInput2Url(), p.getOutput2Url(),
-						Paths.get(ScriptPath, "cicScript.lego").toString());
+				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
+						p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
@@ -353,5 +379,24 @@ public class ManagementParser extends Thread implements GuiInterface
 	{
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void OperationInSync()
+	{
+		for (WebSocket conn : server.connections())
+		{
+			SendStatusMessage("Stream is synchronized", conn);
+		}
+
+	}
+
+	@Override
+	public void OperationOutOfSync()
+	{
+		for (WebSocket conn : server.connections())
+		{
+			SendStatusMessage("Stream is out of synch", conn);
+		}
 	}
 }

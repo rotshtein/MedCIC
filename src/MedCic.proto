@@ -2,15 +2,17 @@ syntax = "proto3";
 package medcic_proto;
 
 /*************/
-/* Version 1 */
+/* Version 2 */
 /************/
 
 enum STATUS
 {
 	RUN = 0;
-	STOP = 1;
-	ERROR = 2;
-	WARNING = 3;
+	SYNC = 1;
+	OUT_OF_SYNC = 2;
+	STOP = 3;
+	ERROR = 4;
+	WARNING = 5;
 }
 
 enum ENCAPSULATION

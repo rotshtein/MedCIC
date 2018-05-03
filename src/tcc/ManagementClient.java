@@ -22,7 +22,7 @@ import medcic_proto.MedCic.StatusReplay;
 public class ManagementClient extends WebSocketClient
 {
 
-	static Logger		logger				= Logger.getLogger("ManagementClient");
+	static final Logger	logger				= Logger.getLogger("ManagementClient");
 	GuiInterface		gui					= null;
 	Boolean				connectionStatus	= false;
 	ManagementClient	conn;
@@ -107,6 +107,16 @@ public class ManagementClient extends WebSocketClient
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
 					gui.onConnectionChange(true);
+				}
+				else if (sr.getStatus() == STATUS.SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.onConnectionChange(true);
+				}
+				else if (sr.getStatus() == STATUS.OUT_OF_SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.onConnectionChange(false);
 				}
 				break;
 
