@@ -20,6 +20,7 @@ public class ProcMon implements Runnable
 	public ProcMon(Process proc)
 	{
 		_proc = proc;
+		
 		Thread t = new Thread(this);
 		t.start();
 	}

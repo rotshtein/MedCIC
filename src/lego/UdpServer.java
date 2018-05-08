@@ -14,12 +14,13 @@ import tcc.GuiInterface;
 public class UdpServer extends Thread
 {
 
-	Logger							logger		= Logger.getLogger("UdpServer");
+	static final Logger				logger		= Logger.getLogger("UdpServer");
 	static DatagramSocket			socket		= null;
 	static final  int				PACKETSIZE	= 255;
 	Boolean							stopThread	= false;
 	BlockingQueue<DatagramPacket>	queue		= null;
 	GuiInterface					gui			= null;
+	static int port = 0;
 
 	public UdpServer(int Port, BlockingQueue<DatagramPacket> Queue, GuiInterface Gui) throws Exception
 	{
@@ -47,8 +48,14 @@ public class UdpServer extends Thread
 		}
 		socket.close();
 		socket = null;
+		port = 0;
 	}
-
+	
+	public static int getPort()
+	{
+		return port;
+	}
+	
 	@Override
 	public void run()
 	{

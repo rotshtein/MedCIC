@@ -81,11 +81,8 @@ public class MessageParser extends Thread
 
 				logger.debug("Lego message" + new String(pkt.getData()));
 
-				if (cm.getSavirity() == null)
-				{
-					continue;
-				}
-
+				
+				gui.UpdateStatus(cm.path + "-" + cm.module + ": " + cm.StatusMessage());
 				if (gui != null)
 				{
 					switch (cm.issue)
@@ -95,6 +92,19 @@ public class MessageParser extends Thread
 						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
 						{
 							gui.UpdateStatus(cm.StatusMessage());
+						}
+						break;
+						
+					case ConfigurationMessage.ISSUE_MSG_ACTIVE:
+						//if ((cm.module.equals("udpclient")) && (cm.StatusMessage() != null))
+						if (cm.isinput == 1)
+						{
+							gui.UpdateStatus(cm.module + ": " + cm.input);
+						}
+						
+						if (cm.isoutput == 1)
+						{
+							gui.UpdateStatus(cm.module + ": " + cm.output);
 						}
 						break;
 

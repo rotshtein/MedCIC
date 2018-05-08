@@ -39,14 +39,15 @@ public abstract class Operation implements Runnable
 				
 				builder.redirectOutput(new File("out-"+ Thread.currentThread().getId()+".txt"));
 				builder.redirectError(new File("out-"+ Thread.currentThread().getId()+".txt"));
+				String s = "";
+				for (String v : vars)
+				{
+					s += " " + v;
+				}
+				System.out.println("Running" + s);
 				p = builder.start(); // may throw IOException
 
 				procMon = new ProcMon(p, operation);
-				procMonThread = new Thread(procMon, operation + " procMon");
-				procMonThread.start();
-
-				//feedbackFileThread = new Thread(this, operation + " feedback reader");
-				//feedbackFileThread.start();
 			}
 			catch (Exception ex)
 			{

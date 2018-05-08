@@ -154,7 +154,7 @@ public class ManagementParser extends Thread implements GuiInterface
 				String MediationExe = Parameters.Get("MediationExe", "notepad.exe");
 				Mediate med = new Mediate(MediationExe, this, "CIC Production");
 
-				String ScriptPath = Parameters.Get("ScriptPath", "C:\\programs\\lego\\config");
+				String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\config");
 				Kill();
 				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
 						p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());

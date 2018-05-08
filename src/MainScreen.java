@@ -7,7 +7,6 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import lego.MessageParser;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
@@ -34,7 +33,6 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
-
 
 
 public class MainScreen implements GuiInterface

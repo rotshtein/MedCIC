@@ -199,8 +199,8 @@ public class ScriptFile
 		AddModule(new ModuleConfiguration(Path + ".1.1", module, parameters, Path + ".1.1.1"));
 		AddModule(new ModuleConfiguration(Path + ".1.1.1", "cesrawout", null, Path + ".1.1.1.1"));
 		AddModule(new ModuleConfiguration(Path + ".1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri),
-				Path + ".1.1.1.1,1"));
-		AddModule(new ModuleConfiguration(Path + ".1.1.1.1,1", "packet2null", "", ""));
+				Path + ".1.1.1.1.1"));
+		AddModule(new ModuleConfiguration(Path + ".1.1.1.1.1", "packet2null", "", ""));
 
 		return true;
 	}

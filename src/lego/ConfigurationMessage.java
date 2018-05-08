@@ -51,15 +51,21 @@ public class ConfigurationMessage
 	public ConfigurationMessage()
 	{
 	}
-
-	public ConfigurationMessage(int t, String Path)
+	
+	public ConfigurationMessage(String Path,  int issue)
+	{
+		this (Path, "", issue, GetIssueString(issue));
+	}
+	
+	
+	public ConfigurationMessage(String Path, String Module, int issue, String IssueString)
 	{
 		if (Path == null) Path = "1";
 
 		this.path = Path;
-		this.module = "ProcessBlock";
-		this.issue = t;
-		this.issuestring = "";
+		this.module =  Module;
+		this.issue = issue;
+		this.issuestring = IssueString;
 		this.message = "";
 		this.input = 0;
 		this.output = 0;
@@ -70,6 +76,7 @@ public class ConfigurationMessage
 		this.isoutput = 0;
 	}
 
+	
 	public String toJson() throws Exception
 	{
 		ObjectMapper mapper = new ObjectMapper();
@@ -173,6 +180,45 @@ public class ConfigurationMessage
 		}
 		
 		return status;
+	}
+	public static String GetIssueString(int issue)
+	{
+		switch (issue)
+		{
+		case ISSUE_MSG_ACTIVE:
+			return "Active";
+		case ISSUE_MSG_START:
+			return "Start";
+		case ISSUE_MSG_PAUSE:
+			return "Pause";
+		case ISSUE_MSG_DONE:
+			return "Done";
+		case ISSUE_MSG_RESTART:
+			return "Restart";
+		case ISSUE_MSG_PING:
+			return "Ping";
+		case ISSUE_MSG_UNPAUSE:
+			return "Unpause";
+		case ISSUE_MSG_SYNC:
+			return "Sync";
+		case ISSUE_MSG_LOST_SYNC:
+			return "Lost sync";
+		case ISSUE_MSG_FATAL:
+			return "Fatal";
+		case ISSUE_MSG_ERROR:
+			return "Error";
+		case ISSUE_MSG_WARNING:
+			return "Warning";
+		case ISSUE_MSG_NOTICE:
+			return "Notice";
+		case ISSUE_MSG_INFO:
+			return "Info";
+		case ISSUE_MSG_DEBUG:
+			return "Debug";
+		case ISSUE_MSG_TRACE:
+			return "Trace";
+		}
+	return "";
 	}
 
 }

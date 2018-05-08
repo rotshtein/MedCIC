@@ -88,8 +88,7 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote)
 	{
-		logger.info(
-				"closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+		logger.info("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
 	}
 
 	@Override
