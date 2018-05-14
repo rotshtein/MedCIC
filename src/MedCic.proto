@@ -15,9 +15,9 @@ enum STATUS
 
 enum CHANEL_STATUS
 {
-	SYNC = 0;
+	UNKNOWN = 0;
 	OUT_OF_SYNC = 1;
-	UNKNOWN = 2;
+	SYNC = 2;
 }
 
 enum ENCAPSULATION

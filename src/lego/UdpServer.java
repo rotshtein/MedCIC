@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.log4j.Logger;
 
 import tcc.GuiInterface;
+import tcc.Parameters;
 
 public class UdpServer extends Thread
 {
@@ -27,7 +28,8 @@ public class UdpServer extends Thread
 		if (socket == null)
 		{
 			socket = new DatagramSocket(null);
-			socket.bind(new InetSocketAddress("0.0.0.0", Port));
+			String ListenAddress = Parameters.Get("ListenAddress", "127.0.0.1");
+			socket.bind(new InetSocketAddress(ListenAddress, Port));
 			socket.setSoTimeout(500);
 		}
 		queue = Queue;
