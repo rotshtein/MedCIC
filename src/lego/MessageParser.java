@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.log4j.Logger;
 
 import tcc.GuiInterface;
+import tcc.GuiInterface.Channel;
 import tcc.Parameters;
 
 public class MessageParser extends Thread
@@ -17,6 +18,56 @@ public class MessageParser extends Thread
 	BlockingQueue<DatagramPacket>	queue		= null;
 	UdpServer						server		= null;
 	Boolean							stopThread	= false;
+	CicChanel cic1 = null;
+	CicChanel cic2 = null;
+	
+	class CicChanel
+	{
+		long prevInputBytes = 0;
+		long prevOutputBytes = 0;
+		long inputBytes = 0;
+		long outputBytes = 0;
+		
+		public void Clear()
+		{
+			prevInputBytes = prevOutputBytes = inputBytes = outputBytes = 0;
+		}
+		
+		public Boolean IsInSync()
+		{
+			if ( (inputBytes == 0) | (outputBytes == 0) )
+			{
+				return false;
+			}
+			
+			if (outputBytes < prevOutputBytes + 8192)
+			{
+				return false;
+			}
+			
+			if (inputBytes < prevInputBytes + 8192)
+			{
+				return false;
+			}
+			
+			return true;
+		}
+		
+		
+		
+		
+		public void setInputByte(long Bytes)
+		{
+			prevInputBytes = inputBytes;
+			inputBytes = Bytes;
+		}
+		
+		public void setOutputByte(long Bytes)
+		{
+			prevOutputBytes = outputBytes;
+			outputBytes = Bytes;
+		}
+	}
 
 	public MessageParser(GuiInterface Gui) throws Exception
 	{
@@ -26,6 +77,8 @@ public class MessageParser extends Thread
 
 	public MessageParser(GuiInterface Gui, int Port) throws Exception
 	{
+		cic1 = new CicChanel();
+		cic2 = new CicChanel();
 		gui = Gui;
 		queue = new LinkedBlockingDeque<DatagramPacket>(100);
 		server = new UdpServer(Port, queue, Gui);
@@ -92,19 +145,68 @@ public class MessageParser extends Thread
 						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
 						{
 							gui.UpdateStatus(cm.StatusMessage());
+							cic1.Clear();
+							cic2.Clear();
 						}
 						break;
 						
 					case ConfigurationMessage.ISSUE_MSG_ACTIVE:
-						//if ((cm.module.equals("udpclient")) && (cm.StatusMessage() != null))
-						if (cm.isinput == 1)
+						if (cm.module.toLowerCase().equals("udpclient"))
 						{
-							gui.UpdateStatus(cm.module + ": " + cm.input);
+							if (cm.path.startsWith("1"))
+							{
+								cic1.setInputByte(cm.input);
+								if (cic1.IsInSync())
+								{
+									gui.OperationInSync(Channel.INPUT1);
+								}
+								else
+								{
+									gui.OperationOutOfSync(Channel.INPUT1);
+								}
+							}
+							else if (cm.path.startsWith("2"))
+							{
+								cic2.setInputByte(cm.input);
+								if (cic2.IsInSync())
+								{
+									gui.OperationInSync(Channel.INPUT2);
+								}
+								else
+								{
+									gui.OperationOutOfSync(Channel.INPUT2);
+								}
+
+							}
 						}
 						
-						if (cm.isoutput == 1)
+						if (cm.module.toLowerCase().equals("udpserver"))
 						{
-							gui.UpdateStatus(cm.module + ": " + cm.output);
+							if (cm.path.startsWith("1"))
+							{
+								cic1.setOutputByte(cm.input);
+								if (cic1.IsInSync())
+								{
+									gui.OperationInSync(Channel.OUTPUT1);
+								}
+								else
+								{
+									gui.OperationOutOfSync(Channel.OUTPUT1);
+								}
+							}
+							else if (cm.path.startsWith("2"))
+							{
+								cic2.setOutputByte(cm.input);
+								if (cic2.IsInSync())
+								{
+									gui.OperationInSync(Channel.OUTPUT2);
+								}
+								else
+								{
+									gui.OperationOutOfSync(Channel.OUTPUT2);
+								}
+							}
+
 						}
 						break;
 

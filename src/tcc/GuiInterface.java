@@ -2,6 +2,14 @@ package tcc;
 
 public interface GuiInterface
 {
+	
+	public enum Channel
+	{
+		INPUT1,
+		INPUT2,
+		OUTPUT1,
+		OUTPUT2
+	}
 
 	void onConnectionChange(Boolean status);
 
@@ -11,8 +19,8 @@ public interface GuiInterface
 	
 	void OperationStarted();
 	
-	void OperationInSync();
+	void OperationInSync(Channel ch);
 	
-	void OperationOutOfSync();
+	void OperationOutOfSync(Channel ch);
 	
 }

@@ -11,6 +11,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import medcic_proto.MedCic.AutomaticStartCommand;
+import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
@@ -18,6 +19,7 @@ import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
+import tcc.GuiInterface.Channel;
 
 public class ManagementClient extends WebSocketClient
 {
@@ -101,22 +103,55 @@ public class ManagementClient extends WebSocketClient
 				if (sr.getStatus() == STATUS.STOP)
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
-					gui.onConnectionChange(false);
+					gui.OperationCompleted();
+					
 				}
 				else if (sr.getStatus() == STATUS.RUN)
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
-					gui.onConnectionChange(true);
+					gui.OperationStarted();
 				}
-				else if (sr.getStatus() == STATUS.SYNC)
+				if (sr.getCic1Input() == CHANEL_STATUS.SYNC)
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
-					gui.onConnectionChange(true);
+					gui.OperationInSync(Channel.INPUT1);
 				}
-				else if (sr.getStatus() == STATUS.OUT_OF_SYNC)
+				else if (sr.getCic1Input() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
 					gui.UpdateStatus(sr.getStatusDescription());
-					gui.onConnectionChange(false);
+					gui.OperationOutOfSync(Channel.INPUT1);
+				}
+				if (sr.getCic2Input() == CHANEL_STATUS.SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationInSync(Channel.INPUT1);
+				}
+				else if (sr.getCic2Input() == CHANEL_STATUS.OUT_OF_SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationOutOfSync(Channel.INPUT1);
+				}
+
+				if (sr.getCic1Output() == CHANEL_STATUS.SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationInSync(Channel.OUTPUT2);
+				}
+				else if (sr.getCic1Output() == CHANEL_STATUS.OUT_OF_SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationOutOfSync(Channel.OUTPUT2);
+				}
+
+				if (sr.getCic2Output() == CHANEL_STATUS.SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationInSync(Channel.OUTPUT2);
+				}
+				else if (sr.getCic2Output() == CHANEL_STATUS.OUT_OF_SYNC)
+				{
+					gui.UpdateStatus(sr.getStatusDescription());
+					gui.OperationOutOfSync(Channel.OUTPUT2);
 				}
 				break;
 

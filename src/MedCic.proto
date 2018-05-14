@@ -2,17 +2,22 @@ syntax = "proto3";
 package medcic_proto;
 
 /*************/
-/* Version 2 */
+/* Version 3 */
 /************/
 
 enum STATUS
 {
 	RUN = 0;
-	SYNC = 1;
-	OUT_OF_SYNC = 2;
-	STOP = 3;
-	ERROR = 4;
-	WARNING = 5;
+	STOP = 1;
+	ERROR = 2;
+	WARNING = 3;
+}
+
+enum CHANEL_STATUS
+{
+	SYNC = 0;
+	OUT_OF_SYNC = 1;
+	UNKNOWN = 2;
 }
 
 enum ENCAPSULATION
@@ -105,13 +110,17 @@ message StatusRequest
 message StatusReplay
 {
 	STATUS status = 1;
-	string status_description = 2;
-	bool warning = 3;
-	string warning_message = 4;
-	int32 warning_number = 5;
-	bool error = 6;
-	string error_mMessage = 7;
-	int32 error_number = 8;
+	CHANEL_STATUS cic1Input = 2;
+	CHANEL_STATUS cic2Input = 3;
+	CHANEL_STATUS cic1Output = 4;
+	CHANEL_STATUS cic2Output = 5;
+	string status_description = 6;
+	bool warning = 7;
+	string warning_message = 8;
+	int32 warning_number = 9;
+	bool error = 10;
+	string error_mMessage = 11;
+	int32 error_number = 12;
 }
 
 /*****************************************************************************************************************************/

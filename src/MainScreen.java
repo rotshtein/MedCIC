@@ -249,6 +249,7 @@ public class MainScreen implements GuiInterface
 		frame.getContentPane().setLayout(null);
 
 		txtIn1 = new JFormattedTextField();
+		txtIn1.setBackground(Color.WHITE);
 		txtIn1.setBounds(10, 13, 197, 20);
 		txtIn1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtIn1.setToolTipText("test tooltip");
@@ -421,6 +422,10 @@ public class MainScreen implements GuiInterface
 		}
 		// Now edit your gui objects
 		btnStart.setBackground(back);
+		txtIn1.setBackground(Color.WHITE);
+		txtIn2.setBackground(Color.WHITE);
+		txtOut1.setBackground(Color.WHITE);
+		txtOut2.setBackground(Color.WHITE);
 	}
 	
 	public JTextArea getTextArea() 
@@ -447,12 +452,17 @@ public class MainScreen implements GuiInterface
 		}
 		// Now edit your gui objects
 		btnStart.setBackground(Color.ORANGE);
+		txtIn1.setBackground(Color.ORANGE);
+		txtIn2.setBackground(Color.ORANGE);
+		txtOut1.setBackground(Color.ORANGE);
+		txtOut2.setBackground(Color.ORANGE);
+		
 	}
 
 
 
 	@Override
-	public void OperationInSync()
+	public void OperationInSync(Channel ch)
 	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
@@ -461,19 +471,39 @@ public class MainScreen implements GuiInterface
 				@Override
 				public void run()
 				{
-					OperationInSync();
+					OperationInSync(ch);
 				}
 			});
 			return;
 		}
 		// Now edit your gui objects
-		btnStart.setBackground(Color.GREEN);
+		switch (ch)
+		{
+		case INPUT1:
+			txtIn1.setBackground(Color.GREEN);
+			break;
+			
+		case INPUT2:
+			txtIn2.setBackground(Color.GREEN);
+			break;
+			
+		case OUTPUT1:
+			txtOut1.setBackground(Color.GREEN);
+			break;
+			
+		case OUTPUT2:
+			txtOut2.setBackground(Color.GREEN);
+			break;
+			
+		default:
+			return;
+		}
 	}
 
 
 
 	@Override
-	public void OperationOutOfSync()
+	public void OperationOutOfSync(Channel ch)
 	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
@@ -482,12 +512,33 @@ public class MainScreen implements GuiInterface
 				@Override
 				public void run()
 				{
-					OperationOutOfSync();
+					OperationOutOfSync(ch);
 				}
 			});
 			return;
 		}
 		// Now edit your gui objects
-		btnStart.setBackground(Color.GRAY);
+		switch (ch)
+		{
+		case INPUT1:
+			txtIn1.setBackground(Color.RED);
+			break;
+			
+		case INPUT2:
+			txtIn2.setBackground(Color.RED);
+			break;
+			
+		case OUTPUT1:
+			txtOut1.setBackground(Color.RED);
+			break;
+			
+		case OUTPUT2:
+			txtOut2.setBackground(Color.RED);
+			break;
+			
+		default:
+			return;
+		}
+
 	}
 }

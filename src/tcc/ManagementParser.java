@@ -5,16 +5,21 @@ import java.util.AbstractMap;
 import java.util.concurrent.BlockingQueue;
 import org.apache.log4j.Logger;
 import org.java_websocket.WebSocket;
+
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import lego.MessageParser;
 import medcic_proto.MedCic.AutomaticStartCommand;
+import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
+
+
 
 public class ManagementParser extends Thread implements GuiInterface
 {
@@ -161,6 +166,7 @@ public class ManagementParser extends Thread implements GuiInterface
 				SendStatusMessage("Starting ...", conn);
 				logger.info("Starting...");
 				SendAck(h, conn);
+				SendProcessStartMessage();
 			}
 			catch (Exception e)
 			{
@@ -187,8 +193,10 @@ public class ManagementParser extends Thread implements GuiInterface
 			}
 			else
 			{
+				
 				SendStatusMessage("Process not running", conn);
 			}
+			SendProcessStopMessage();
 			procMon = null;
 			break;
 
@@ -257,6 +265,24 @@ public class ManagementParser extends Thread implements GuiInterface
 		return h;
 	}
 
+	private void SendProcessStopMessage()
+	{
+		StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
+		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
+				.setMessageData(r.toByteString()).build();
+
+		BroadcastMessage(h.toByteString());
+	}
+	
+	private void SendProcessStartMessage()
+	{
+		StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
+		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
+				.setMessageData(r.toByteString()).build();
+
+		BroadcastMessage(h.toByteString());
+	}
+	
 	private void SendStatusMessage(String message, WebSocket conn)
 	{
 		try
@@ -265,11 +291,38 @@ public class ManagementParser extends Thread implements GuiInterface
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
 					.setMessageData(s.toByteString()).build();
 
-			conn.send(h.toByteArray());
+			SendMessage(h.toByteString(), conn);
 		}
 		catch (Exception e)
 		{
 			logger.error("Failed to send StatusMessage to a connection", e);
+		}
+	}
+
+	private void SendMessage(ByteString buffer, WebSocket conn )
+	{
+		try
+		{
+			conn.send(buffer.toByteArray());
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send Message to a connection", e);
+		}
+	}
+	
+	private void BroadcastMessage(ByteString buffer)
+	{
+		try
+		{
+			for (WebSocket conn : server.connections() )
+			{
+				conn.send(buffer.toByteArray());
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to Broadcast Message to a connection", e);
 		}
 	}
 
@@ -307,21 +360,13 @@ public class ManagementParser extends Thread implements GuiInterface
 	@Override
 	public void OperationCompleted()
 	{
-		for (WebSocket conn : server.connections())
-		{
-			OperationCompleted(conn);
-		}
-	}
-
-	public void OperationCompleted(WebSocket conn)
-	{
 		try
 		{
 			StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
 					.setMessageData(s.toByteString()).build();
 
-			conn.send(h.toByteArray());
+			BroadcastMessage(h.toByteString());
 		}
 		catch (Exception e)
 		{
@@ -335,35 +380,9 @@ public class ManagementParser extends Thread implements GuiInterface
 		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
 				.build();
 
-		for (WebSocket conn : server.connections())
-		{
-			OperationStarted(conn, h);
-		}
+		BroadcastMessage(h.toByteString());
 	}
 
-	public void OperationStarted(WebSocket conn)
-	{
-		OperationStarted(conn, null);
-	}
-
-	public void OperationStarted(WebSocket conn, Header h)
-	{
-		try
-		{
-			if (h == null)
-			{
-				StatusReplay s = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
-				h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
-						.build();
-			}
-
-			conn.send(h.toByteArray());
-		}
-		catch (Exception e)
-		{
-			logger.error("Failed to send StatusReplay on starting operation to a connection", e);
-		}
-	}
 
 	@Override
 	public void UpdateStatus(String status)
@@ -382,21 +401,86 @@ public class ManagementParser extends Thread implements GuiInterface
 	}
 
 	@Override
-	public void OperationInSync()
+	public void OperationInSync(Channel ch)
 	{
+		StatusReplay s = null;
+		Header h = null;
+		try
+		{
+			switch (ch)
+			{
+			case  INPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.SYNC).setStatusDescription("CIC 1 input synchronized").build();
+				break;
+			case  INPUT2:
+				s = StatusReplay.newBuilder().setCic2Input(CHANEL_STATUS.SYNC).setStatusDescription("CIC 2 input synchronized").build();
+				break;
+			case  OUTPUT1:
+				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.SYNC).setStatusDescription("CIC 1 output synchronized").build();
+				break;
+			case  OUTPUT2:
+				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.SYNC).setStatusDescription("CIC 2 output synchronized").build();
+				break;
+			default:
+				return;
+			}
+			
+			
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
+					.setMessageData(s.toByteString()).build();
+			BroadcastMessage(h.toByteString() );
+			
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send StatusMessage to a connection", e);
+		}
+		
 		for (WebSocket conn : server.connections())
 		{
-			SendStatusMessage("Stream is synchronized", conn);
+			conn.send(h.toByteArray());
 		}
-
 	}
 
 	@Override
-	public void OperationOutOfSync()
+	public void OperationOutOfSync(Channel ch)
 	{
+		StatusReplay s = null;
+		Header h = null;
+		try
+		{
+			switch (ch)
+			{
+			case  INPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 1 input NOT synchronized").build();
+				break;
+			case  INPUT2:
+				s = StatusReplay.newBuilder().setCic2Input(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 2 input NOT synchronized").build();
+				break;
+			case  OUTPUT1:
+				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 1 output NOT synchronized").build();
+				break;
+			case  OUTPUT2:
+				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 2 output NOT synchronized").build();
+				break;
+			default:
+				return;
+			}
+			
+			
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
+					.setMessageData(s.toByteString()).build();
+			BroadcastMessage(h.toByteString() );
+			
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send StatusMessage to a connection", e);
+		}
+		
 		for (WebSocket conn : server.connections())
 		{
-			SendStatusMessage("Stream is out of synch", conn);
+			conn.send(h.toByteArray());
 		}
 	}
 }
