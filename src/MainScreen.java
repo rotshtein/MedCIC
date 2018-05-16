@@ -518,10 +518,12 @@ public class MainScreen implements GuiInterface
 			
 		case OUTPUT1:
 			txtOut1.setBackground(Color.GREEN);
+			UpdateStatus("CIC-1 is synchronized\n\r");
 			break;
 			
 		case OUTPUT2:
 			txtOut2.setBackground(Color.GREEN);
+			UpdateStatus("CIC-2 is synchronized\n\r");
 			break;
 			
 		default:
@@ -559,10 +561,12 @@ public class MainScreen implements GuiInterface
 			
 		case OUTPUT1:
 			txtOut1.setBackground(Color.RED);
+			UpdateStatus("CIC-1 is out of synchronized\n\r");
 			break;
 			
 		case OUTPUT2:
 			txtOut2.setBackground(Color.RED);
+			UpdateStatus("CIC-2 is out of synchronized\n\r");
 			break;
 			
 		default:

@@ -24,7 +24,6 @@ public class MessageParser extends Thread
 	
 	class CicChanel
 	{
-		
 		public class LimitedSizeQueue<K> extends ArrayList<K> 
 		{
 		    /**
@@ -66,73 +65,42 @@ public class MessageParser extends Thread
 		    }
 		}
 		
-		final int lowpass = 7; 
+		final int lowpass = 3; 
 		long prevInputBytes = 0;
-		long prevOutputBytes = 0;
-		long inputBytes = 0;
-		long outputBytes = 0;
-		Boolean inSync = false;
+		Boolean alive = false;
 		LimitedSizeQueue<Long> inputQueue = new LimitedSizeQueue<Long>(lowpass);
-		LimitedSizeQueue<Long> outputQueue = new LimitedSizeQueue<Long>(lowpass);
+
 		
 		public void Clear()
 		{
-			prevInputBytes = prevOutputBytes = inputBytes = outputBytes = 0;
+			prevInputBytes =  0;
 			inputQueue.Clear();
-			outputQueue.Clear();
+			alive = false;
 		}
 		
-		public Boolean IsInSync()
+		public Boolean IsAlive()
 		{
-			return inSync;
+			return alive;
 		}
 		
 		public void setInputByte(long Bytes)
 		{
 			if (Bytes == 0)
 			{
-				inputQueue.Clear();
-				prevInputBytes = inputBytes = 0;
+				Clear();
 			}
 			else
 			{
 				prevInputBytes = inputQueue.getSum();
 				inputQueue.add(Bytes);
-				inputBytes = inputQueue.getSum();
-				if (prevInputBytes + (64000) > inputBytes)
+				
+				if (prevInputBytes + (64000) > inputQueue.getSum())
 				{
-					inSync = false;
-					inputQueue.Clear();
-					prevInputBytes = inputBytes = 0;
+					Clear();
 				}
 				else
 				{
-					inSync = true;
-				}
-			}
-		}
-		
-		public void setOutputByte(long Bytes)
-		{
-			if (Bytes == 0)
-			{
-				outputQueue.Clear();
-				prevOutputBytes = outputBytes = 0;
-			}
-			else
-			{
-				prevOutputBytes = outputQueue.getSum();
-				outputQueue.add(Bytes);
-				outputBytes = outputQueue.getSum();
-				if (prevOutputBytes + (64000) > outputBytes)
-				{
-					inSync = false;
-					outputQueue.Clear();
-					prevOutputBytes = outputBytes = 0;
-				}
-				else
-				{
-					inSync = true;
+					alive = true;
 				}
 			}
 		}
@@ -231,7 +199,7 @@ public class MessageParser extends Thread
 							if (cm.path.startsWith("1"))
 							{
 								cic1.setInputByte(cm.output);
-								if (cic1.IsInSync())
+								if (cic1.IsAlive())
 								{
 									gui.OperationInSync(Channel.INPUT1);
 								}
@@ -243,7 +211,7 @@ public class MessageParser extends Thread
 							else if (cm.path.startsWith("2"))
 							{
 								cic2.setInputByte(cm.output);
-								if (cic2.IsInSync())
+								if (cic2.IsAlive())
 								{
 									gui.OperationInSync(Channel.INPUT2);
 								}
@@ -254,7 +222,7 @@ public class MessageParser extends Thread
 
 							}
 						}
-						
+						/*
 						else if (cm.module.toLowerCase().equals("udpclient"))
 						{
 							if (cm.path.startsWith("1"))
@@ -281,8 +249,7 @@ public class MessageParser extends Thread
 									gui.OperationOutOfSync(Channel.OUTPUT2);
 								}
 							}
-
-						}
+						}*/
 						
 						else
 						{
@@ -295,7 +262,31 @@ public class MessageParser extends Thread
 							gui.UpdateStatus(st);
 						}
 						break;
-
+					case ConfigurationMessage.ISSUE_MSG_SYNC:
+							if (cm.path.startsWith("1.1.1"))
+							{
+								gui.OperationInSync(Channel.OUTPUT1);
+							}
+							
+							else if (cm.path.startsWith("2.1.1"))
+							{
+								gui.OperationInSync(Channel.OUTPUT2);
+							}
+							
+							break;
+							
+					case ConfigurationMessage.ISSUE_MSG_LOST_SYNC:
+							if (cm.path.startsWith("1.1.1"))
+							{
+								gui.OperationOutOfSync(Channel.OUTPUT1);
+							}
+							
+							else if (cm.path.startsWith("2.1.1"))
+							{
+								gui.OperationOutOfSync(Channel.OUTPUT2);
+							}
+							break;
+						
 					default:
 						/*
 						String status = "-------->" + cm.StatusMessage();
