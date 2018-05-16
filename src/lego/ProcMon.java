@@ -8,6 +8,8 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 
+import tcc.Parameters;
+
 public class ProcMon implements Runnable
 {
 
@@ -15,12 +17,12 @@ public class ProcMon implements Runnable
 	private Process		_proc;
 	String processName = null;
 	private volatile boolean	_complete	= false;
-	String						description	= "";
+	public String				description	= "";
 
-	public ProcMon(String[] vars, String description) throws Exception
+	/*public ProcMon(String[] vars, String description) throws Exception
 	{
 		this(Runtime.getRuntime().exec(vars, null), description);
-	}
+	}*/
 
 	public ProcMon(Process proc)
 	{
@@ -41,7 +43,7 @@ public class ProcMon implements Runnable
 		return _complete;
 	}
 
-	public Boolean kill()
+	public Boolean Kill()
 	{
 		SendStop();
 				
@@ -86,7 +88,7 @@ public class ProcMon implements Runnable
 		logger.info("Exiting procMon thread");
 	}
 	
-	void SendStop()
+	public static void SendStop()
 	{
 		try
 		{
@@ -99,25 +101,28 @@ public class ProcMon implements Runnable
 		}
 	}
 	
-	void SendStop(String Path) throws Exception
+	public static void SendStop(String Path) throws Exception
 	{
-		byte[] message = (new ConfigurationMessage(Path,ConfigurationMessage.ISSUE_MSG_DONE)).toJson().getBytes();
+		ConfigurationMessage cm = new ConfigurationMessage(Path,ConfigurationMessage.ISSUE_MSG_DONE);
+		cm.module = "udpserver";
+		byte[] message = cm.toJson().getBytes();
 		try
 		{
-			InetAddress address = InetAddress.getByName("127.0.0.1");
+			InetAddress address = InetAddress.getByName(Parameters.Get("ManagementHost", "127.0.0.1"));
 			int Port = UdpServer.getPort();
 			if (Port > 0)
 			{
 				DatagramPacket packet = new DatagramPacket(message, message.length, address, Port );
 				DatagramSocket dsocket = new DatagramSocket();
 			    dsocket.send(packet);
+			    logger.debug("Sending Done to path " + Path + " => " + new String(packet.getData()) );
+			    String s = new String(packet.getData());
 			    dsocket.close();
 			}
 		}
 		catch (UnknownHostException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("UnknownHostException", e);
 		}
 	}
 	

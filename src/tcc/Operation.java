@@ -5,6 +5,8 @@ import java.lang.ProcessBuilder.Redirect;
 
 import org.apache.log4j.Logger;
 
+import lego.ProcMon;
+
 public abstract class Operation implements Runnable
 {
 
@@ -31,14 +33,13 @@ public abstract class Operation implements Runnable
 		{
 			try
 			{
-
 				ProcessBuilder builder = new ProcessBuilder(vars);
 				builder.redirectInput(Redirect.INHERIT)
 				   .redirectOutput(Redirect.INHERIT)
 				   .redirectError(Redirect.INHERIT);
 				
-				builder.redirectOutput(new File("out-"+ Thread.currentThread().getId()+".txt"));
-				builder.redirectError(new File("out-"+ Thread.currentThread().getId()+".txt"));
+				builder.redirectOutput(new File("ProcessBlock_out-"+ Thread.currentThread().getId()+".txt"));
+				builder.redirectError(new File("ProcessBlock_error-"+ Thread.currentThread().getId()+".txt"));
 				String s = "";
 				for (String v : vars)
 				{

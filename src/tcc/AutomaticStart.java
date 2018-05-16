@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
+import lego.ProcMon;
 import lego.ScriptFile;
 
 public class AutomaticStart implements Runnable
@@ -152,7 +153,7 @@ public class AutomaticStart implements Runnable
 		{
 			if(procMon != null)
 			{
-				procMon.kill();
+				procMon.Kill();
 			}
 		}
 		catch (Exception e)

@@ -10,6 +10,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import lego.MessageParser;
+import lego.ProcMon;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.Header;
@@ -18,7 +19,6 @@ import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
-
 
 
 public class ManagementParser extends Thread implements GuiInterface
@@ -105,120 +105,128 @@ public class ManagementParser extends Thread implements GuiInterface
 			SendNck(h, conn);
 			return;
 		}
-
-		switch (h.getOpcode())
+		try
 		{
-		case HEADER:
-			SendNck(h, conn);
-			break;
-
-		case AUTO_START_CMD:
-			AutomaticStartCommand AuroRun = null;
-			try
+			switch (h.getOpcode())
 			{
-				AuroRun = AutomaticStartCommand.parseFrom(h.getMessageData());
-			}
-			catch (InvalidProtocolBufferException e)
-			{
-				logger.error("Failed to parse Automatic Start Command", e);
+			case HEADER:
 				SendNck(h, conn);
-			}
-
-			if (AuroRun.getInput1Url() != null & AuroRun.getInput1Url() != "")
-			{
-
-			}
-
-			if (AuroRun.getInput2Url() != null & AuroRun.getInput2Url() != "")
-			{
-
-			}
-			/*
-			 * Start thread to: 1. Get sample file 2. Identify 3. Run production
-			 * 
-			 * Terminate the thread on processes on STOP if running run thread per CIC => 2
-			 * threads
-			 */
-
-			break;
-
-		case START_CMD:
-			StartCommand p = null;
-			try
-			{
-				p = StartCommand.parseFrom(h.getMessageData());
-			}
-			catch (InvalidProtocolBufferException e)
-			{
-				logger.error("Failed to parse Start Command", e);
-				SendNck(h, conn);
-			}
-
-			try
-			{
-				String MediationExe = Parameters.Get("MediationExe", "notepad.exe");
-				Mediate med = new Mediate(MediationExe, this, "CIC Production");
-
-				String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\config");
-				Kill();
-				procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
-						p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
-				SendStatusMessage("Starting ...", conn);
-				logger.info("Starting...");
+				break;
+	
+			case AUTO_START_CMD:
+				AutomaticStartCommand AuroRun = null;
+				try
+				{
+					AuroRun = AutomaticStartCommand.parseFrom(h.getMessageData());
+				}
+				catch (InvalidProtocolBufferException e)
+				{
+					logger.error("Failed to parse Automatic Start Command", e);
+					SendNck(h, conn);
+				}
+	
+				if (AuroRun.getInput1Url() != null & AuroRun.getInput1Url() != "")
+				{
+	
+				}
+	
+				if (AuroRun.getInput2Url() != null & AuroRun.getInput2Url() != "")
+				{
+	
+				}
+				/*
+				 * Start thread to: 1. Get sample file 2. Identify 3. Run production
+				 * 
+				 * Terminate the thread on processes on STOP if running run thread per CIC => 2
+				 * threads
+				 */
+	
+				break;
+	
+			case START_CMD:
+				StartCommand p = null;
+				try
+				{
+					p = StartCommand.parseFrom(h.getMessageData());
+				}
+				catch (InvalidProtocolBufferException e)
+				{
+					logger.error("Failed to parse Start Command", e);
+					SendNck(h, conn);
+				}
+	
+				try
+				{
+					String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
+					Mediate med = new Mediate(MediationExe, this, "CIC Production");
+	
+					String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+					Kill();
+					procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
+							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
+					SendStatusMessage("Starting ...", conn);
+					logger.info("Starting...");
+					SendAck(h, conn);
+					SendProcessStartMessage();
+				}
+				catch (Exception e)
+				{
+					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+					logger.error("Executable not found. Please fix the configuration file", e);
+					SendNck(h, conn);
+				}
+				break;
+	
+			case STOP_CMD:
 				SendAck(h, conn);
-				SendProcessStartMessage();
-			}
-			catch (Exception e)
-			{
-				SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-				logger.error("Executable not found. Please fix the configuration file", e);
-				SendNck(h, conn);
-			}
-			break;
-
-		case STOP_CMD:
-			SendAck(h, conn);
-			if (procMon == null)
-			{
-				SendStatusMessage("Process not running", conn);
-				return;
-			}
-
-			if (!procMon.isComplete())
-			{
-				logger.warn("Killing process. [ " + procMon.description + " ]");
-				SendStatusMessage("Killing process. [ " + procMon.description + " ]", conn);
-				procMon.kill();
-				OperationCompleted();
-			}
-			else
-			{
+				ProcMon.SendStop();
+				if (procMon == null)
+				{
+					SendStatusMessage("Process not running", conn);
+					return;
+				}
+	
+				if (!procMon.isComplete())
+				{
+					logger.warn("Killing process. [ " + procMon.description + " ]");
+					SendStatusMessage("Killing process. [ " + procMon.description + " ]", conn);
+					procMon.Kill();
+					OperationCompleted();
+				}
+				else
+				{
+					
+					SendStatusMessage("Process not running", conn);
+				}
+				SendProcessStopMessage();
+				procMon = null;
+				break;
+	
+			case STATUS_REQUEST:
+				StatusReplay sr = null;
+				if (procMon != null)
+				{
+					sr = StatusReplay.newBuilder().setError(false).setErrorMMessage("").setWarning(false)
+							.setWarningMessage("").setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
+				}
+				else
+				{
+					sr = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
+				}
+				Header hh = Header.newBuilder().setSequence(h.getSequence()).setMessageData(sr.getErrorMMessageBytes())
+						.build();
 				
-				SendStatusMessage("Process not running", conn);
+				SendMessage(hh.toByteString(), conn);
+				break;
+	
+			default:
+				SendNck(h, conn);
+				break;
 			}
-			SendProcessStopMessage();
-			procMon = null;
-			break;
-
-		case STATUS_REQUEST:
-			StatusReplay sr = null;
-			if (procMon != null)
-			{
-				sr = StatusReplay.newBuilder().setError(false).setErrorMMessage("").setWarning(false)
-						.setWarningMessage("").setStatus(procMon.isComplete() ? STATUS.STOP : STATUS.RUN).build();
-			}
-			else
-			{
-				sr = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
-			}
-			Header hh = Header.newBuilder().setSequence(h.getSequence()).setMessageData(sr.getErrorMMessageBytes())
-					.build();
-			conn.send(hh.toByteArray());
-			break;
-
-		default:
-			SendNck(h, conn);
-			break;
+		}
+		catch (Exception e)
+		{
+			logger.error("Something want wrong in the parser" , e);
 		}
 	}
 
@@ -303,7 +311,10 @@ public class ManagementParser extends Thread implements GuiInterface
 	{
 		try
 		{
-			conn.send(buffer.toByteArray());
+			if (conn.isOpen())
+			{
+				conn.send(buffer.toByteArray());
+			}
 		}
 		catch (Exception e)
 		{
@@ -317,7 +328,10 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			for (WebSocket conn : server.connections() )
 			{
-				conn.send(buffer.toByteArray());
+				if (conn.isOpen())
+				{
+					conn.send(buffer.toByteArray());
+				}
 			}
 		}
 		catch (Exception e)
@@ -353,7 +367,7 @@ public class ManagementParser extends Thread implements GuiInterface
 
 		if (!procMon.isComplete())
 		{
-			procMon.kill();
+			procMon.Kill();
 		}
 	}
 
@@ -410,16 +424,37 @@ public class ManagementParser extends Thread implements GuiInterface
 			switch (ch)
 			{
 			case  INPUT1:
-				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.SYNC).setStatusDescription("CIC 1 input synchronized").build();
+				s = StatusReplay.newBuilder()
+					.setCic1Input(CHANEL_STATUS.SYNC)
+					.setCic1Output(CHANEL_STATUS.UNKNOWN)
+					.setCic2Input(CHANEL_STATUS.UNKNOWN)
+					.setCic2Output(CHANEL_STATUS.UNKNOWN)
+					.setStatusDescription("CIC 1 input synchronized").build();
+				
 				break;
 			case  INPUT2:
-				s = StatusReplay.newBuilder().setCic2Input(CHANEL_STATUS.SYNC).setStatusDescription("CIC 2 input synchronized").build();
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.SYNC)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+						.setStatusDescription("CIC 2 input synchronized").build();
 				break;
 			case  OUTPUT1:
-				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.SYNC).setStatusDescription("CIC 1 output synchronized").build();
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.SYNC)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+				.setStatusDescription("CIC 1 output synchronized").build();
 				break;
 			case  OUTPUT2:
-				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.SYNC).setStatusDescription("CIC 2 output synchronized").build();
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.SYNC)
+						.setStatusDescription("CIC 2 output synchronized").build();
 				break;
 			default:
 				return;
@@ -438,7 +473,10 @@ public class ManagementParser extends Thread implements GuiInterface
 		
 		for (WebSocket conn : server.connections())
 		{
-			conn.send(h.toByteArray());
+			if (conn.isOpen())
+			{
+				conn.send(h.toByteArray());
+			}
 		}
 	}
 
@@ -452,17 +490,37 @@ public class ManagementParser extends Thread implements GuiInterface
 			switch (ch)
 			{
 			case  INPUT1:
-				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 1 input NOT synchronized").build();
+				s = StatusReplay.newBuilder()
+					.setCic1Input(CHANEL_STATUS.OUT_OF_SYNC)
+					.setCic1Output(CHANEL_STATUS.UNKNOWN)
+					.setCic2Input(CHANEL_STATUS.UNKNOWN)
+					.setCic2Output(CHANEL_STATUS.UNKNOWN)
+					.setStatusDescription("CIC 1 input NOT synchronized").build();
+				
 				break;
 			case  INPUT2:
-				s = StatusReplay.newBuilder().setCic2Input(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 2 input NOT synchronized").build();
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.OUT_OF_SYNC)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+						.setStatusDescription("CIC 2 input NOT synchronized").build();
 				break;
 			case  OUTPUT1:
-				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 1 output NOT synchronized").build();
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.OUT_OF_SYNC)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+				.setStatusDescription("CIC 1 output NOT synchronized").build();
 				break;
 			case  OUTPUT2:
-				s = StatusReplay.newBuilder().setCic1Output(CHANEL_STATUS.OUT_OF_SYNC).setStatusDescription("CIC 2 output NOT synchronized").build();
-				break;
+				s = StatusReplay.newBuilder()
+						.setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.OUT_OF_SYNC)
+						.setStatusDescription("CIC 2 output NOT synchronized").build();
 			default:
 				return;
 			}
@@ -480,7 +538,10 @@ public class ManagementParser extends Thread implements GuiInterface
 		
 		for (WebSocket conn : server.connections())
 		{
-			conn.send(h.toByteArray());
+			if (conn.isOpen())
+			{
+				conn.send(h.toByteArray());
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ package lego;
 import javax.print.attribute.standard.Severity;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class ConfigurationMessage
@@ -91,6 +92,7 @@ public class ConfigurationMessage
 		return object;
 	}
 	
+	/*
 	public Severity getSavirity()
 	{
 		Severity savity = null;
@@ -129,7 +131,7 @@ public class ConfigurationMessage
 				break;				
 		}
 		return savity;
-	}
+	}*/
 	
 	public String StatusMessage()
 	{
@@ -168,19 +170,20 @@ public class ConfigurationMessage
 				return null;
 		}
 		
-		String status = module + ": ";
+		String status = module;
 		if (issuePrefix != null & issuePrefix != "")
 		{
-			status += issuePrefix + ": ";
+			status += " : " + issuePrefix;
 		}
-		status += issuestring;
+		status +=  " [" + issuestring +"]";
 		if (message != null & message != "")
 		{
-			status += " -> " + message;
+			status += " input:" + input + " output:" + output + " >> " + message;
 		}
 		
 		return status;
 	}
+	
 	public static String GetIssueString(int issue)
 	{
 		switch (issue)

@@ -31,6 +31,7 @@ public class UdpServer extends Thread
 			String ListenAddress = Parameters.Get("ListenAddress", "127.0.0.1");
 			socket.bind(new InetSocketAddress(ListenAddress, Port));
 			socket.setSoTimeout(500);
+			port = Port;
 		}
 		queue = Queue;
 		gui = Gui;

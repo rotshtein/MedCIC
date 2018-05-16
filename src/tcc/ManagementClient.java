@@ -27,17 +27,66 @@ public class ManagementClient extends WebSocketClient
 	static final Logger	logger				= Logger.getLogger("ManagementClient");
 	GuiInterface		gui					= null;
 	Boolean				connectionStatus	= false;
-	ManagementClient	conn;
 	Boolean				gotAck				= false;
 	Boolean				gotNck				= false;
+	Boolean				operationStarted 	= false;
+	Boolean 			syncTimeout		 = false;
+	long 				lastSyncTime			 = 0;
+	Thread 				syncTimeoutThread = null;
+	Boolean 			runThread = true;
+	
 
+	
 	public ManagementClient(URI serverUri, GuiInterface gui)
 	{
 		super(serverUri);
 		this.gui = gui;
 		this.connect();
+		syncTimeoutThread = new Thread( () -> SyncTimeoutThread());
+		syncTimeoutThread.start();
+		logger.debug("ManagementClient and the SyncTimeoutThread started");
 	}
 
+	@SuppressWarnings("deprecation")
+	public void Stop()
+	{
+		//syncTimeoutThread.stop();
+		runThread = false;
+		logger.debug("Stop ManagementClient and the SyncTimeoutThread");
+		this.close();
+	}
+	
+	void SyncTimeoutThread()
+	{
+		runThread = true;
+		while (runThread) 
+		{
+			try
+			{
+				Thread.sleep(1000);
+				if (System.currentTimeMillis() - lastSyncTime > 5000)
+				{
+					if (syncTimeout == false)
+					{
+						syncTimeout = true;
+						gui.OperationOutOfSync(Channel.INPUT1);
+						gui.OperationOutOfSync(Channel.INPUT2);
+						gui.OperationOutOfSync(Channel.OUTPUT1);
+						gui.OperationOutOfSync(Channel.OUTPUT2);
+					}
+				}
+				else
+				{
+					syncTimeout = false;
+				}
+			}
+			catch (InterruptedException e)
+			{
+				logger.error("sleep fialed", e);
+			}
+		}
+	}
+	
 	@Override
 	public void onOpen(ServerHandshake handshakedata)
 	{
@@ -87,9 +136,10 @@ public class ManagementClient extends WebSocketClient
 				break;
 
 			case STATUS_REPLAY:
+				lastSyncTime = System.currentTimeMillis();
 				StatusReplay sr = StatusReplay.parseFrom(h.getMessageData());
 
-				gui.UpdateStatus(sr.getStatusDescription());
+				//gui.UpdateStatus(sr.getStatusDescription());
 
 				if (sr.getError())
 				{
@@ -102,55 +152,52 @@ public class ManagementClient extends WebSocketClient
 
 				if (sr.getStatus() == STATUS.STOP)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
+					//gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationCompleted();
+					operationStarted = false;
 					
 				}
 				else if (sr.getStatus() == STATUS.RUN)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
-					gui.OperationStarted();
+					//gui.UpdateStatus(sr.getStatusDescription());
+					if (operationStarted == false)
+					{
+						gui.OperationStarted();
+						operationStarted = true;
+					}
 				}
 				if (sr.getCic1Input() == CHANEL_STATUS.SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationInSync(Channel.INPUT1);
 				}
 				else if (sr.getCic1Input() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationOutOfSync(Channel.INPUT1);
 				}
 				if (sr.getCic2Input() == CHANEL_STATUS.SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
-					gui.OperationInSync(Channel.INPUT1);
+					gui.OperationInSync(Channel.INPUT2);
 				}
 				else if (sr.getCic2Input() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
-					gui.OperationOutOfSync(Channel.INPUT1);
+					gui.OperationOutOfSync(Channel.INPUT2);
 				}
 
 				if (sr.getCic1Output() == CHANEL_STATUS.SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
-					gui.OperationInSync(Channel.OUTPUT2);
+					gui.OperationInSync(Channel.OUTPUT1);
 				}
 				else if (sr.getCic1Output() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
-					gui.OperationOutOfSync(Channel.OUTPUT2);
+					gui.OperationOutOfSync(Channel.OUTPUT1);
 				}
 
 				if (sr.getCic2Output() == CHANEL_STATUS.SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationInSync(Channel.OUTPUT2);
 				}
 				else if (sr.getCic2Output() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
-					gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationOutOfSync(Channel.OUTPUT2);
 				}
 				break;

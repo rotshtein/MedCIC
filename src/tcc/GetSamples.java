@@ -1,5 +1,6 @@
 package tcc;
 
+import lego.ProcMon;
 import lego.ScriptFile;
 
 public class GetSamples extends Operation

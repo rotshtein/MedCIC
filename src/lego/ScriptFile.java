@@ -153,33 +153,34 @@ public class ScriptFile
 			break;
 
 		case EDMAC2_3072: // "EDMAC-2 (3072)":
-			module = "edmac3072";
+			module = "edmac2";
 			parameters = "synclength=12,syncword=0xe8c0,width=3072,mode=cut,0-12,204-213,405-414,606-615,807-816";
 			break;
 
 		case ESC_532: // "ESC++ (532)":
-			module = "escplusplus532";
+			module = "escplusplus";
 			parameters = "synclength=12,syncword=0xe8c0,width=532,mode=cut,0-12,20-27,36-45";
 			break;
 
 		case ESC_874:// "ESC++ (874)":
-			module = "escplusplus874";
+			module = "escplusplus";
 			parameters = "synclength=12,syncword=0xe8c0,width=874,mode=cut,0-12,20-28,36-45,146-155,255-264,364-373,473-482,582-591,691-700,800-809";
 			break;
 
 		case ESC_1104: // "ESC++ (1104)":
-			module = "escplusplus1104";
+			module = "escplusplus";
 			parameters = "synclength=12,syncword=0xe8c0,width=1104,mode=cut,0-12,20-28,36-45,174-183,312-321,450-459,588-597,726-735,864-873,1002-1011";
 			break;
 
 		case ESC_1792: // "ESC++ (1792)":
-			module = "escplusplus1792";
+			module = "escplusplus";
 			parameters = "synclength=12,syncword=0xe8c0,width=1792,mode=cut,0-12,20-27,36-45";
 			break;
 
 		case ESC_551: // "ESC++ (551)":
+			module = "escplusplus";
+			parameters = "synclength=12,syncword=0xe8c0,width=551,mode=cut,0-12,21-29,36-45,311-320";
 			logger.warn("ESC_551 - encapsulation not supporeted");
-			module = null;
 			break;
 
 		case E2:// "E2":
@@ -194,7 +195,11 @@ public class ScriptFile
 			break;
 		}
 
-		if (module == null) return null;
+		if (module == null) 
+		{
+			logger.error("Unknown encapsulation");
+			return false;
+		}
 
 		AddModule(new ModuleConfiguration(Path + ".1.1", module, parameters, Path + ".1.1.1"));
 		AddModule(new ModuleConfiguration(Path + ".1.1.1", "cesrawout", null, Path + ".1.1.1.1"));
@@ -208,9 +213,8 @@ public class ScriptFile
 	public Boolean BuildProductionScript(ENCAPSULATION Encapsolation, String Source1Uri, String Dest1Uri,
 			String Source2Uri, String Dest2Uri)
 	{
-		BuildProductionScript("1", Encapsolation, Source1Uri, Dest1Uri);
-		BuildProductionScript("2", Encapsolation, Source2Uri, Dest2Uri);
-		return true;
+		return (BuildProductionScript("1", Encapsolation, Source1Uri, Dest1Uri) & 
+				BuildProductionScript("2", Encapsolation, Source2Uri, Dest2Uri));
 	}
 
 }

@@ -1,6 +1,7 @@
 package lego;
 
 import java.net.DatagramPacket;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -23,49 +24,117 @@ public class MessageParser extends Thread
 	
 	class CicChanel
 	{
+		
+		public class LimitedSizeQueue<K> extends ArrayList<K> 
+		{
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			private int maxSize;
+		    private long sum;
+		    
+		    public LimitedSizeQueue(int size)
+		    {
+		        this.maxSize = size;
+		    }
+
+		    public boolean add(K k)
+		    {
+		        boolean r = super.add(k);
+		        if (r)
+		        {
+		        	sum += (long)k;
+		        }
+		        
+		        if (size() > maxSize)
+		        {
+		        	sum -= (long)(this.get(size() - maxSize - 1));
+		            removeRange(0, size() - maxSize - 1);
+		        }
+		        return r;
+		    }
+		    
+		    public long getSum()
+		    {
+		    	return sum;
+		    }
+		    
+		    public void Clear()
+		    {
+		    	this.clear();
+		    }
+		}
+		
+		final int lowpass = 7; 
 		long prevInputBytes = 0;
 		long prevOutputBytes = 0;
 		long inputBytes = 0;
 		long outputBytes = 0;
+		Boolean inSync = false;
+		LimitedSizeQueue<Long> inputQueue = new LimitedSizeQueue<Long>(lowpass);
+		LimitedSizeQueue<Long> outputQueue = new LimitedSizeQueue<Long>(lowpass);
 		
 		public void Clear()
 		{
 			prevInputBytes = prevOutputBytes = inputBytes = outputBytes = 0;
+			inputQueue.Clear();
+			outputQueue.Clear();
 		}
 		
 		public Boolean IsInSync()
 		{
-			if ( (inputBytes == 0) | (outputBytes == 0) )
-			{
-				return false;
-			}
-			
-			if (outputBytes < prevOutputBytes + 8192)
-			{
-				return false;
-			}
-			
-			if (inputBytes < prevInputBytes + 8192)
-			{
-				return false;
-			}
-			
-			return true;
+			return inSync;
 		}
-		
-		
-		
 		
 		public void setInputByte(long Bytes)
 		{
-			prevInputBytes = inputBytes;
-			inputBytes = Bytes;
+			if (Bytes == 0)
+			{
+				inputQueue.Clear();
+				prevInputBytes = inputBytes = 0;
+			}
+			else
+			{
+				prevInputBytes = inputQueue.getSum();
+				inputQueue.add(Bytes);
+				inputBytes = inputQueue.getSum();
+				if (prevInputBytes + (64000) > inputBytes)
+				{
+					inSync = false;
+					inputQueue.Clear();
+					prevInputBytes = inputBytes = 0;
+				}
+				else
+				{
+					inSync = true;
+				}
+			}
 		}
 		
 		public void setOutputByte(long Bytes)
 		{
-			prevOutputBytes = outputBytes;
-			outputBytes = Bytes;
+			if (Bytes == 0)
+			{
+				outputQueue.Clear();
+				prevOutputBytes = outputBytes = 0;
+			}
+			else
+			{
+				prevOutputBytes = outputQueue.getSum();
+				outputQueue.add(Bytes);
+				outputBytes = outputQueue.getSum();
+				if (prevOutputBytes + (64000) > outputBytes)
+				{
+					inSync = false;
+					outputQueue.Clear();
+					prevOutputBytes = outputBytes = 0;
+				}
+				else
+				{
+					inSync = true;
+				}
+			}
 		}
 	}
 
@@ -131,11 +200,16 @@ public class MessageParser extends Thread
 				{
 					logger.error("Failed to parse message", e);
 				}
-
+				
+				if (cm == null)
+				{
+					logger.warn("Failed to parse message");
+					continue;
+				}
 				logger.debug("Lego message" + new String(pkt.getData()));
 
 				
-				gui.UpdateStatus(cm.path + "-" + cm.module + ": " + cm.StatusMessage());
+				
 				if (gui != null)
 				{
 					switch (cm.issue)
@@ -148,14 +222,15 @@ public class MessageParser extends Thread
 							cic1.Clear();
 							cic2.Clear();
 						}
+						gui.UpdateStatus(cm.path + "-" + cm.module + ": " + cm.StatusMessage());
 						break;
 						
 					case ConfigurationMessage.ISSUE_MSG_ACTIVE:
-						if (cm.module.toLowerCase().equals("udpclient"))
+						if (cm.module.toLowerCase().equals("udpserver"))
 						{
 							if (cm.path.startsWith("1"))
 							{
-								cic1.setInputByte(cm.input);
+								cic1.setInputByte(cm.output);
 								if (cic1.IsInSync())
 								{
 									gui.OperationInSync(Channel.INPUT1);
@@ -167,7 +242,7 @@ public class MessageParser extends Thread
 							}
 							else if (cm.path.startsWith("2"))
 							{
-								cic2.setInputByte(cm.input);
+								cic2.setInputByte(cm.output);
 								if (cic2.IsInSync())
 								{
 									gui.OperationInSync(Channel.INPUT2);
@@ -180,7 +255,7 @@ public class MessageParser extends Thread
 							}
 						}
 						
-						if (cm.module.toLowerCase().equals("udpserver"))
+						else if (cm.module.toLowerCase().equals("udpclient"))
 						{
 							if (cm.path.startsWith("1"))
 							{
@@ -208,14 +283,26 @@ public class MessageParser extends Thread
 							}
 
 						}
+						
+						else
+						{
+							break;
+						}
+						
+						String st = cm.StatusMessage();
+						if (st != null)
+						{
+							gui.UpdateStatus(st);
+						}
 						break;
 
 					default:
-						String status = cm.StatusMessage();
+						/*
+						String status = "-------->" + cm.StatusMessage();
 						if (status != null)
 						{
 							gui.UpdateStatus(status);
-						}
+						}*/
 						break;
 					}
 				}

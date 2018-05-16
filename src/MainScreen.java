@@ -56,6 +56,7 @@ public class MainScreen implements GuiInterface
 	private final JButton btnClear = new JButton("Clear");
 	private final JButton btnSave = new JButton("Save");
 	private Color back = Color.LIGHT_GRAY; 
+	String serverUri = null;
 
 	/**
 	 * Launch the application.
@@ -110,7 +111,22 @@ public class MainScreen implements GuiInterface
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
 			{
-				client.send(0,OPCODE.STOP_CMD, null);
+				if (client != null)
+				{
+					client.send(0,OPCODE.STOP_CMD, null);
+					try
+					{
+						Thread.sleep(200);
+					}
+					catch (InterruptedException e1)
+					{
+						
+					}
+					client.Stop();
+					client = null;
+				}
+				OperationCompleted();
+				btnStart.setEnabled(true);
 			}
 		});
 		frame.getContentPane().add(btnStop);
@@ -140,8 +156,8 @@ public class MainScreen implements GuiInterface
 
 		server = new ManagementServer(new InetSocketAddress(host, port));
 		server.start();
-		String serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
-		client = new ManagementClient(new URI(serverUri), this);
+		serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
+		client = null;// new ManagementClient(new URI(serverUri), this);
 		/*
 		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
 		try
@@ -161,7 +177,15 @@ public class MainScreen implements GuiInterface
 
 		public void actionPerformed(ActionEvent arg0)
 		{
-
+			try
+			{
+				client = new ManagementClient(new URI(serverUri), MainScreen.this);
+			}
+			catch (URISyntaxException e)
+			{
+				logger.error("Failed to create client" ,e);
+				client = null;
+			}
 			try
 			{
 				Parameters.Set("url-in-1", txtIn1.getText());
@@ -189,6 +213,7 @@ public class MainScreen implements GuiInterface
 			{
 				client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
 			}
+			btnStart.setEnabled(false);
 		}
 	}
 
@@ -354,8 +379,12 @@ public class MainScreen implements GuiInterface
 			server.Stop();
 		}
 		
-		
+		if (client != null)
+		{
+			client.Stop();
+		}
 	}
+
 	@Override
 	public void UpdateStatus(String status)
 	{
