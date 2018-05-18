@@ -132,8 +132,9 @@ public class MainScreen implements GuiInterface
 		frame.getContentPane().add(btnStop);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 89, 607, 215);
+		scrollPane.setBounds(10, 89, 597, 215);
 		frame.getContentPane().add(scrollPane);
+		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 		btnClear.setBounds(81, 315, 74, 23);
 		btnClear.addActionListener(new ActionListener() {
@@ -291,7 +292,7 @@ public class MainScreen implements GuiInterface
 		txtIn2.setInputVerifier(new UrlVerifier());
 
 		txtOut1 = new JFormattedTextField();
-		txtOut1.setBounds(420, 11, 197, 20);
+		txtOut1.setBounds(420, 11, 187, 20);
 		txtOut1.setToolTipText("test tooltip");
 		txtOut1.setText("udp://127.0.0.0.3:1000");
 		txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -299,7 +300,7 @@ public class MainScreen implements GuiInterface
 		txtOut1.setInputVerifier(new UrlVerifier());
 
 		txtOut2 = new JFormattedTextField();
-		txtOut2.setBounds(420, 56, 197, 20);
+		txtOut2.setBounds(420, 56, 187, 20);
 		txtOut2.setToolTipText("test tooltip");
 		txtOut2.setText("udp://127.0.0.0.4:1000");
 		txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
