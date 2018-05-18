@@ -422,6 +422,7 @@ public class MainScreen implements GuiInterface
 			return;
 		}
 		// Now edit your gui objects
+		/*
 		if (status)
 		{
 			btnStart.setBackground(Color.GREEN);
@@ -429,7 +430,7 @@ public class MainScreen implements GuiInterface
 		else
 		{
 			btnStart.setBackground(Color.GRAY);
-		}
+		}*/
 		
 		
 	}

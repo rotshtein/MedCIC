@@ -34,7 +34,8 @@ public class ManagementClient extends WebSocketClient
 	long 				lastSyncTime			 = 0;
 	Thread 				syncTimeoutThread = null;
 	Boolean 			runThread = true;
-	
+	long cic1LastLostSync = 0;
+	long cic2LastLostSync = 0;
 
 	
 	public ManagementClient(URI serverUri, GuiInterface gui)
@@ -185,20 +186,28 @@ public class ManagementClient extends WebSocketClient
 
 				if (sr.getCic1Output() == CHANEL_STATUS.SYNC)
 				{
-					gui.OperationInSync(Channel.OUTPUT1);
+					if (System.currentTimeMillis() - cic1LastLostSync > 500)
+					{
+						gui.OperationInSync(Channel.OUTPUT1);
+					}
 				}
 				else if (sr.getCic1Output() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
 					gui.OperationOutOfSync(Channel.OUTPUT1);
+					cic1LastLostSync = System.currentTimeMillis();
 				}
 
 				if (sr.getCic2Output() == CHANEL_STATUS.SYNC)
 				{
-					gui.OperationInSync(Channel.OUTPUT2);
+					if (System.currentTimeMillis() - cic2LastLostSync > 500)
+					{
+						gui.OperationInSync(Channel.OUTPUT2);
+					}
 				}
 				else if (sr.getCic2Output() == CHANEL_STATUS.OUT_OF_SYNC)
 				{
 					gui.OperationOutOfSync(Channel.OUTPUT2);
+					cic2LastLostSync = System.currentTimeMillis();
 				}
 				break;
 

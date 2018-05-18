@@ -32,10 +32,12 @@ public class MessageParser extends Thread
 			private static final long serialVersionUID = 1L;
 			private int maxSize;
 		    private long sum;
+		   
 		    
 		    public LimitedSizeQueue(int size)
 		    {
 		        this.maxSize = size;
+		        
 		    }
 
 		    public boolean add(K k)
@@ -63,13 +65,23 @@ public class MessageParser extends Thread
 		    {
 		    	this.clear();
 		    }
+		    
+		    public boolean getSync()
+		    {
+		    	return Sync;
+		    }
+		    
+		    public void setSync(boolean s)
+		    {
+		    	Sync = s;
+		    }
 		}
 		
 		final int lowpass = 3; 
 		long prevInputBytes = 0;
 		Boolean alive = false;
 		LimitedSizeQueue<Long> inputQueue = new LimitedSizeQueue<Long>(lowpass);
-
+		public boolean Sync = false;
 		
 		public void Clear()
 		{
@@ -213,6 +225,7 @@ public class MessageParser extends Thread
 								cic2.setInputByte(cm.output);
 								if (cic2.IsAlive())
 								{
+									//if (cic1.)
 									gui.OperationInSync(Channel.INPUT2);
 								}
 								else
@@ -265,12 +278,20 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
-								gui.OperationInSync(Channel.OUTPUT1);
+								if (!cic1.Sync)
+								{
+									gui.OperationInSync(Channel.OUTPUT1);
+									cic1.Sync = true;
+								}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
-								gui.OperationInSync(Channel.OUTPUT2);
+								if (!cic2.Sync)
+								{
+									gui.OperationInSync(Channel.OUTPUT2);
+									cic2.Sync = true;
+								}
 							}
 							
 							break;
@@ -278,12 +299,20 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_LOST_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
-								gui.OperationOutOfSync(Channel.OUTPUT1);
+								if (cic1.Sync)
+								{
+									gui.OperationOutOfSync(Channel.OUTPUT1);
+									cic1.Sync = false;
+								}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
-								gui.OperationOutOfSync(Channel.OUTPUT2);
+								if (cic2.Sync)
+								{
+									gui.OperationOutOfSync(Channel.OUTPUT2);
+									cic2.Sync = false;
+								}
 							}
 							break;
 						

@@ -8,6 +8,7 @@ import org.java_websocket.WebSocket;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.sun.xml.internal.ws.resources.SenderMessages;
 
 import lego.MessageParser;
 import lego.ProcMon;
@@ -33,7 +34,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	Thread														Cic1Thread			= null;
 	Thread														Cic2Thread			= null;
 	MessageParser												messageParser		= null;
-
+	WebSocket													currentConn = null;
 	public ManagementParser(BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue, ManagementServer server)
 			throws Exception
 	{
@@ -99,6 +100,7 @@ public class ManagementParser extends Thread implements GuiInterface
 
 	public void Parse(byte[] buffer, WebSocket conn)
 	{
+		currentConn = conn;
 		Header h = getHeader(buffer);
 		if (h == null)
 		{
@@ -228,6 +230,7 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			logger.error("Something want wrong in the parser" , e);
 		}
+		currentConn = null;
 	}
 
 	private void SendAck(Header h, WebSocket conn)
@@ -235,7 +238,7 @@ public class ManagementParser extends Thread implements GuiInterface
 		try
 		{
 			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.ACK).build();
-			conn.send(hh.toByteArray());
+			SendMessage(hh.toByteString(), conn);
 		}
 		catch (Exception e)
 		{
@@ -249,7 +252,7 @@ public class ManagementParser extends Thread implements GuiInterface
 		try
 		{
 			Header hh = Header.newBuilder().setSequence(h.getSequence()).setOpcode(OPCODE.NACK).build();
-			conn.send(hh.toByteArray());
+			SendMessage(hh.toByteString(), conn);
 		}
 		catch (Exception e)
 		{
@@ -284,11 +287,18 @@ public class ManagementParser extends Thread implements GuiInterface
 	
 	private void SendProcessStartMessage()
 	{
-		StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
-		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
-				.setMessageData(r.toByteString()).build();
-
-		BroadcastMessage(h.toByteString());
+		try
+		{
+			StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
+					.setMessageData(r.toByteString()).build();
+	
+			BroadcastMessage(h.toByteString());
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send StatusMessage when process starts", e);
+		}
 	}
 	
 	private void SendStatusMessage(String message, WebSocket conn)
@@ -304,6 +314,15 @@ public class ManagementParser extends Thread implements GuiInterface
 		catch (Exception e)
 		{
 			logger.error("Failed to send StatusMessage to a connection", e);
+		}
+	}
+
+
+	private void SendMessage(ByteString buffer)
+	{
+		if (currentConn != null)
+		{
+			SendMessage(buffer, currentConn );
 		}
 	}
 
@@ -324,6 +343,8 @@ public class ManagementParser extends Thread implements GuiInterface
 	
 	private void BroadcastMessage(ByteString buffer)
 	{
+		//SendMessage(buffer);
+		
 		try
 		{
 			for (WebSocket conn : server.connections() )
@@ -401,9 +422,17 @@ public class ManagementParser extends Thread implements GuiInterface
 	@Override
 	public void UpdateStatus(String status)
 	{
-		for (WebSocket conn : server.connections())
+		try
 		{
-			SendStatusMessage(status, conn);
+			StatusMessage s = StatusMessage.newBuilder().setMessage(status).build();
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
+					.setMessageData(s.toByteString()).build();
+
+			BroadcastMessage(h.toByteString());
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send StatusMessage to a connection", e);
 		}
 	}
 
@@ -464,19 +493,10 @@ public class ManagementParser extends Thread implements GuiInterface
 			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
 					.setMessageData(s.toByteString()).build();
 			BroadcastMessage(h.toByteString() );
-			
-		}
+		}	
 		catch (Exception e)
 		{
-			logger.error("Failed to send StatusMessage to a connection", e);
-		}
-		
-		for (WebSocket conn : server.connections())
-		{
-			if (conn.isOpen())
-			{
-				conn.send(h.toByteArray());
-			}
+			logger.error("Failed to send StatusReplay in sync",e);
 		}
 	}
 
@@ -530,18 +550,11 @@ public class ManagementParser extends Thread implements GuiInterface
 					.setMessageData(s.toByteString()).build();
 			BroadcastMessage(h.toByteString() );
 			
+			
 		}
 		catch (Exception e)
 		{
 			logger.error("Failed to send StatusMessage to a connection", e);
-		}
-		
-		for (WebSocket conn : server.connections())
-		{
-			if (conn.isOpen())
-			{
-				conn.send(h.toByteArray());
-			}
 		}
 	}
 }

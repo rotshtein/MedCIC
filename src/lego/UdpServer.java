@@ -91,6 +91,7 @@ public class UdpServer extends Thread
 
 				try
 				{
+					//String s = new String(packet.getData());
 					queue.add(packet);
 				}
 				catch (IllegalStateException e)
