@@ -48,7 +48,6 @@ public class ManagementClient extends WebSocketClient
 		logger.debug("ManagementClient and the SyncTimeoutThread started");
 	}
 
-	@SuppressWarnings("deprecation")
 	public void Stop()
 	{
 		//syncTimeoutThread.stop();

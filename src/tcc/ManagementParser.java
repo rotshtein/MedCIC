@@ -8,7 +8,6 @@ import org.java_websocket.WebSocket;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.sun.xml.internal.ws.resources.SenderMessages;
 
 import lego.MessageParser;
 import lego.ProcMon;
@@ -317,7 +316,7 @@ public class ManagementParser extends Thread implements GuiInterface
 		}
 	}
 
-
+/*
 	private void SendMessage(ByteString buffer)
 	{
 		if (currentConn != null)
@@ -325,7 +324,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			SendMessage(buffer, currentConn );
 		}
 	}
-
+*/
 	private void SendMessage(ByteString buffer, WebSocket conn )
 	{
 		try

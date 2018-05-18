@@ -1,9 +1,6 @@
 package lego;
 
-import javax.print.attribute.standard.Severity;
-
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class ConfigurationMessage

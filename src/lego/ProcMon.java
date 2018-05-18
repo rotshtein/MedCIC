@@ -116,7 +116,7 @@ public class ProcMon implements Runnable
 				DatagramSocket dsocket = new DatagramSocket();
 			    dsocket.send(packet);
 			    logger.debug("Sending Done to path " + Path + " => " + new String(packet.getData()) );
-			    String s = new String(packet.getData());
+			    //String s = new String(packet.getData());
 			    dsocket.close();
 			}
 		}
