@@ -245,21 +245,37 @@ public class ManagementClient extends WebSocketClient
 	public Boolean SendAutomatucStartCommand(String input1_url, String input2_url, String output1_url,
 			String output2_url)
 	{
-		AutomaticStartCommand sc = AutomaticStartCommand.newBuilder().setInput1Url(input1_url).setInput2Url(input2_url)
-				.setOutput1Url(output1_url).setOutput2Url(output2_url).build();
-
-		send(0, OPCODE.AUTO_START_CMD, sc.toByteString());
-		return true;
+		try
+		{
+			AutomaticStartCommand sc = AutomaticStartCommand.newBuilder().setInput1Url(input1_url).setInput2Url(input2_url)
+					.setOutput1Url(output1_url).setOutput2Url(output2_url).build();
+	
+			send(0, OPCODE.AUTO_START_CMD, sc.toByteString());
+			return true;
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send Automatic start command",e);
+		}
+		return false;
 	}
 
 	public Boolean SendStartCommand(ENCAPSULATION encap, String input1_url, String input2_url, String output1_url,
 			String output2_url)
 	{
-		StartCommand sc = StartCommand.newBuilder().setEncapsulation(encap).setInput1Url(input1_url)
-				.setInput2Url(input2_url).setOutput1Url(output1_url).setOutput2Url(output2_url).build();
-
-		send(0, OPCODE.START_CMD, sc.toByteString());
-		return true;
+		try
+		{
+			StartCommand sc = StartCommand.newBuilder().setEncapsulation(encap).setInput1Url(input1_url)
+					.setInput2Url(input2_url).setOutput1Url(output1_url).setOutput2Url(output2_url).build();
+	
+			send(0, OPCODE.START_CMD, sc.toByteString());
+			return true;
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send Start command",e);
+		}
+		return false;
 	}
 
 	public Boolean SendStopCommand()

@@ -26,7 +26,7 @@ public class ModuleConfiguration
 	public ModuleConfiguration(String TextBlock)
 	{
 		List<String> outs = new ArrayList<String>();
-		String[] lines = TextBlock.split("\\W+");
+		String[] lines = TextBlock.split("\\r?\\n");
 
 		for (String line : lines)
 		{
@@ -35,30 +35,31 @@ public class ModuleConfiguration
 
 			if (line.toLowerCase().startsWith(PATH.toLowerCase()))
 			{
-				path = val[0];
+				path = val[1];
 			}
 
-			if (line.toLowerCase().startsWith(MODULE.toLowerCase()))
+			else if (line.toLowerCase().startsWith(MODULE.toLowerCase()))
 			{
-				module = val[0];
+				module = val[1];
 			}
 
-			if (line.toLowerCase().startsWith(PARAMS.toLowerCase()))
+			else if (line.toLowerCase().startsWith(PARAMS.toLowerCase()))
 			{
-				params = val[0];
+				params = val[1];
 			}
 
-			if (line.toLowerCase().startsWith(OUT.toLowerCase()))
+			else if (line.toLowerCase().startsWith(OUT.toLowerCase()))
 			{
-				outs.add(val[0]);
+				outs.add(val[1]);
 			}
 
-			if (line.toLowerCase().startsWith(POS.toLowerCase()))
+			else if (line.toLowerCase().startsWith(POS.toLowerCase()))
 			{
-				pos = val[0];
+				pos = val[1];
 			}
 
 		}
+		out = new String[outs.size()];
 		outs.toArray(out);
 	}
 

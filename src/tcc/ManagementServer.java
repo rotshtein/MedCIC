@@ -28,7 +28,7 @@ public class ManagementServer extends WebSocketServer
 		super(address);
 		try
 		{
-			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);
+			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);  
 			parser = new ManagementParser(queue, this);
 			parser.start();
 			monitorProcesThread = new Thread(MonitorProcesThread);

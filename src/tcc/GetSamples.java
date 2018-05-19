@@ -27,16 +27,4 @@ public class GetSamples extends Operation
 		scriptFile.Write();
 		return StartAction(new String[]	{ "ProcessBlock", ConfigFile });
 	}
-
-	public ProcMon Start(	String Source1Uri, String IdFile1,
-							String Source2Uri, String IdFile2,
-							String ConfigFile, String Server, int Port) throws Exception
-	{
-		
-		scriptFile = new ScriptFile();
-		scriptFile.BuildRecordToFileScript(Source1Uri, IdFile1, Source2Uri, IdFile2);
-		scriptFile.Write();
-		return StartAction(new String[] { "ProcessBlock", ConfigFile });
-	}
-
 }

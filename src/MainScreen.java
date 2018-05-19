@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
@@ -23,6 +24,7 @@ import java.awt.ComponentOrientation;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -101,7 +103,8 @@ public class MainScreen implements GuiInterface
 		// txtIn1 ****://###.###.###.###:#####
 		// MaskFormatter formatter = new MaskFormatter("****://###.###.###.###:#####");
 		// txtIn1.setFormatterFactory(forrmatter);
-
+		
+		
 		txtIn1.setText(Parameters.Get("url-in-1", "udp://127.0.0.1:5001"));
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
@@ -159,6 +162,28 @@ public class MainScreen implements GuiInterface
 		server.start();
 		serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
 		client = null;// new ManagementClient(new URI(serverUri), this);
+		
+		/*
+		ScriptFile sf = null;
+		ENCAPSULATION e = null;
+		
+		try
+		{
+			sf = new ScriptFile("c:\\bin\\lego\\legoFiles\\cicScript.lego");
+			e = sf.getEncapsolation();
+		}
+		catch (FileNotFoundException e2)
+		{
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		catch (IOException e2)
+		{
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}*/
+		
+		
 		/*
 		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
 		try

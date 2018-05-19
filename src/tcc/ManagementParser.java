@@ -1,5 +1,6 @@
 package tcc;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.concurrent.BlockingQueue;
@@ -13,6 +14,7 @@ import lego.MessageParser;
 import lego.ProcMon;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
+import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
@@ -46,7 +48,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			{
 				Stop();
 			}
-			messageParser = new MessageParser(this, ManagementPort);
+ 			messageParser = new MessageParser(this, ManagementPort);
 			messageParser.start();
 		}
 		catch (Exception e1)
@@ -126,14 +128,80 @@ public class ManagementParser extends Thread implements GuiInterface
 					SendNck(h, conn);
 				}
 	
-				if (AuroRun.getInput1Url() != null & AuroRun.getInput1Url() != "")
+				/*try
 				{
-	
+					
+					AutomaticStart as = AutomaticStart(this, 
+							AuroRun.getInput1Url(), 
+							AuroRun.getOutput1Url(), 
+							AuroRun.getInput2Url(),
+							AuroRun.getOutput2Url(), 
+							"gg",
+							Paths.get(ScriptPath, "cicScript.lego").toString(),
+							"127.0.0.1", 11001,
+							conn);
+					
+					ENCAPSULATION e = as.GetEncapsulation();
+					
+					// Get samples for ID process
+					 * 
+					 */
+				/*
+					try
+					{
+						String IdentificationExe = Parameters.Get("IdentificationExe", "C:\\bin\\lego\\bin\\IdBlock.exe");
+						String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+						
+						
+						// Get sample file
+						GetSamples gs = new GetSamples(this, "Getting Samples");
+						procMon = gs.Start(AuroRun.getInput1Url(), IdentificationExe, ScriptPath, managementServer, managementPort);
+						while (!procMon.isComplete())
+						{
+							if  (new File(idFile).length() > SAMPLE_FILE_SIZE) 	
+							{
+								procMon.Kill();
+								break;
+							}
+							
+							Thread.sleep(50);
+						}
+					}
+					catch (Exception e1)
+					{
+						UpdateStatus("Failed to get samples for identification - Aborting");
+						logger.error("Failed to get samples for identification", e1);
+						Kill();
+					}
+					
+					/*
+					if (e != null & e != ENCAPSULATION.UNRECOGNIZED)
+					{
+						StartProduction(ENCAPSULATION.ESC_551, 
+									AuroRun.getInput1Url(), 
+									AuroRun.getOutput1Url(), 
+									AuroRun.getInput2Url(),
+									AuroRun.getOutput2Url(), 
+									Paths.get(ScriptPath, "cicScript.lego").toString(),
+									h,conn);
+					}
+				
+				
+					SendStatusMessage("Starting ...", conn);
+					logger.info("Starting...");
+		
+				
+					SendAck(h, conn);
+					SendProcessStartMessage();
 				}
-	
-				if (AuroRun.getInput2Url() != null & AuroRun.getInput2Url() != "")
+				catch (Exception e)
 				{
-	
+					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+					logger.error("Executable not found. Please fix the configuration file", e);
+					if (h != null & conn != null)
+					{
+						SendNck(h, conn);
+					}
 				}
 				/*
 				 * Start thread to: 1. Get sample file 2. Identify 3. Run production
@@ -141,7 +209,7 @@ public class ManagementParser extends Thread implements GuiInterface
 				 * Terminate the thread on processes on STOP if running run thread per CIC => 2
 				 * threads
 				 */
-	
+
 				break;
 	
 			case START_CMD:
@@ -156,26 +224,9 @@ public class ManagementParser extends Thread implements GuiInterface
 					SendNck(h, conn);
 				}
 	
-				try
-				{
-					String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
-					Mediate med = new Mediate(MediationExe, this, "CIC Production");
-	
-					String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-					Kill();
-					procMon = med.Start(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
-							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
-					SendStatusMessage("Starting ...", conn);
-					logger.info("Starting...");
-					SendAck(h, conn);
-					SendProcessStartMessage();
-				}
-				catch (Exception e)
-				{
-					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-					logger.error("Executable not found. Please fix the configuration file", e);
-					SendNck(h, conn);
-				}
+				String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+				StartProduction(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
+						p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString(),h,conn);
 				break;
 	
 			case STOP_CMD:
@@ -232,6 +283,41 @@ public class ManagementParser extends Thread implements GuiInterface
 		currentConn = null;
 	}
 
+	public Boolean StartProduction (ENCAPSULATION encap, 
+			String InputUrl1, String OutputUrl1,
+			String InputUrl2, String OutputUrl2, 
+			String ConfigFilename,
+			Header h, 
+			WebSocket conn)
+	{
+		try
+		{
+			String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
+			Mediate med = new Mediate(MediationExe, this, "CIC Production");
+
+			String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+			Kill();
+			procMon = med.Start(encap, 	InputUrl1, OutputUrl1, 
+										InputUrl2, OutputUrl2, 
+										Paths.get(ScriptPath, "cicScript.lego").toString());
+			SendStatusMessage("Starting ...", conn);
+			logger.info("Starting...");
+			SendAck(h, conn);
+			SendProcessStartMessage();
+		}
+		catch (Exception e)
+		{
+			SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+			logger.error("Executable not found. Please fix the configuration file", e);
+			if (h != null & conn != null)
+			{
+				SendNck(h, conn);
+			}
+			return false;
+		}
+		return true;
+	}
+	
 	private void SendAck(Header h, WebSocket conn)
 	{
 		try

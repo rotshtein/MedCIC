@@ -1,11 +1,17 @@
 package tcc;
 
 import java.io.File;
+import java.net.URI;
+import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
+import org.java_websocket.WebSocket;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
 import lego.ProcMon;
 import lego.ScriptFile;
+import medcic_proto.MedCic.ENCAPSULATION;
 
 public class AutomaticStart implements Runnable
 {
@@ -16,37 +22,87 @@ public class AutomaticStart implements Runnable
 	Boolean			stopThread	= false;
 	GuiInterface	gui			= null;
 	String			sourceUri1;
-	String			idFile1;
+	String			idFile;
 	String			destUri1;
 	String			sourceUri2;
-	String			idFile2;
 	String			destUri2;
 	String			configFile;
 	String			managementServer;
 	int				managementPort;
-	ProcMon procMon = null;
+	ProcMon 		procMon = null;
+	WebSocket conn = null;
 	
 
+	public class GetSampleFile extends WebSocketClient implements Runnable
+	{
+
+		public GetSampleFile(URI serverUri)
+		{
+			super(serverUri);
+			
+		}
+
+		@Override
+		public void onOpen(ServerHandshake handshakedata)
+		{
+			
+		}
+
+		@Override
+		public void onMessage(String message)
+		{
+			
+		}
+
+		@Override
+		public void onClose(int code, String reason, boolean remote)
+		{
+			
+		}
+
+		@Override
+		public void onError(Exception ex)
+		{
+			
+		}
+		
+		
+		
+	}
+	
 	public AutomaticStart(GuiInterface gui, 
 			String Source1Uri, 	String Dest1tUri, 
 			String Source2Uri, 	String Dest2tUri, 
-			String IdFile1, 	String IdFile2, 
+			String IdFile, 	
 			String ConfigFile,
-			String Server, int Port)
+			String Server, int Port,
+			WebSocket Connection) throws Exception
 	{
+
+		if ( (Source1Uri == null | Source1Uri == "") | (Dest1tUri == null | Dest1tUri == ""))
+		{
+			throw new Exception("CIC 1 details are wrong");
+		}
+
+		if ( (Source2Uri == null | Source2Uri == "") | (Dest2tUri == null | Dest2tUri == ""))
+		{
+			throw new Exception("CIC 2 details are wrong");
+		}
+		
 		this.gui = gui;
 		
+		this.idFile = IdFile;
+
 		this.sourceUri1 = Source1Uri;
-		this.idFile1 = IdFile1;
 		this.destUri1 = Dest1tUri;
-		
 		this.sourceUri2 = Source2Uri;
-		this.idFile2 = IdFile2;
 		this.destUri2 = Dest2tUri;
 		
 		this.configFile = ConfigFile;
 		this.managementServer = Server;
 		this.managementPort = Port;
+		
+		this.conn = Connection;
 	}
 
 	public void Stop()
@@ -57,26 +113,29 @@ public class AutomaticStart implements Runnable
 	@Override
 	public void run()
 	{
+	}
+	
+	public ENCAPSULATION GetEncapsulation()
+	{
 		try
 		{
 			// Get sample file
 			GetSamples gs = new GetSamples(gui, "Getting Samples");
-			procMon = gs.Start(sourceUri1, idFile1, sourceUri2, idFile2, configFile, managementServer, managementPort);
+			procMon = gs.Start(sourceUri1, idFile, configFile, managementServer, managementPort);
 			while (!procMon.isComplete())
 			{
-				if ( (new File(idFile1).length() > SAMPLE_FILE_SIZE) &
-					 (new File(idFile2).length() > SAMPLE_FILE_SIZE))	
-					
-				stopThread = true;
+				if  (new File(idFile).length() > SAMPLE_FILE_SIZE) 	
+				{
+					stopThread = true;
+				}
 				
 				if (stopThread)
 				{
 					Kill();
 					gui.UpdateStatus("Terminating Auto start process - Getting samples");
 					logger.debug("Terminating Auto start process - Getting samples");
-					return;
+					return null;
 				}
-				
 				Thread.sleep(50);
 			}
 		}
@@ -85,12 +144,14 @@ public class AutomaticStart implements Runnable
 			gui.UpdateStatus("Failed to get samples for identification - Aborting");
 			logger.error("Failed to get samples for identification", e);
 			Kill();
+			return null;
 		}
+		
 		// Identify
 		try
 		{
 			Identify idn = new Identify(gui);
-			procMon = idn.Start(idFile1, configFile+"1", managementServer, managementPort);
+			procMon = idn.Start(idFile, configFile, managementServer, managementPort);
 
 			while (!procMon.isComplete())
 			{
@@ -100,51 +161,38 @@ public class AutomaticStart implements Runnable
 					Kill();
 					gui.UpdateStatus("Terminating Auto start process - Getting samples");
 					logger.debug("Terminating Auto start process - Getting samples");
-					return;
+					return null;
 				}
 			}
-			
 		}
 		catch (Exception e)
 		{
 			gui.UpdateStatus("Failed to idetify CIC-1 sampelse - Aborting");
 			logger.error("Failed to idetify sampelse", e);
 			Kill();
-			return;
+			return null;
 		}
 		
+		// get encapsulation module name
+		
+		ENCAPSULATION e = null;
+	
 		try
 		{
-			
-			Identify idn = new Identify(gui);
-			procMon = idn.Start(idFile2, configFile + "2", managementServer, managementPort);
-
-			while (!procMon.isComplete())
+			ScriptFile sf = new ScriptFile("c:\\bin\\lego\\config\\Script.lego");
+			e = sf.getEncapsolation();
+			if (e == null)
 			{
-				Thread.sleep(50);
-				if (stopThread)
-				{
-					Kill();
-					gui.UpdateStatus("Terminating Auto start process - Getting samples");
-					logger.debug("Terminating Auto start process - Getting samples");
-					return;
-				}
+				throw new Exception("Unrecognized ancapsulation");
 			}
-			
 		}
-		catch (Exception e)
+		catch (Exception e1)
 		{
-			gui.UpdateStatus("Failed to idetify CIC-1 sampelse - Aborting");
-			logger.error("Failed to idetify sampelse", e);
-			Kill();
-			return;
+			logger.error("Failed to filnd the encapsulation methos from file", e1);
+			return null;
 		}
-
-
-		// Start Production
 		
-		// build 
-
+		return e;
 	}
 	
 	public void Kill()

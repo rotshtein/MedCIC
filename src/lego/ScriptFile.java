@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+
+import javafx.util.Pair;
 import medcic_proto.MedCic.ENCAPSULATION;
 
 public class ScriptFile
@@ -33,7 +35,7 @@ public class ScriptFile
 			{
 				if (line.trim().startsWith("#")) continue;
 
-				TextBlock += line;
+				TextBlock += line + "\r\n";
 				if (line.trim().isEmpty())
 				{
 					if (TextBlock.toLowerCase().startsWith("path"))
@@ -119,18 +121,58 @@ public class ScriptFile
 	}
 
 	public Boolean BuildProductionScript(String Path, ENCAPSULATION Encapsolation, String SourceUri, String DestUri)
-
 	{
 		AddModule(new ModuleConfiguration(Path, "udpserver", ModuleConfiguration.UriToParam(SourceUri), Path + ".1"));
 
 		AddModule(new ModuleConfiguration(Path + ".1", "cesrawinput", null, Path + ".1.1"));
-		// AddModule(new ModuleConfiguration(Path +".1", "cese1input", "e1", Path
-		// +".1.1"));
 
+		Pair<String, String> mp = Encapsulation2Module(Encapsolation);
+		
+		if (mp == null | mp.getKey() == null)
+		{
+			logger.error("Unknown encapsulation");
+			return false;
+		}
+		
+		String module = mp.getKey();
+		String parameters = mp.getValue();
+
+
+		AddModule(new ModuleConfiguration(Path + ".1.1", module, parameters, Path + ".1.1.1"));
+		AddModule(new ModuleConfiguration(Path + ".1.1.1", "cesrawout", null, Path + ".1.1.1.1"));
+		AddModule(new ModuleConfiguration(Path + ".1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri),
+				Path + ".1.1.1.1.1"));
+		AddModule(new ModuleConfiguration(Path + ".1.1.1.1.1", "packet2null", "", ""));
+
+		return true;
+	}
+
+	public Boolean BuildProductionScript(ENCAPSULATION Encapsolation, String Source1Uri, String Dest1Uri,
+			String Source2Uri, String Dest2Uri)
+	{
+		return (BuildProductionScript("1", Encapsolation, Source1Uri, Dest1Uri) & 
+				BuildProductionScript("2", Encapsolation, Source2Uri, Dest2Uri));
+	}
+	
+	
+	public ENCAPSULATION getEncapsolation()
+	{
+		for (ModuleConfiguration mc : moduleList)
+		{
+			ENCAPSULATION encap =  Module2Encapsulation(mc.module, mc.params);
+			if (encap != ENCAPSULATION.UNRECOGNIZED)
+			{
+				return encap;
+			}
+		}
+		return null;
+	}
+	
+	public static Pair<String, String> Encapsulation2Module(ENCAPSULATION EncapsolationName)
+	{
 		String module = null;
 		String parameters = null;
-
-		switch (Encapsolation)
+		switch (EncapsolationName)
 		{
 		case DI:
 			logger.warn("DI - encapsulation not supporeted");
@@ -194,27 +236,92 @@ public class ScriptFile
 			module = null;
 			break;
 		}
-
-		if (module == null) 
-		{
-			logger.error("Unknown encapsulation");
-			return false;
-		}
-
-		AddModule(new ModuleConfiguration(Path + ".1.1", module, parameters, Path + ".1.1.1"));
-		AddModule(new ModuleConfiguration(Path + ".1.1.1", "cesrawout", null, Path + ".1.1.1.1"));
-		AddModule(new ModuleConfiguration(Path + ".1.1.1.1", "udpclient", ModuleConfiguration.UriToParam(DestUri),
-				Path + ".1.1.1.1.1"));
-		AddModule(new ModuleConfiguration(Path + ".1.1.1.1.1", "packet2null", "", ""));
-
-		return true;
+		return new Pair<String,String>(module, parameters);
 	}
-
-	public Boolean BuildProductionScript(ENCAPSULATION Encapsolation, String Source1Uri, String Dest1Uri,
-			String Source2Uri, String Dest2Uri)
+	
+	public static ENCAPSULATION Module2Encapsulation(String module, String parameters)
 	{
-		return (BuildProductionScript("1", Encapsolation, Source1Uri, Dest1Uri) & 
-				BuildProductionScript("2", Encapsolation, Source2Uri, Dest2Uri));
-	}
+		ENCAPSULATION encap = ENCAPSULATION.UNRECOGNIZED;
+		switch (module)
+		{
+		case "dropinsertpp":
+			switch  (parameters.toLowerCase())
+			{
+			case "synclength=20,syncword=0xfa85c0,width=2944,mode=cut,0-24,600-610,1186-1196,1772-1782,2358-2368":
+				encap = ENCAPSULATION.DI_PLUS;
+				break;
+			
+			default:
+				logger.warn("DI - encapsulation not supporeted");
+				encap = ENCAPSULATION.UNRECOGNIZED;
+				break;
+			}
+			break;
 
+		case "edmac1": // "EDMAC":
+			switch (parameters.toLowerCase())
+			{
+			case "synclength=12,syncword=0xe8c0,width=1008,mode=cut,0-12,204-213,405-414,606-615,807-816":
+				encap = ENCAPSULATION.EDMAC;
+				break;
+				
+			default:
+				encap = ENCAPSULATION.UNRECOGNIZED;
+				break;
+			}
+			break;
+
+		case "edmac2":
+			switch (parameters.toLowerCase())
+			{
+			case "synclength=12,syncword=0xe8c0,width=2928,mode=cut,0-12,204-213,405-414,606-615,807-816":
+				encap = ENCAPSULATION.EDMAC2_2928;
+				break;
+
+			case "synclength=12,syncword=0xe8c0,width=3072,mode=cut,0-12,204-213,405-414,606-615,807-816":
+				encap = ENCAPSULATION.EDMAC2_3072;
+				break;
+				
+			default:
+				encap = ENCAPSULATION.UNRECOGNIZED;
+				break;
+			}
+
+		case "escplusplus": // "ESC++ (532)":
+			switch (parameters.toLowerCase())
+			{
+			case  "synclength=12,syncword=0xe8c0,width=532,mode=cut,0-12,20-27,36-45":
+				encap = ENCAPSULATION.ESC_532;
+				break;
+
+			case "synclength=12,syncword=0xe8c0,width=874,mode=cut,0-12,20-28,36-45,146-155,255-264,364-373,473-482,582-591,691-700,800-809":
+				encap = ENCAPSULATION.ESC_874;
+				break;
+	
+			case "synclength=12,syncword=0xe8c0,width=1104,mode=cut,0-12,20-28,36-45,174-183,312-321,450-459,588-597,726-735,864-873,1002-1011":
+				encap = ENCAPSULATION.ESC_1104;
+				break;
+	
+			case "synclength=12,syncword=0xe8c0,width=1792,mode=cut,0-12,20-27,36-45":
+				encap = ENCAPSULATION.ESC_1792;
+				break;
+	
+			case "synclength=12,syncword=0xe8c0,width=551,mode=cut,0-12,21-29,36-45,311-320":
+				encap = ENCAPSULATION.ESC_551;
+				break;
+			}
+			break;
+
+		case "E2":
+			logger.warn("E2 - encapsulation not supporeted");
+			encap = ENCAPSULATION.UNRECOGNIZED;
+			break;
+
+		default:
+			logger.warn("UNRECOGNIZED - encapsulation not supporeted");
+			encap = ENCAPSULATION.UNRECOGNIZED;
+			break;
+		}
+		return encap;
+	}
 }
