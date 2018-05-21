@@ -49,6 +49,7 @@ enum OPCODE
 	STATUS_MESSAGE = 8;
 	GET_SAMPLE_FILE = 9;
 	IDENTYPIED_ENCAPSULATION = 10;
+	STATISTICS_REPLAY = 11;
 }
 
 
@@ -142,8 +143,18 @@ message GetSampleFile
 }
 
 /*****************************************************************************************************************************/
-// This should be sent in order to get StatusReplay
+// This should be sent in order to inform on discovered encapsulation
 message IdentifiedEncapsulation
 {
 	ENCAPSULATION encapsulation = 1;
+}
+
+/*****************************************************************************************************************************/
+// This should be sent in order to update counters
+message StatisticsReplay
+{
+	int64 Cic1InputByteCounter = 1;
+	int64 Cic2InputByteCounter = 2;
+	int64 Cic1OutputByteCounter = 3;
+	int64 Cic2OutputByteCounter = 4;
 }

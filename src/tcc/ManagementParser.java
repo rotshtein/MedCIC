@@ -20,6 +20,7 @@ import medcic_proto.MedCic.IdentifiedEncapsulation;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
+import medcic_proto.MedCic.StatisticsReplay;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
 
@@ -650,5 +651,29 @@ public class ManagementParser extends Thread implements GuiInterface
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void UpdateCounters(Statistics stat)
+	{
+		try
+		{
+			StatisticsReplay s = null;
+			Header h = null;
+			
+			s = StatisticsReplay.newBuilder()
+					.setCic1InputByteCounter(stat.getCic1In())
+					.setCic2InputByteCounter(stat.getCic1In())
+					.setCic1OutputByteCounter(stat.getCic1In())
+					.setCic2OutputByteCounter(stat.getCic1In())
+					.build();
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATISTICS_REPLAY)
+				.setMessageData(s.toByteString()).build();
+			BroadcastMessage(h.toByteString() );
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send Statistics Message to a connection", e);
+		}
 	}
 }

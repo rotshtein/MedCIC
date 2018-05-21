@@ -14,6 +14,7 @@ import tcc.GuiInterface;
 import tcc.ManagementClient;
 import tcc.ManagementServer;
 import tcc.Parameters;
+import tcc.Statistics;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -766,5 +767,17 @@ public class MainScreen implements GuiInterface
 			break;
 		}
 		return index;
+	}
+
+
+
+	@Override
+	public void UpdateCounters(Statistics stat)
+	{
+		UpdateStatus("CIC 1 < input byte count: " + stat.getCic1In());
+		UpdateStatus("CIC 2 < input byte count: " + stat.getCic1In());
+		UpdateStatus("CIC 1 > output byte count: " + stat.getCic1In());
+		UpdateStatus("CIC 2 > outinput byte count: " + stat.getCic1In());
+		UpdateStatus("======================================================");
 	}
 }

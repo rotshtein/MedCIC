@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import tcc.GuiInterface;
 import tcc.GuiInterface.Channel;
 import tcc.Parameters;
+import tcc.Statistics;
 
 
 public class MessageParser extends Thread
@@ -23,7 +24,7 @@ public class MessageParser extends Thread
 	SyncMessageFilter syncMessageFilter = null;
 	public static Boolean Cic1SendSync = true;
 	public static Boolean Cic2SendSync = true;
-	
+	Statistics stat = null;
 		
 	class CicChanel
 	{
@@ -118,6 +119,7 @@ public class MessageParser extends Thread
 
 	public MessageParser(GuiInterface Gui, int Port) throws Exception
 	{
+		stat = new Statistics();
 		cic1 = new CicChanel();
 		cic2 = new CicChanel();
 		gui = Gui;
@@ -214,6 +216,7 @@ public class MessageParser extends Thread
 								{
 									gui.OperationOutOfSync(Channel.INPUT1);
 								}
+								stat.setCic1In(cm.output);
 							}
 							else if (cm.path.startsWith("2"))
 							{
@@ -227,7 +230,9 @@ public class MessageParser extends Thread
 								{
 									gui.OperationOutOfSync(Channel.INPUT2);
 								}
+								stat.setCic2In(cm.output);
 							}
+							gui.UpdateCounters(stat);
 						}
 						else
 						{
@@ -237,61 +242,37 @@ public class MessageParser extends Thread
 						String st = cm.StatusMessage();
 						if (st != null)
 						{
-							gui.UpdateStatus(st);
+							//gui.UpdateStatus(st);
 						}
 						break;
+						
 					case ConfigurationMessage.ISSUE_MSG_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
 								syncMessageFilter.setCic1Sync(true);
-								//if (Cic1SendSync)
-								//{
-									//gui.OperationInSync(Channel.OUTPUT1);
-									//Cic1SendSync = false;
-								//}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
 								syncMessageFilter.setCic2Sync(true);
-								//if (Cic2SendSync)
-								//{
-									//gui.OperationInSync(Channel.OUTPUT2);
-									//Cic2SendSync = false;
-								//}
 							}
-							
+							stat.setCic1Out(cm.output);
 							break;
 							
 					case ConfigurationMessage.ISSUE_MSG_LOST_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
 								syncMessageFilter.setCic1Sync(false);
-								//if (Cic1SendSync)
-								//{
-									//gui.OperationOutOfSync(Channel.OUTPUT1);
-									//Cic1SendSync = false;
-								//}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
 								syncMessageFilter.setCic2Sync(false);
-								//if (Cic2SendSync)
-								//{
-									//gui.OperationOutOfSync(Channel.OUTPUT2);
-									//Cic2SendSync = false;
-								//}
 							}
+							stat.setCic2Out(cm.output);
 							break;
 						
 					default:
-						/*
-						String status = "-------->" + cm.StatusMessage();
-						if (status != null)
-						{
-							gui.UpdateStatus(status);
-						}*/
 						break;
 					}
 				}

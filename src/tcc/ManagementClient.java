@@ -18,6 +18,7 @@ import medcic_proto.MedCic.IdentifiedEncapsulation;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
+import medcic_proto.MedCic.StatisticsReplay;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
 import tcc.GuiInterface.Channel;
@@ -221,6 +222,15 @@ public class ManagementClient extends WebSocketClient
 				IdentifiedEncapsulation ie = IdentifiedEncapsulation.parseFrom(h.getMessageData());
 				gui.SetEncapsulation(ie.getEncapsulation());
 				break;
+				
+			case STATISTICS_REPLAY:
+				StatisticsReplay stat = StatisticsReplay.parseFrom(h.getMessageData());
+				gui.UpdateCounters(new Statistics(	stat.getCic1InputByteCounter(),
+													stat.getCic2InputByteCounter(),
+													stat.getCic1OutputByteCounter(),
+													stat.getCic2OutputByteCounter()));
+				break;
+				
 			default:
 				logger.error("Unknown command.");
 				break;

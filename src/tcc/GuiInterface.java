@@ -27,4 +27,6 @@ public interface GuiInterface
 	
 	void SetEncapsulation(ENCAPSULATION encap);
 	
+	void UpdateCounters(Statistics statistics);
+	
 }
