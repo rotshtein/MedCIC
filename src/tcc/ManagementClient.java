@@ -14,6 +14,7 @@ import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.Header;
+import medcic_proto.MedCic.IdentifiedEncapsulation;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
@@ -37,7 +38,6 @@ public class ManagementClient extends WebSocketClient
 	long cic1LastLostSync = 0;
 	long cic2LastLostSync = 0;
 
-	
 	public ManagementClient(URI serverUri, GuiInterface gui)
 	{
 		super(serverUri);
@@ -217,6 +217,10 @@ public class ManagementClient extends WebSocketClient
 				gui.UpdateStatus(sm.getMessage());
 				break;
 
+			case IDENTYPIED_ENCAPSULATION:
+				IdentifiedEncapsulation ie = IdentifiedEncapsulation.parseFrom(h.getMessageData());
+				gui.SetEncapsulation(ie.getEncapsulation());
+				break;
 			default:
 				logger.error("Unknown command.");
 				break;
@@ -285,8 +289,10 @@ public class ManagementClient extends WebSocketClient
 		try
 		{
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STOP_CMD).build();
-
-			this.send(h.toByteArray());
+			if (this.isOpen())
+			{
+				this.send(h.toByteArray());
+			}
 			send(0, OPCODE.STOP_CMD, null);
 		}
 		catch (Exception e)
@@ -297,6 +303,25 @@ public class ManagementClient extends WebSocketClient
 		return true;
 	}
 
+	public Boolean SendStatus(String status)
+	{
+		try
+		{
+			StatusMessage sm = StatusMessage.newBuilder().setMessage(status).build();
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE).setMessageData(sm.toByteString()).build();
+
+			if (this.isOpen())
+			{
+				this.send(h.toByteArray());
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Send SendStatus error", e);
+			return false;
+		}
+		return true;
+	}
 	public void send(int Sequence, OPCODE opcode, ByteString data)
 	{
 		gotAck = false;
@@ -313,8 +338,10 @@ public class ManagementClient extends WebSocketClient
 			{
 				h = Header.newBuilder().setSequence(Sequence).setOpcode(opcode).build();
 			}
-
-			this.send(h.toByteArray());
+			if (this.isOpen())
+			{
+				this.send(h.toByteArray());
+			}
 		}
 		catch (Exception e)
 		{

@@ -1,7 +1,10 @@
-package tcc;
+package legoID;
 
 import lego.ProcMon;
 import lego.ScriptFile;
+import tcc.GuiInterface;
+import tcc.Operation;
+import tcc.Parameters;
 
 public class GetSamples extends Operation
 {
@@ -17,11 +20,11 @@ public class GetSamples extends Operation
 		super(Exe, gui, Description);
 	}
 
-	public ProcMon Start(	String SourceUri, String IdFile, String ConfigFile, String Server, int Port) throws Exception
+	public ProcMon Start(	String SourceUri, String SampleFile, String ConfigFile, String Server, int Port) throws Exception
 	{
 		ScriptFile scriptFile = new ScriptFile(ConfigFile, Server, Port);
 		
-		scriptFile.BuildRecordToFileScript(SourceUri, SourceUri);
+		scriptFile.BuildRecordToFileScript(SourceUri, SampleFile);
 		scriptFile.Write();
 		
 		return StartAction(new String[]	{ Exe, ConfigFile });

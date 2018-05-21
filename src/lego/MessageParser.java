@@ -27,7 +27,6 @@ public class MessageParser extends Thread
 		
 	class CicChanel
 	{
-		
 		class LimitedSizeQueue<K> extends ArrayList<K> 
 		{
 		    /**
@@ -124,15 +123,7 @@ public class MessageParser extends Thread
 		gui = Gui;
 		
 		syncMessageFilter = new SyncMessageFilter(gui);
-		//syncMessageFilter.start();
-		
-		//Thread t1 = new Thread(new Runnable() {
-	      //   public void run() {
-	        //     Stop();
-	        // }
-	    //});  
-	    //t1.start();
-		
+				
 		queue = new LinkedBlockingDeque<DatagramPacket>(1000);
 		server = new UdpServer(Port, queue, Gui);
 		server.start();
@@ -201,6 +192,7 @@ public class MessageParser extends Thread
 
 						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
 						{
+							syncMessageFilter.Restart();
 							gui.UpdateStatus(cm.StatusMessage());
 							cic1.Clear();
 							cic2.Clear();

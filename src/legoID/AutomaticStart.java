@@ -1,4 +1,4 @@
-package tcc;
+package legoID;
 
 import java.io.File;
 import java.net.URI;
@@ -11,6 +11,9 @@ import org.java_websocket.handshake.ServerHandshake;
 import lego.ProcMon;
 import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
+import tcc.GetSampleAndIdentify;
+import tcc.GuiInterface;
+import tcc.Parameters;
 
 public class AutomaticStart extends WebSocketClient implements Runnable
 {
@@ -127,8 +130,8 @@ public class AutomaticStart extends WebSocketClient implements Runnable
 		// Identify
 		try
 		{
-			Identify idn = new Identify(gui);
-			procMon = idn.Start(idFile, configFile, managementServer, managementPort);
+			GetSampleAndIdentify idn = new GetSampleAndIdentify(gui);
+			procMon = idn.Start(sourceUri1, idFile, configFile, managementServer, managementPort);
 
 			while (!procMon.isComplete())
 			{
@@ -153,7 +156,7 @@ public class AutomaticStart extends WebSocketClient implements Runnable
 		// get encapsulation module name
 		
 		ENCAPSULATION e = null;
-	
+	/*
 		try
 		{
 			ScriptFile sf = new ScriptFile("c:\\bin\\lego\\config\\Script.lego");
@@ -167,7 +170,7 @@ public class AutomaticStart extends WebSocketClient implements Runnable
 		{
 			logger.error("Failed to filnd the encapsulation methos from file", e1);
 			return null;
-		}
+		}*/
 		
 		return e;
 	}

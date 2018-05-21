@@ -104,11 +104,12 @@ public class ScriptFile
 		return BuildRecordToFileScript("1", SourceUri, IdFile);
 	}
 
-	public Boolean BuildRecordToFileScript(String Path, String SourceUri, String IdFile)
+	public Boolean BuildRecordToFileScript(String Path, String SourceUri, String SampleFile)
 	{
+		SourceUri = SourceUri.replace(":", ",");
 		AddModule(new ModuleConfiguration(Path, "udpserver", SourceUri, Path + ".1"));
 		AddModule(new ModuleConfiguration(Path + ".1", "cesrawinput", null, Path + ".1.1"));
-		AddModule(new ModuleConfiguration(Path + ".1.1", "bitoutput", IdFile, ""));
+		AddModule(new ModuleConfiguration(Path + ".1.1", "bitoutput", SampleFile, ""));
 
 		return true;
 	}

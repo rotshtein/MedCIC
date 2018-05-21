@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import javafx.util.Pair;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
@@ -37,13 +38,13 @@ import javax.swing.JTextArea;
 
 public class MainScreen implements GuiInterface
 {
-	Logger logger = Logger.getLogger("MainScreen");
+	static final Logger logger = Logger.getLogger("MainScreen");
 	private JFrame		frame;
 	JFormattedTextField	txtIn1;
 	JFormattedTextField	txtIn2;
 	JFormattedTextField	txtOut1;
 	JFormattedTextField	txtOut2;
-	JComboBox<String>	encap;
+	JComboBox<String>	cmbEncap;
 	JButton				btnStart;
 	ManagementServer	server;
 	ManagementClient	client;
@@ -232,13 +233,13 @@ public class MainScreen implements GuiInterface
 			input2 = txtIn2.getText();
 			output2 = txtOut2.getText();
 			
-			if (((String)(encap.getSelectedItem())).toLowerCase().startsWith("auto"))
+			if (((String)(cmbEncap.getSelectedItem())).toLowerCase().startsWith("auto"))
 			{
 				client.SendAutomatucStartCommand(input1,input2, output1, output2);
 			}
 			else
 			{
-				client.SendStartCommand(toProtobuff((String) encap.getSelectedItem()),input1,input2, output1, output2);
+				client.SendStartCommand(toProtobuff((String) cmbEncap.getSelectedItem()),input1,input2, output1, output2);
 			}
 			btnStart.setEnabled(false);
 		}
@@ -333,9 +334,9 @@ public class MainScreen implements GuiInterface
 		frame.getContentPane().add(txtOut2);
 		txtOut2.setInputVerifier(new UrlVerifier());
 
-		encap = new JComboBox<String>();
-		encap.setBounds(250, 11, 135, 22);
-		frame.getContentPane().add(encap);
+		cmbEncap = new JComboBox<String>();
+		cmbEncap.setBounds(250, 11, 135, 22);
+		frame.getContentPane().add(cmbEncap);
 
 		btnStart = new JButton("Start");
 		btnStart.setBounds(250, 55, 57, 23);
@@ -343,17 +344,17 @@ public class MainScreen implements GuiInterface
 		btnStart.addActionListener(new StartAction());
 		frame.getContentPane().add(btnStart);
 
-		encap.addItem("Auto Detect");
-		encap.addItem("D&I++");
-		encap.addItem("EDMAC");
-		encap.addItem("EDMAC-2 (2928)");
-		encap.addItem("EDMAC-2 (3072)");
-		encap.addItem("ESC++        (532)");
-		encap.addItem("ESC++        (551)");
-		encap.addItem("ESC++        (874)");
-		encap.addItem("ESC++      (1104)");
-		encap.addItem("ESC++      (1792)");
-		encap.addItem("E2");
+		cmbEncap.addItem("Auto Detect");
+		cmbEncap.addItem("D&I++");
+		cmbEncap.addItem("EDMAC");
+		cmbEncap.addItem("EDMAC-2 (2928)");
+		cmbEncap.addItem("EDMAC-2 (3072)");
+		cmbEncap.addItem("ESC++        (532)");
+		cmbEncap.addItem("ESC++        (551)");
+		cmbEncap.addItem("ESC++        (874)");
+		cmbEncap.addItem("ESC++      (1104)");
+		cmbEncap.addItem("ESC++      (1792)");
+		cmbEncap.addItem("E2");
 		frame.setVisible(true);
 		// create the status bar panel and shove it down the bottom of the frame
 
@@ -678,5 +679,92 @@ public class MainScreen implements GuiInterface
 			lastUpdateTimeOutofSync = System.currentTimeMillis();
 		}
 
+	}
+
+
+
+	@Override
+	public void SetEncapsulation(ENCAPSULATION encap)
+	{
+		
+		if (!SwingUtilities.isEventDispatchThread())
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					SetEncapsulation(encap);
+				}
+			});
+			return;
+		}
+		// Now edit your gui objects
+		int Index = Encapsulation2Index(encap);
+		if (Index > 0)
+		{
+			cmbEncap.setSelectedIndex(Index);
+		}
+	}
+	
+	public int Encapsulation2Index(ENCAPSULATION EncapsolationName)
+	{
+		int index = -1;
+	
+		switch (EncapsolationName)
+		{
+		case DI:
+			logger.warn("DI - encapsulation not supporeted");
+			index = -1;
+			break;
+
+		case DI_PLUS: // "DI++":
+			index = 1;
+			break;
+
+		case EDMAC: // "EDMAC":
+			index = 2;
+			break;
+
+		case EDMAC2_2928: // "EDMAC-2 (2928)":
+			index = 3;
+			break;
+
+		case EDMAC2_3072: // "EDMAC-2 (3072)":
+			index = 4;
+			break;
+
+		case ESC_532: // "ESC++ (532)":
+			index = 5;
+			break;
+
+		case ESC_551: // "ESC++ (551)":
+			index = 6;
+			break;
+
+		case ESC_874:// "ESC++ (874)":
+			index = 7;
+			break;
+
+		case ESC_1104: // "ESC++ (1104)":
+			index = 8;
+			break;
+
+		case ESC_1792: // "ESC++ (1792)":
+			index = 9;
+			break;
+
+		case E2:// "E2":
+			logger.warn("E2 - encapsulation not supporeted");
+			index = 10;
+			break;
+
+		case UNRECOGNIZED:
+		default:
+			logger.warn("UNRECOGNIZED - encapsulation not supporeted");
+			index = -1;
+			break;
+		}
+		return index;
 	}
 }

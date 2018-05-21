@@ -11,11 +11,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import lego.MessageParser;
 import lego.ProcMon;
+import legoID.GetSamples;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.ENCAPSULATION;
-import medcic_proto.MedCic.GetSampleFile;
 import medcic_proto.MedCic.Header;
+import medcic_proto.MedCic.IdentifiedEncapsulation;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
 import medcic_proto.MedCic.StartCommand;
@@ -36,6 +37,10 @@ public class ManagementParser extends Thread implements GuiInterface
 	Thread														Cic2Thread			= null;
 	MessageParser												messageParser		= null;
 	WebSocket													currentConn = null;
+	String AutoCic1Input = null;
+	String AutoCic2Input = null; 
+	String AutoCic1Output = null; 
+	String AutoCic2Output = null;
 	
 	String UdpServerHost = null;
 	int UdpServerPort = 0;
@@ -111,6 +116,8 @@ public class ManagementParser extends Thread implements GuiInterface
 	public void Parse(byte[] buffer, WebSocket conn)
 	{
 		currentConn = conn;
+		
+		
 		Header h = getHeader(buffer);
 		if (h == null)
 		{
@@ -126,132 +133,74 @@ public class ManagementParser extends Thread implements GuiInterface
 				break;
 	
 			case AUTO_START_CMD:
-				AutomaticStartCommand AuroRun = null;
+				AutomaticStartCommand ar = null;
 				try
 				{
-					AuroRun = AutomaticStartCommand.parseFrom(h.getMessageData());
+					ar = AutomaticStartCommand.parseFrom(h.getMessageData());
 				}
 				catch (InvalidProtocolBufferException e)
 				{
 					logger.error("Failed to parse Automatic Start Command", e);
 					SendNck(h, conn);
 				}
-	
-				/*try
+				AutoCic1Input = ar.getInput1Url();
+				AutoCic2Input = ar.getInput2Url();
+				AutoCic1Output = ar.getOutput1Url();
+				AutoCic2Output = ar.getOutput2Url();
+				
+				try
 				{
-					
-					AutomaticStart as = AutomaticStart(this, 
-							AuroRun.getInput1Url(), 
-							AuroRun.getOutput1Url(), 
-							AuroRun.getInput2Url(),
-							AuroRun.getOutput2Url(), 
-							"gg",
-							Paths.get(ScriptPath, "cicScript.lego").toString(),
-							"127.0.0.1", 11001,
-							conn);
-					
-					ENCAPSULATION e = as.GetEncapsulation();
-					
-					// Get samples for ID process
-					 * 
-					 */
-				/*
-					try
-					{
-						String IdentificationExe = Parameters.Get("IdentificationExe", "C:\\bin\\lego\\bin\\IdBlock.exe");
-						String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-						
-						
-						// Get sample file
-						GetSamples gs = new GetSamples(this, "Getting Samples");
-						procMon = gs.Start(AuroRun.getInput1Url(), IdentificationExe, ScriptPath, managementServer, managementPort);
-						while (!procMon.isComplete())
-						{
-							if  (new File(idFile).length() > SAMPLE_FILE_SIZE) 	
-							{
-								procMon.Kill();
-								break;
-							}
-							
-							Thread.sleep(50);
-						}
-					}
-					catch (Exception e1)
-					{
-						UpdateStatus("Failed to get samples for identification - Aborting");
-						logger.error("Failed to get samples for identification", e1);
-						Kill();
-					}
-					
-					/*
-					if (e != null & e != ENCAPSULATION.UNRECOGNIZED)
-					{
-						StartProduction(ENCAPSULATION.ESC_551, 
-									AuroRun.getInput1Url(), 
-									AuroRun.getOutput1Url(), 
-									AuroRun.getInput2Url(),
-									AuroRun.getOutput2Url(), 
-									Paths.get(ScriptPath, "cicScript.lego").toString(),
-									h,conn);
-					}
-				
-				
-					SendStatusMessage("Starting ...", conn);
-					logger.info("Starting...");
-		
-				
-					SendAck(h, conn);
-					SendProcessStartMessage();
+					GetSampleAndIdentify gsi = new GetSampleAndIdentify(this);
+					procMon = gsi.Start(ar.getInput1Url(), "c:\\d\\id.bin", "id.lego" , "127.0.0.1", 11001);
 				}
 				catch (Exception e)
 				{
-					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-					logger.error("Executable not found. Please fix the configuration file", e);
-					if (h != null & conn != null)
-					{
-						SendNck(h, conn);
-					}
+					logger.error("Java", e);
 				}
-				/*
-				 * Start thread to: 1. Get sample file 2. Identify 3. Run production
-				 * 
-				 * Terminate the thread on processes on STOP if running run thread per CIC => 2
-				 * threads
-				 */
+				
+			
 
 				break;
 	
-			case GET_SAMPLE_FILE:
-				GetSampleFile gs = null;
+			case IDENTYPIED_ENCAPSULATION:
+				IdentifiedEncapsulation ie = null;
 				try
 				{
-					gs = GetSampleFile.parseFrom(h.getMessageData());
+					ie = IdentifiedEncapsulation.parseFrom(h.getMessageData());
 				}
 				catch (InvalidProtocolBufferException e)
 				{
-					logger.error("Failed to parse GetSamplesFile Command", e);
+					logger.error("Failed to parse Start Command", e);
 					SendNck(h, conn);
 				}
-				try
+				
+				if (ie.getEncapsulation() != ENCAPSULATION.UNRECOGNIZED)
 				{
-					StartGetSampleFile(gs.getInputUrl(), gs.getFilename(), "cicScript.lego");
-					SendStatusMessage("Starting ...", conn);
-					logger.info("Starting...");
-					SendAck(h, conn);
-					SendProcessStartMessage();
-				}
-				catch (Exception e)
-				{
-					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-					logger.error("Executable not found. Please fix the configuration file", e);
-					if (h != null & conn != null)
+					try
 					{
-						SendNck(h, conn);
+						BroadcastMessage(h.toByteString());
+						Thread.sleep(500);
+						String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+						StartProduction(ie.getEncapsulation(), AutoCic1Input, AutoCic1Output,
+															   AutoCic2Input, AutoCic2Output,
+															   Paths.get(ScriptPath, "cicScript.lego").toString());
+						
+						SendStatusMessage("Starting ...", conn);
+						logger.info("Starting...");
+						SendAck(h, conn);
+						SendProcessStartMessage();
+					}
+					catch (Exception e)
+					{
+						SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+						logger.error("Executable not found. Please fix the configuration file", e);
+						if (h != null & conn != null)
+						{
+							SendNck(h, conn);
+						}
 					}
 				}
-				break;
 				
-			case IDENTYPY:
 				break;
 				
 			case START_CMD:
@@ -330,7 +279,9 @@ public class ManagementParser extends Thread implements GuiInterface
 				
 				SendMessage(hh.toByteString(), conn);
 				break;
-	
+				
+			case STATUS_MESSAGE:
+				BroadcastMessage(h.toByteString());
 			default:
 				SendNck(h, conn);
 				break;
@@ -359,7 +310,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	}
 	
 	
-	public void StartGetSampleFile (String InputUrl, String SampleFilename, String ConfigFile) throws Exception
+	public void Identify (String InputUrl, String SampleFilename, String ConfigFile) throws Exception
 	{
 		Kill();
 		GetSamples getSamples = new GetSamples(this, "Getting Sample File");
@@ -692,5 +643,12 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			logger.error("Failed to send StatusMessage to a connection", e);
 		}
+	}
+
+	@Override
+	public void SetEncapsulation(ENCAPSULATION encap)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

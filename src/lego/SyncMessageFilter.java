@@ -40,6 +40,14 @@ public class SyncMessageFilter extends Thread
 		}
 	}
 	
+	public void Restart()
+	{
+		cic1PrevSync = false;
+		cic2PrevSync = false;
+		cic1Sync = false;
+		cic2Sync = false;
+	}
+	
 	public void setCic1Sync(Boolean state)
 	{
 		cic1Sync = state;

@@ -1,5 +1,7 @@
 package tcc;
 
+import medcic_proto.MedCic.ENCAPSULATION;
+
 public interface GuiInterface
 {
 	
@@ -22,5 +24,7 @@ public interface GuiInterface
 	void OperationInSync(Channel ch);
 	
 	void OperationOutOfSync(Channel ch);
+	
+	void SetEncapsulation(ENCAPSULATION encap);
 	
 }
