@@ -7,7 +7,6 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import javafx.util.Pair;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
