@@ -2,7 +2,7 @@ syntax = "proto3";
 package medcic_proto;
 
 /*************/
-/* Version 3 */
+/* Version 4 */
 /************/
 
 enum STATUS
@@ -47,6 +47,8 @@ enum OPCODE
 	STATUS_REQUEST = 6;
 	STATUS_REPLAY = 7;
 	STATUS_MESSAGE = 8;
+	GET_SAMPLE_FILE = 9;
+	IDENTYPY = 10;
 }
 
 
@@ -128,4 +130,19 @@ message StatusReplay
 message StatusMessage
 {
 	string message = 1;
+}
+
+/*****************************************************************************************************************************/
+// This command should be sent to start processing bitstream
+message GetSampleFile
+{
+	string input_url = 1;			// The intput url.
+	string filename = 2;			// sample filename
+	int32 duration = 3; 	       	//duration in seconds
+}
+
+/*****************************************************************************************************************************/
+// This should be sent in order to get StatusReplay
+message Identify
+{
 }

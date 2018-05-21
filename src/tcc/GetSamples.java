@@ -5,9 +5,7 @@ import lego.ScriptFile;
 
 public class GetSamples extends Operation
 {
-
-	ScriptFile		scriptFile	= null;
-	static String	Exe			= Parameters.Get("GetSamplesExe", "C:\\programs\\lego\\bin\\BuildingBlock.exe");
+	static String	Exe	= Parameters.Get("GetSamplesExe", "C:\\programs\\lego\\bin\\ProcesssBlock.exe");
 
 	public GetSamples(GuiInterface gui)
 	{
@@ -21,10 +19,11 @@ public class GetSamples extends Operation
 
 	public ProcMon Start(	String SourceUri, String IdFile, String ConfigFile, String Server, int Port) throws Exception
 	{
-		scriptFile = new ScriptFile(ConfigFile, Server, Port);
+		ScriptFile scriptFile = new ScriptFile(ConfigFile, Server, Port);
 		
 		scriptFile.BuildRecordToFileScript(SourceUri, SourceUri);
 		scriptFile.Write();
-		return StartAction(new String[]	{ "ProcessBlock", ConfigFile });
+		
+		return StartAction(new String[]	{ Exe, ConfigFile });
 	}
 }

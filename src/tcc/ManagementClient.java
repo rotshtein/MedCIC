@@ -166,6 +166,7 @@ public class ManagementClient extends WebSocketClient
 						operationStarted = true;
 					}
 				}
+				
 				if (sr.getCic1Input() == CHANEL_STATUS.SYNC)
 				{
 					gui.OperationInSync(Channel.INPUT1);
@@ -174,6 +175,7 @@ public class ManagementClient extends WebSocketClient
 				{
 					gui.OperationOutOfSync(Channel.INPUT1);
 				}
+				
 				if (sr.getCic2Input() == CHANEL_STATUS.SYNC)
 				{
 					gui.OperationInSync(Channel.INPUT2);

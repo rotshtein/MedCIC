@@ -97,6 +97,7 @@ public class UdpServer extends Thread
 				catch (IllegalStateException e)
 				{
 					logger.error("Udp mssage queue full", e);
+					//queue.clear();
 				}
 			}
 			catch (Exception e)

@@ -6,14 +6,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.log4j.Logger;
-
 import tcc.GuiInterface;
 import tcc.GuiInterface.Channel;
 import tcc.Parameters;
 
+
 public class MessageParser extends Thread
 {
-
 	static final Logger				logger		= Logger.getLogger("MessageParser");
 	GuiInterface					gui			= null;
 	BlockingQueue<DatagramPacket>	queue		= null;
@@ -21,10 +20,15 @@ public class MessageParser extends Thread
 	Boolean							stopThread	= false;
 	CicChanel cic1 = null;
 	CicChanel cic2 = null;
+	SyncMessageFilter syncMessageFilter = null;
+	public static Boolean Cic1SendSync = true;
+	public static Boolean Cic2SendSync = true;
 	
+		
 	class CicChanel
 	{
-		public class LimitedSizeQueue<K> extends ArrayList<K> 
+		
+		class LimitedSizeQueue<K> extends ArrayList<K> 
 		{
 		    /**
 			 * 
@@ -65,23 +69,12 @@ public class MessageParser extends Thread
 		    {
 		    	this.clear();
 		    }
-		    
-		    public boolean getSync()
-		    {
-		    	return Sync;
-		    }
-		    
-		    public void setSync(boolean s)
-		    {
-		    	Sync = s;
-		    }
 		}
 		
 		final int lowpass = 3; 
 		long prevInputBytes = 0;
 		Boolean alive = false;
 		LimitedSizeQueue<Long> inputQueue = new LimitedSizeQueue<Long>(lowpass);
-		public boolean Sync = false;
 		
 		public void Clear()
 		{
@@ -129,7 +122,18 @@ public class MessageParser extends Thread
 		cic1 = new CicChanel();
 		cic2 = new CicChanel();
 		gui = Gui;
-		queue = new LinkedBlockingDeque<DatagramPacket>(100);
+		
+		syncMessageFilter = new SyncMessageFilter(gui);
+		//syncMessageFilter.start();
+		
+		//Thread t1 = new Thread(new Runnable() {
+	      //   public void run() {
+	        //     Stop();
+	        // }
+	    //});  
+	    //t1.start();
+		
+		queue = new LinkedBlockingDeque<DatagramPacket>(1000);
 		server = new UdpServer(Port, queue, Gui);
 		server.start();
 	}
@@ -145,7 +149,6 @@ public class MessageParser extends Thread
 	public void run()
 	{
 		stopThread = false;
-
 		while (!stopThread)
 		{
 			try
@@ -232,38 +235,8 @@ public class MessageParser extends Thread
 								{
 									gui.OperationOutOfSync(Channel.INPUT2);
 								}
-
 							}
 						}
-						/*
-						else if (cm.module.toLowerCase().equals("udpclient"))
-						{
-							if (cm.path.startsWith("1"))
-							{
-								cic1.setOutputByte(cm.input);
-								if (cic1.IsInSync())
-								{
-									gui.OperationInSync(Channel.OUTPUT1);
-								}
-								else
-								{
-									gui.OperationOutOfSync(Channel.OUTPUT1);
-								}
-							}
-							else if (cm.path.startsWith("2"))
-							{
-								cic2.setOutputByte(cm.input);
-								if (cic2.IsInSync())
-								{
-									gui.OperationInSync(Channel.OUTPUT2);
-								}
-								else
-								{
-									gui.OperationOutOfSync(Channel.OUTPUT2);
-								}
-							}
-						}*/
-						
 						else
 						{
 							break;
@@ -278,20 +251,22 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
-								if (!cic1.Sync)
-								{
-									gui.OperationInSync(Channel.OUTPUT1);
-									cic1.Sync = true;
-								}
+								syncMessageFilter.setCic1Sync(true);
+								//if (Cic1SendSync)
+								//{
+									//gui.OperationInSync(Channel.OUTPUT1);
+									//Cic1SendSync = false;
+								//}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
-								if (!cic2.Sync)
-								{
-									gui.OperationInSync(Channel.OUTPUT2);
-									cic2.Sync = true;
-								}
+								syncMessageFilter.setCic2Sync(true);
+								//if (Cic2SendSync)
+								//{
+									//gui.OperationInSync(Channel.OUTPUT2);
+									//Cic2SendSync = false;
+								//}
 							}
 							
 							break;
@@ -299,20 +274,22 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_LOST_SYNC:
 							if (cm.path.startsWith("1.1.1"))
 							{
-								if (cic1.Sync)
-								{
-									gui.OperationOutOfSync(Channel.OUTPUT1);
-									cic1.Sync = false;
-								}
+								syncMessageFilter.setCic1Sync(false);
+								//if (Cic1SendSync)
+								//{
+									//gui.OperationOutOfSync(Channel.OUTPUT1);
+									//Cic1SendSync = false;
+								//}
 							}
 							
 							else if (cm.path.startsWith("2.1.1"))
 							{
-								if (cic2.Sync)
-								{
-									gui.OperationOutOfSync(Channel.OUTPUT2);
-									cic2.Sync = false;
-								}
+								syncMessageFilter.setCic2Sync(false);
+								//if (Cic2SendSync)
+								//{
+									//gui.OperationOutOfSync(Channel.OUTPUT2);
+									//Cic2SendSync = false;
+								//}
 							}
 							break;
 						

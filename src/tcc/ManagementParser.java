@@ -1,6 +1,5 @@
 package tcc;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.concurrent.BlockingQueue;
@@ -15,6 +14,7 @@ import lego.ProcMon;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.ENCAPSULATION;
+import medcic_proto.MedCic.GetSampleFile;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.OPCODE;
 import medcic_proto.MedCic.STATUS;
@@ -36,11 +36,18 @@ public class ManagementParser extends Thread implements GuiInterface
 	Thread														Cic2Thread			= null;
 	MessageParser												messageParser		= null;
 	WebSocket													currentConn = null;
+	
+	String UdpServerHost = null;
+	int UdpServerPort = 0;
+	
+	
 	public ManagementParser(BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue, ManagementServer server)
 			throws Exception
 	{
 		this.queue = queue;
 		this.server = server;
+		this.UdpServerHost = Parameters.Get("ManagementHost");
+		this.UdpServerPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
 		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
 		try
 		{
@@ -54,6 +61,8 @@ public class ManagementParser extends Thread implements GuiInterface
 		catch (Exception e1)
 		{
 			logger.error("Failed to run UDP server for messages from the modules", e1);
+			System.out.println("Failed to run UDP server for messages from the modules");
+			System.exit(-1);
 		}
 	}
 
@@ -212,6 +221,39 @@ public class ManagementParser extends Thread implements GuiInterface
 
 				break;
 	
+			case GET_SAMPLE_FILE:
+				GetSampleFile gs = null;
+				try
+				{
+					gs = GetSampleFile.parseFrom(h.getMessageData());
+				}
+				catch (InvalidProtocolBufferException e)
+				{
+					logger.error("Failed to parse GetSamplesFile Command", e);
+					SendNck(h, conn);
+				}
+				try
+				{
+					StartGetSampleFile(gs.getInputUrl(), gs.getFilename(), "cicScript.lego");
+					SendStatusMessage("Starting ...", conn);
+					logger.info("Starting...");
+					SendAck(h, conn);
+					SendProcessStartMessage();
+				}
+				catch (Exception e)
+				{
+					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+					logger.error("Executable not found. Please fix the configuration file", e);
+					if (h != null & conn != null)
+					{
+						SendNck(h, conn);
+					}
+				}
+				break;
+				
+			case IDENTYPY:
+				break;
+				
 			case START_CMD:
 				StartCommand p = null;
 				try
@@ -223,10 +265,28 @@ public class ManagementParser extends Thread implements GuiInterface
 					logger.error("Failed to parse Start Command", e);
 					SendNck(h, conn);
 				}
-	
-				String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-				StartProduction(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
-						p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString(),h,conn);
+				
+				try
+				{
+					Thread.sleep(500);
+					String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+					StartProduction(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
+							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
+					
+					SendStatusMessage("Starting ...", conn);
+					logger.info("Starting...");
+					SendAck(h, conn);
+					SendProcessStartMessage();
+				}
+				catch (Exception e)
+				{
+					SendStatusMessage("Executable not found. Please fix the configuration file", conn);
+					logger.error("Executable not found. Please fix the configuration file", e);
+					if (h != null & conn != null)
+					{
+						SendNck(h, conn);
+					}
+				}
 				break;
 	
 			case STOP_CMD:
@@ -283,39 +343,29 @@ public class ManagementParser extends Thread implements GuiInterface
 		currentConn = null;
 	}
 
-	public Boolean StartProduction (ENCAPSULATION encap, 
+	public void StartProduction (ENCAPSULATION encap, 
 			String InputUrl1, String OutputUrl1,
 			String InputUrl2, String OutputUrl2, 
-			String ConfigFilename,
-			Header h, 
-			WebSocket conn)
+			String ConfigFilename) throws Exception
 	{
-		try
-		{
-			String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
-			Mediate med = new Mediate(MediationExe, this, "CIC Production");
+		Kill();
+		String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
+		Mediate med = new Mediate(MediationExe, this, "CIC Production");
 
-			String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-			Kill();
-			procMon = med.Start(encap, 	InputUrl1, OutputUrl1, 
-										InputUrl2, OutputUrl2, 
-										Paths.get(ScriptPath, "cicScript.lego").toString());
-			SendStatusMessage("Starting ...", conn);
-			logger.info("Starting...");
-			SendAck(h, conn);
-			SendProcessStartMessage();
-		}
-		catch (Exception e)
-		{
-			SendStatusMessage("Executable not found. Please fix the configuration file", conn);
-			logger.error("Executable not found. Please fix the configuration file", e);
-			if (h != null & conn != null)
-			{
-				SendNck(h, conn);
-			}
-			return false;
-		}
-		return true;
+		String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+		procMon = med.Start(encap, 	InputUrl1, OutputUrl1, 
+									InputUrl2, OutputUrl2, 
+									Paths.get(ScriptPath, "cicScript.lego").toString());
+	}
+	
+	
+	public void StartGetSampleFile (String InputUrl, String SampleFilename, String ConfigFile) throws Exception
+	{
+		Kill();
+		GetSamples getSamples = new GetSamples(this, "Getting Sample File");
+		String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
+		//String SourceUri, String IdFile, String ConfigFile, String Server, int Port
+		procMon = getSamples.Start(InputUrl, 	SampleFilename, Paths.get(ScriptPath, ConfigFile).toString(), UdpServerHost, UdpServerPort); 
 	}
 	
 	private void SendAck(Header h, WebSocket conn)
@@ -626,6 +676,7 @@ public class ManagementParser extends Thread implements GuiInterface
 						.setCic2Input(CHANEL_STATUS.UNKNOWN)
 						.setCic2Output(CHANEL_STATUS.OUT_OF_SYNC)
 						.setStatusDescription("CIC 2 output NOT synchronized").build();
+				break;
 			default:
 				return;
 			}

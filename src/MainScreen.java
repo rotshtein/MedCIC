@@ -7,7 +7,6 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
@@ -24,7 +23,6 @@ import java.awt.ComponentOrientation;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -57,9 +55,11 @@ public class MainScreen implements GuiInterface
 	private JScrollPane scrollPane;
 	private final JButton btnClear = new JButton("Clear");
 	private final JButton btnSave = new JButton("Save");
-	private Color back = Color.LIGHT_GRAY; 
 	String serverUri = null;
-
+	Boolean isRunning = false;
+	long lastUpdateTimeSync = System.currentTimeMillis();
+	long lastUpdateTimeOutofSync = System.currentTimeMillis();
+	
 	/**
 	 * Launch the application.
 	 */
@@ -128,6 +128,7 @@ public class MainScreen implements GuiInterface
 					client.Stop();
 					client = null;
 				}
+				isRunning = false;
 				OperationCompleted();
 				btnStart.setEnabled(true);
 			}
@@ -195,7 +196,6 @@ public class MainScreen implements GuiInterface
 		{
 			logger.error("Failed to run UDP server for messages from the modules", e1);
 		} */
-		back = textArea.getBackground();
 	}
 
 	class StartAction implements ActionListener
@@ -203,6 +203,7 @@ public class MainScreen implements GuiInterface
 
 		public void actionPerformed(ActionEvent arg0)
 		{
+			isRunning = true;
 			try
 			{
 				client = new ManagementClient(new URI(serverUri), MainScreen.this);
@@ -476,8 +477,8 @@ public class MainScreen implements GuiInterface
 			});
 			return;
 		}
+		isRunning = false;
 		// Now edit your gui objects
-		btnStart.setBackground(back);
 		txtIn1.setBackground(Color.WHITE);
 		txtIn2.setBackground(Color.WHITE);
 		txtOut1.setBackground(Color.WHITE);
@@ -494,25 +495,26 @@ public class MainScreen implements GuiInterface
 	@Override
 	public void OperationStarted()
 	{
-		if (!SwingUtilities.isEventDispatchThread())
+		if (isRunning)
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			if (!SwingUtilities.isEventDispatchThread())
 			{
-				@Override
-				public void run()
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					OperationStarted();
-				}
-			});
-			return;
+					@Override
+					public void run()
+					{
+						OperationStarted();
+					}
+				});
+				return;
+			}
+			// Now edit your gui objects
+			txtIn1.setBackground(Color.ORANGE);
+			txtIn2.setBackground(Color.ORANGE);
+			txtOut1.setBackground(Color.ORANGE);
+			txtOut2.setBackground(Color.ORANGE);
 		}
-		// Now edit your gui objects
-		btnStart.setBackground(Color.ORANGE);
-		txtIn1.setBackground(Color.ORANGE);
-		txtIn2.setBackground(Color.ORANGE);
-		txtOut1.setBackground(Color.ORANGE);
-		txtOut2.setBackground(Color.ORANGE);
-		
 	}
 
 
@@ -520,51 +522,123 @@ public class MainScreen implements GuiInterface
 	@Override
 	public void OperationInSync(Channel ch)
 	{
-		if (!SwingUtilities.isEventDispatchThread())
+		if (isRunning)
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			if (!SwingUtilities.isEventDispatchThread())
 			{
-				@Override
-				public void run()
+				switch (ch)
 				{
-					OperationInSync(ch);
+				case INPUT1:
+					if (txtIn1.getBackground() == Color.GREEN)
+					{
+						return;
+					}
+					break;
+					
+				case INPUT2:
+					if (txtIn2.getBackground() == Color.GREEN)
+					{
+						return;
+					}
+					break;
+					
+				case OUTPUT1:
+					if (txtOut1.getBackground() == Color.GREEN)
+					{
+						return;
+					}
+					break;
+					
+				case OUTPUT2:
+					if (txtOut2.getBackground() == Color.GREEN)
+					{
+						return;
+					}
+					break;
+					
+				default:
+					return;
 				}
-			});
-			return;
-		}
-		// Now edit your gui objects
-		switch (ch)
-		{
-		case INPUT1:
-			txtIn1.setBackground(Color.GREEN);
-			break;
-			
-		case INPUT2:
-			txtIn2.setBackground(Color.GREEN);
-			break;
-			
-		case OUTPUT1:
-			txtOut1.setBackground(Color.GREEN);
-			UpdateStatus("CIC-1 is synchronized\n\r");
-			break;
-			
-		case OUTPUT2:
-			txtOut2.setBackground(Color.GREEN);
-			UpdateStatus("CIC-2 is synchronized\n\r");
-			break;
-			
-		default:
-			return;
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						OperationInSync(ch);
+					}
+				});
+				return;
+			}
+			// Now edit your gui objects
+			//if (System.currentTimeMillis() - lastUpdateTimeSync > 200)
+			{
+				switch (ch)
+				{
+				case INPUT1:
+					txtIn1.setBackground(Color.GREEN);
+					break;
+					
+				case INPUT2:
+					txtIn2.setBackground(Color.GREEN);
+					break;
+					
+				case OUTPUT1:
+					txtOut1.setBackground(Color.GREEN);
+					UpdateStatus("CIC-1 is synchronized\n\r");
+					break;
+					
+				case OUTPUT2:
+					txtOut2.setBackground(Color.GREEN);
+					UpdateStatus("CIC-2 is synchronized\n\r");
+					break;
+					
+				default:
+					return;
+				}
+				lastUpdateTimeSync = System.currentTimeMillis();
+			}
 		}
 	}
 
-
-
+	
 	@Override
 	public void OperationOutOfSync(Channel ch)
 	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
+			switch (ch)
+			{
+			case INPUT1:
+				if (!(txtIn1.getBackground() != Color.RED))
+				{
+					return;
+				}
+				break;
+				
+			case INPUT2:
+				if (!(txtIn2.getBackground() != Color.RED))
+				{
+					return;
+				}
+				break;
+				
+			case OUTPUT1:
+				if (!(txtOut1.getBackground() != Color.RED))
+				{
+					return;
+				}
+				break;
+				
+			case OUTPUT2:
+				if (!(txtOut2.getBackground() != Color.RED))
+				{
+					return;
+				}
+				break;
+				
+			default:
+				return;
+			}
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				@Override
@@ -575,29 +649,33 @@ public class MainScreen implements GuiInterface
 			});
 			return;
 		}
-		// Now edit your gui objects
-		switch (ch)
+		//if (System.currentTimeMillis() - lastUpdateTimeOutofSync > 200)
 		{
-		case INPUT1:
-			txtIn1.setBackground(Color.RED);
-			break;
-			
-		case INPUT2:
-			txtIn2.setBackground(Color.RED);
-			break;
-			
-		case OUTPUT1:
-			txtOut1.setBackground(Color.RED);
-			UpdateStatus("CIC-1 is out of synchronized\n\r");
-			break;
-			
-		case OUTPUT2:
-			txtOut2.setBackground(Color.RED);
-			UpdateStatus("CIC-2 is out of synchronized\n\r");
-			break;
-			
-		default:
-			return;
+		// Now edit your gui objects
+			switch (ch)
+			{
+			case INPUT1:
+				txtIn1.setBackground(Color.RED);
+				break;
+				
+			case INPUT2:
+				txtIn2.setBackground(Color.RED);
+				break;
+				
+			case OUTPUT1:
+				txtOut1.setBackground(Color.RED);
+				UpdateStatus("CIC-1 is out of synchronized\n\r");
+				break;
+				
+			case OUTPUT2:
+				txtOut2.setBackground(Color.RED);
+				UpdateStatus("CIC-2 is out of synchronized\n\r");
+				break;
+				
+			default:
+				return;
+			}
+			lastUpdateTimeOutofSync = System.currentTimeMillis();
 		}
 
 	}

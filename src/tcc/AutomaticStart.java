@@ -2,7 +2,6 @@ package tcc;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
 import org.java_websocket.WebSocket;
@@ -13,7 +12,7 @@ import lego.ProcMon;
 import lego.ScriptFile;
 import medcic_proto.MedCic.ENCAPSULATION;
 
-public class AutomaticStart implements Runnable
+public class AutomaticStart extends WebSocketClient implements Runnable
 {
 
 	Logger logger = Logger.getLogger("AutomaticStart");
@@ -31,46 +30,8 @@ public class AutomaticStart implements Runnable
 	int				managementPort;
 	ProcMon 		procMon = null;
 	WebSocket conn = null;
-	
-
-	public class GetSampleFile extends WebSocketClient implements Runnable
-	{
-
-		public GetSampleFile(URI serverUri)
-		{
-			super(serverUri);
-			
-		}
-
-		@Override
-		public void onOpen(ServerHandshake handshakedata)
-		{
-			
-		}
-
-		@Override
-		public void onMessage(String message)
-		{
-			
-		}
-
-		@Override
-		public void onClose(int code, String reason, boolean remote)
-		{
-			
-		}
-
-		@Override
-		public void onError(Exception ex)
-		{
-			
-		}
 		
-		
-		
-	}
-	
-	public AutomaticStart(GuiInterface gui, 
+	public AutomaticStart( 
 			String Source1Uri, 	String Dest1tUri, 
 			String Source2Uri, 	String Dest2tUri, 
 			String IdFile, 	
@@ -78,7 +39,10 @@ public class AutomaticStart implements Runnable
 			String Server, int Port,
 			WebSocket Connection) throws Exception
 	{
-
+		super(new URI(Parameters.Get("ServerUri", "ws://127.0.0.1:8887")));
+		
+		this.connect();
+		
 		if ( (Source1Uri == null | Source1Uri == "") | (Dest1tUri == null | Dest1tUri == ""))
 		{
 			throw new Exception("CIC 1 details are wrong");
@@ -88,8 +52,6 @@ public class AutomaticStart implements Runnable
 		{
 			throw new Exception("CIC 2 details are wrong");
 		}
-		
-		this.gui = gui;
 		
 		this.idFile = IdFile;
 
@@ -113,6 +75,21 @@ public class AutomaticStart implements Runnable
 	@Override
 	public void run()
 	{
+		
+		
+		
+	}
+	
+	
+	public Boolean GetSampleFile(String InputUri, String Filename, int Duration)
+	{
+		return true;
+	}
+	
+	public ENCAPSULATION IdentifyEncapsulation(String Filename)
+	{
+		return null;
+		
 	}
 	
 	public ENCAPSULATION GetEncapsulation()
@@ -208,5 +185,32 @@ public class AutomaticStart implements Runnable
 		{
 			logger.error("Failed to kill", e);
 		}
+	}
+
+	@Override
+	public void onOpen(ServerHandshake handshakedata)
+	{
+		logger.debug("Internal cient connected");
+	}
+
+	@Override
+	public void onMessage(String message)
+	{
+
+		
+	}
+
+	@Override
+	public void onClose(int code, String reason, boolean remote)
+	{
+		logger.debug("Internal cient disconnected");
+		
+	}
+
+	@Override
+	public void onError(Exception ex)
+	{
+		logger.error("Internal cient socket error",ex);
+		
 	}
 }
