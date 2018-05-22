@@ -28,7 +28,7 @@ public class ManagementServer extends WebSocketServer
 		super(address);
 		try
 		{
-			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);  
+			queue = new ArrayBlockingQueue<SimpleEntry<byte[], WebSocket>>(1);
 			parser = new ManagementParser(queue, this);
 			parser.start();
 			monitorProcesThread = new Thread(MonitorProcesThread);
@@ -88,7 +88,8 @@ public class ManagementServer extends WebSocketServer
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote)
 	{
-		logger.info("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+		logger.info(
+				"closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
 	}
 
 	@Override

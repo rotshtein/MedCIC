@@ -17,11 +17,11 @@ public class UdpServer extends Thread
 
 	static final Logger				logger		= Logger.getLogger("UdpServer");
 	static DatagramSocket			socket		= null;
-	static final  int				PACKETSIZE	= 255;
+	static final int				PACKETSIZE	= 255;
 	Boolean							stopThread	= false;
 	BlockingQueue<DatagramPacket>	queue		= null;
 	GuiInterface					gui			= null;
-	static int port = 0;
+	static int						port		= 0;
 
 	public UdpServer(int Port, BlockingQueue<DatagramPacket> Queue, GuiInterface Gui) throws Exception
 	{
@@ -53,12 +53,12 @@ public class UdpServer extends Thread
 		socket = null;
 		port = 0;
 	}
-	
+
 	public static int getPort()
 	{
 		return port;
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -91,13 +91,13 @@ public class UdpServer extends Thread
 
 				try
 				{
-					//String s = new String(packet.getData());
+					// String s = new String(packet.getData());
 					queue.add(packet);
 				}
 				catch (IllegalStateException e)
 				{
 					logger.error("Udp mssage queue full", e);
-					//queue.clear();
+					// queue.clear();
 				}
 			}
 			catch (Exception e)

@@ -5,6 +5,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class ConfigurationMessage
 {
+
 	/*
 	 * public final String ISSUE_MSG_ACTIVE_STRING = "Active"; public final String
 	 * ISSUE_MSG_START_STRING = "Start"; public final String ISSUE_MSG_PAUSE_STRING
@@ -14,8 +15,8 @@ public class ConfigurationMessage
 	 * = "Unpause"; public final String ISSUE_MSG_SYNC_STRING = "Sync"; public final
 	 * String ISSUE_MSG_LOST_SYNC_STRING = "LostSync";
 	 */
-	Logger							logger		= Logger.getLogger("ConfigurationMessage");
-	
+	Logger logger = Logger.getLogger("ConfigurationMessage");
+
 	public String	path;
 	public String	module;
 	public int		issue;
@@ -28,40 +29,39 @@ public class ConfigurationMessage
 	public int		bad;
 	public int		isinput;
 	public int		isoutput;
-	
-	public static final int ISSUE_MSG_ACTIVE = 1;
-	public static final int ISSUE_MSG_START = 2; 
-	public static final int ISSUE_MSG_PAUSE = 3; 
-	public static final int ISSUE_MSG_DONE = 4; 
-	public static final int ISSUE_MSG_RESTART = 5; 
-	public static final int ISSUE_MSG_PING = 6; 
-	public static final int ISSUE_MSG_UNPAUSE = 7; 
-	public static final int ISSUE_MSG_SYNC = 8; 
-	public static final int ISSUE_MSG_LOST_SYNC = 9; 
-	public static final int ISSUE_MSG_FATAL = 100; 
-	public static final int ISSUE_MSG_ERROR = 110; 
-	public static final int ISSUE_MSG_WARNING = 120; 
-	public static final int ISSUE_MSG_NOTICE = 130; 
-	public static final int ISSUE_MSG_INFO = 140; 
-	public static final int ISSUE_MSG_DEBUG = 150; 
-	public static final int ISSUE_MSG_TRACE = 160;
+
+	public static final int	ISSUE_MSG_ACTIVE	= 1;
+	public static final int	ISSUE_MSG_START		= 2;
+	public static final int	ISSUE_MSG_PAUSE		= 3;
+	public static final int	ISSUE_MSG_DONE		= 4;
+	public static final int	ISSUE_MSG_RESTART	= 5;
+	public static final int	ISSUE_MSG_PING		= 6;
+	public static final int	ISSUE_MSG_UNPAUSE	= 7;
+	public static final int	ISSUE_MSG_SYNC		= 8;
+	public static final int	ISSUE_MSG_LOST_SYNC	= 9;
+	public static final int	ISSUE_MSG_FATAL		= 100;
+	public static final int	ISSUE_MSG_ERROR		= 110;
+	public static final int	ISSUE_MSG_WARNING	= 120;
+	public static final int	ISSUE_MSG_NOTICE	= 130;
+	public static final int	ISSUE_MSG_INFO		= 140;
+	public static final int	ISSUE_MSG_DEBUG		= 150;
+	public static final int	ISSUE_MSG_TRACE		= 160;
 
 	public ConfigurationMessage()
 	{
 	}
-	
-	public ConfigurationMessage(String Path,  int issue)
+
+	public ConfigurationMessage(String Path, int issue)
 	{
-		this (Path, "", issue, GetIssueString(issue));
+		this(Path, "", issue, GetIssueString(issue));
 	}
-	
-	
+
 	public ConfigurationMessage(String Path, String Module, int issue, String IssueString)
 	{
 		if (Path == null) Path = "1";
 
 		this.path = Path;
-		this.module =  Module;
+		this.module = Module;
 		this.issue = issue;
 		this.issuestring = IssueString;
 		this.message = "";
@@ -74,7 +74,6 @@ public class ConfigurationMessage
 		this.isoutput = 0;
 	}
 
-	
 	public String toJson() throws Exception
 	{
 		ObjectMapper mapper = new ObjectMapper();
@@ -88,99 +87,56 @@ public class ConfigurationMessage
 		ConfigurationMessage object = mapper.readValue(JasonString, ConfigurationMessage.class);
 		return object;
 	}
-	
-	/*
-	public Severity getSavirity()
-	{
-		Severity savity = null;
-		
-		if (path.equals("0"))
-		{
-			if (!((isinput !=ConfigurationMessage.ISSUE_MSG_ERROR) & (isinput !=ConfigurationMessage.ISSUE_MSG_FATAL)))
-				return savity;
-		}
-		
-		switch (issue)
-		{
-			case ISSUE_MSG_ERROR:
-			case ISSUE_MSG_FATAL:
-				savity = Severity.ERROR; 
-				break;
-				
-			case ISSUE_MSG_WARNING:
-				logger.warn("Got warning message from " + path + ", " + module + ":" + message);
-				savity = Severity.WARNING;
-				break;
-				
-			case ISSUE_MSG_START:
-			case ISSUE_MSG_DONE:
-			case ISSUE_MSG_SYNC:
-			case ISSUE_MSG_LOST_SYNC:
-				savity = Severity.REPORT;
-				break;
-				
-			case ISSUE_MSG_ACTIVE:
-			case ISSUE_MSG_NOTICE: 
-			case ISSUE_MSG_INFO: 
-			case ISSUE_MSG_DEBUG: 
-			case ISSUE_MSG_TRACE:
-			default:
-				break;				
-		}
-		return savity;
-	}*/
-	
+
 	public String StatusMessage()
 	{
 		String issuePrefix = "";
 		switch (issue)
 		{
-			case ISSUE_MSG_ERROR:
-			case ISSUE_MSG_FATAL:
-				logger.error("Got error message from " + path + ", " + module + ":" + message);
-				issuePrefix = "Error";
-				break;
-				
-			case ISSUE_MSG_WARNING:
-				logger.warn("Got warning message from " + path + ", " + module + ":" + message);
-				issuePrefix = "Warning";
-				break;
-				
-			case ISSUE_MSG_ACTIVE:
-			case ISSUE_MSG_START:
-			case ISSUE_MSG_DONE:
-			case ISSUE_MSG_SYNC:
-			case ISSUE_MSG_LOST_SYNC:
-				break;
-				
+		case ISSUE_MSG_ERROR:
+		case ISSUE_MSG_FATAL:
+			logger.error("Got error message from " + path + ", " + module + ":" + message);
+			issuePrefix = "Error";
+			break;
 
-			case ISSUE_MSG_NOTICE: 
-			case ISSUE_MSG_INFO: 
-			case ISSUE_MSG_DEBUG: 
-			case ISSUE_MSG_TRACE:
-				logger.debug("Got message from " + path + ", " + module + ":" + message);
-				return null;
-				
-				
-			default:
-				logger.debug("Got unknown message from " + path + ", " + module + ":" + message);
-				return null;
+		case ISSUE_MSG_WARNING:
+			logger.warn("Got warning message from " + path + ", " + module + ":" + message);
+			issuePrefix = "Warning";
+			break;
+
+		case ISSUE_MSG_ACTIVE:
+		case ISSUE_MSG_START:
+		case ISSUE_MSG_DONE:
+		case ISSUE_MSG_SYNC:
+		case ISSUE_MSG_LOST_SYNC:
+			break;
+
+		case ISSUE_MSG_NOTICE:
+		case ISSUE_MSG_INFO:
+		case ISSUE_MSG_DEBUG:
+		case ISSUE_MSG_TRACE:
+			logger.debug("Got message from " + path + ", " + module + ":" + message);
+			return null;
+
+		default:
+			logger.debug("Got unknown message from " + path + ", " + module + ":" + message);
+			return null;
 		}
-		
+
 		String status = module;
 		if (issuePrefix != null & issuePrefix != "")
 		{
 			status += " : " + issuePrefix;
 		}
-		status +=  " [" + issuestring +"]";
+		status += " [" + issuestring + "]";
 		if (message != null & message != "")
 		{
 			status += " input:" + input + " output:" + output + " >> " + message;
 		}
-		
+
 		return status;
 	}
-	
+
 	public static String GetIssueString(int issue)
 	{
 		switch (issue)
@@ -218,7 +174,7 @@ public class ConfigurationMessage
 		case ISSUE_MSG_TRACE:
 			return "Trace";
 		}
-	return "";
+		return "";
 	}
 
 }

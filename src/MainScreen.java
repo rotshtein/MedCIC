@@ -34,39 +34,40 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
-
+import java.awt.Toolkit;
 
 public class MainScreen implements GuiInterface
 {
-	static final Logger logger = Logger.getLogger("MainScreen");
-	private JFrame		frame;
-	JFormattedTextField	txtIn1;
-	JFormattedTextField	txtIn2;
-	JFormattedTextField	txtOut1;
-	JFormattedTextField	txtOut2;
-	JComboBox<String>	cmbEncap;
-	JButton				btnStart;
-	ManagementServer	server;
-	ManagementClient	client;
-	private final JButton btnStop = new JButton("Stop");
-	static String configurationFilename = "config.properties";
-	JScrollPane jsp;
-	//MessageParser messageParser = null;
-	private final JTextArea textArea = new JTextArea();
-	private JScrollPane scrollPane;
-	private final JButton btnClear = new JButton("Clear");
-	private final JButton btnSave = new JButton("Save");
-	String serverUri = null;
-	Boolean isRunning = false;
-	long lastUpdateTimeSync = System.currentTimeMillis();
-	long lastUpdateTimeOutofSync = System.currentTimeMillis();
-	
+
+	static final Logger		logger					= Logger.getLogger("MainScreen");
+	private JFrame			frame;
+	JFormattedTextField		txtIn1;
+	JFormattedTextField		txtIn2;
+	JFormattedTextField		txtOut1;
+	JFormattedTextField		txtOut2;
+	JComboBox<String>		cmbEncap;
+	JButton					btnStart;
+	ManagementServer		server;
+	ManagementClient		client;
+	private final JButton	btnStop					= new JButton("Stop");
+	static String			configurationFilename	= "config.properties";
+	JScrollPane				jsp;
+	// MessageParser messageParser = null;
+	private final JTextArea	textArea				= new JTextArea();
+	private JScrollPane		scrollPane;
+	private final JButton	btnClear				= new JButton("Clear");
+	private final JButton	btnSave					= new JButton("Save");
+	String					serverUri				= null;
+	Boolean					isRunning				= false;
+	long					lastUpdateTimeSync		= System.currentTimeMillis();
+	long					lastUpdateTimeOutofSync	= System.currentTimeMillis();
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args)
 	{
-		
+
 		if (args.length > 2)
 		{
 			if (args[0].equals("-c"))
@@ -77,6 +78,7 @@ public class MainScreen implements GuiInterface
 
 		EventQueue.invokeLater(new Runnable()
 		{
+
 			public void run()
 			{
 				try
@@ -86,17 +88,16 @@ public class MainScreen implements GuiInterface
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					logger.error("Filed to start the application", e);
 				}
 			}
 		});
 	}
 
-	
-	
 	/**
 	 * Create the application.
-	 * @throws URISyntaxException 
+	 * 
+	 * @throws URISyntaxException
 	 */
 	public MainScreen() throws URISyntaxException
 	{
@@ -104,27 +105,28 @@ public class MainScreen implements GuiInterface
 		// txtIn1 ****://###.###.###.###:#####
 		// MaskFormatter formatter = new MaskFormatter("****://###.###.###.###:#####");
 		// txtIn1.setFormatterFactory(forrmatter);
-		
-		
+
 		txtIn1.setText(Parameters.Get("url-in-1", "udp://127.0.0.1:5001"));
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
 		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
 		btnStop.setBounds(328, 55, 57, 23);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnStop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) 
+		btnStop.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
 			{
 				if (client != null)
 				{
-					client.send(0,OPCODE.STOP_CMD, null);
+					client.send(0, OPCODE.STOP_CMD, null);
 					try
 					{
 						Thread.sleep(200);
 					}
 					catch (InterruptedException e1)
 					{
-						
+						logger.error("Faild to stop", e1);
 					}
 					client.Stop();
 					client = null;
@@ -135,27 +137,30 @@ public class MainScreen implements GuiInterface
 			}
 		});
 		frame.getContentPane().add(btnStop);
-		
+
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 89, 597, 215);
 		frame.getContentPane().add(scrollPane);
 		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 		btnClear.setBounds(81, 315, 74, 23);
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnClear.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
 				textArea.setText("");
 			}
 		});
 		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		
+
 		frame.getContentPane().add(btnClear);
 		btnSave.setBounds(465, 315, 89, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		
+
 		frame.getContentPane().add(btnSave);
-		//frame.getContentPane().add(scroll);
+		// frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
 		int port = Integer.parseInt(Parameters.Get("ListenPort", "8887"));
@@ -164,39 +169,6 @@ public class MainScreen implements GuiInterface
 		server.start();
 		serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
 		client = null;// new ManagementClient(new URI(serverUri), this);
-		
-		/*
-		ScriptFile sf = null;
-		ENCAPSULATION e = null;
-		
-		try
-		{
-			sf = new ScriptFile("c:\\bin\\lego\\legoFiles\\cicScript.lego");
-			e = sf.getEncapsolation();
-		}
-		catch (FileNotFoundException e2)
-		{
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		catch (IOException e2)
-		{
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}*/
-		
-		
-		/*
-		int ManagementPort = Integer.parseInt(Parameters.Get("ManagementPort", "11001"));
-		try
-		{
-			messageParser = new MessageParser(this, ManagementPort);
-			messageParser.start();
-		}
-		catch (Exception e1)
-		{
-			logger.error("Failed to run UDP server for messages from the modules", e1);
-		} */
 	}
 
 	class StartAction implements ActionListener
@@ -211,7 +183,7 @@ public class MainScreen implements GuiInterface
 			}
 			catch (URISyntaxException e)
 			{
-				logger.error("Failed to create client" ,e);
+				logger.error("Failed to create client", e);
 				client = null;
 			}
 			try
@@ -226,20 +198,21 @@ public class MainScreen implements GuiInterface
 				logger.error("Failed to save parameters", e1);
 			}
 
-			String input1="" ,input2="", output1="", output2="";
-			
+			String input1 = "", input2 = "", output1 = "", output2 = "";
+
 			input1 = txtIn1.getText();
 			output1 = txtOut1.getText();
 			input2 = txtIn2.getText();
 			output2 = txtOut2.getText();
-			
-			if (((String)(cmbEncap.getSelectedItem())).toLowerCase().startsWith("auto"))
+
+			if (((String) (cmbEncap.getSelectedItem())).toLowerCase().startsWith("auto"))
 			{
-				client.SendAutomatucStartCommand(input1,input2, output1, output2);
+				client.SendAutomatucStartCommand(input1, input2, output1, output2);
 			}
 			else
 			{
-				client.SendStartCommand(toProtobuff((String) cmbEncap.getSelectedItem()),input1,input2, output1, output2);
+				client.SendStartCommand(toProtobuff((String) cmbEncap.getSelectedItem()), input1, input2, output1,
+						output2);
 			}
 			btnStart.setEnabled(false);
 		}
@@ -247,6 +220,7 @@ public class MainScreen implements GuiInterface
 
 	class UrlVerifier extends InputVerifier
 	{
+
 		public boolean verify(JComponent input)
 		{
 			if (!(input instanceof JFormattedTextField)) return true;
@@ -269,8 +243,10 @@ public class MainScreen implements GuiInterface
 						}
 						catch (Exception ex)
 						{
+							logger.error("Worng port number", ex);
 						}
-						JOptionPane.showMessageDialog(null,"Wrong URL format.:port should be a number between 1 and 65535");
+						JOptionPane.showMessageDialog(null,
+								"Wrong URL format.:port should be a number between 1 and 65535");
 						return false;
 					}
 				}
@@ -279,7 +255,8 @@ public class MainScreen implements GuiInterface
 					return true;
 				}
 			}
-			JOptionPane.showMessageDialog(null,"Wrong URL format. Should be udp://ip:port or file://<file path and name>");
+			JOptionPane.showMessageDialog(null,
+					"Wrong URL format. Should be udp://ip:port or file://<file path and name>");
 			return false;
 		}
 	}
@@ -290,9 +267,11 @@ public class MainScreen implements GuiInterface
 	private void initialize()
 	{
 		frame = new JFrame();
-		frame.addWindowListener(new WindowAdapter() {
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainScreen.class.getResource("/tcc/mediation.png")));
+		frame.addWindowListener(new WindowAdapter()
+		{
 			@Override
-			public void windowClosing(WindowEvent e) 
+			public void windowClosing(WindowEvent e)
 			{
 				Stop();
 			}
@@ -359,7 +338,7 @@ public class MainScreen implements GuiInterface
 		// create the status bar panel and shove it down the bottom of the frame
 
 	}
-	
+
 	private ENCAPSULATION toProtobuff(String encap)
 	{
 		switch (encap)
@@ -367,34 +346,33 @@ public class MainScreen implements GuiInterface
 		case "D&I++":
 			return ENCAPSULATION.DI_PLUS;
 
-			
 		case "EDMAC":
 			return ENCAPSULATION.EDMAC;
-			
+
 		case "EDMAC-2 (2928)":
 			return ENCAPSULATION.EDMAC2_2928;
-			
+
 		case "EDMAC-2 (3072)":
 			return ENCAPSULATION.EDMAC2_3072;
-			
+
 		case "ESC++        (532)":
 			return ENCAPSULATION.ESC_532;
-			
+
 		case "ESC++        (551)":
 			return ENCAPSULATION.ESC_551;
-			
+
 		case "ESC++        (874)":
 			return ENCAPSULATION.ESC_874;
-			
+
 		case "ESC++      (1104)":
 			return ENCAPSULATION.ESC_1104;
-			
+
 		case "ESC++      (1792)":
 			return ENCAPSULATION.ESC_1792;
-			
+
 		case "E2":
 			return ENCAPSULATION.E2;
-			
+
 		default:
 			return ENCAPSULATION.DI_PLUS;
 		}
@@ -406,7 +384,7 @@ public class MainScreen implements GuiInterface
 		{
 			server.Stop();
 		}
-		
+
 		if (client != null)
 		{
 			client.Stop();
@@ -451,16 +429,10 @@ public class MainScreen implements GuiInterface
 		}
 		// Now edit your gui objects
 		/*
-		if (status)
-		{
-			btnStart.setBackground(Color.GREEN);
-		}
-		else
-		{
-			btnStart.setBackground(Color.GRAY);
-		}*/
-		
-		
+		 * if (status) { btnStart.setBackground(Color.GREEN); } else {
+		 * btnStart.setBackground(Color.GRAY); }
+		 */
+
 	}
 
 	@Override
@@ -470,6 +442,7 @@ public class MainScreen implements GuiInterface
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
+
 				@Override
 				public void run()
 				{
@@ -485,13 +458,11 @@ public class MainScreen implements GuiInterface
 		txtOut1.setBackground(Color.WHITE);
 		txtOut2.setBackground(Color.WHITE);
 	}
-	
-	public JTextArea getTextArea() 
+
+	public JTextArea getTextArea()
 	{
 		return textArea;
 	}
-
-
 
 	@Override
 	public void OperationStarted()
@@ -502,6 +473,7 @@ public class MainScreen implements GuiInterface
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
+
 					@Override
 					public void run()
 					{
@@ -518,8 +490,6 @@ public class MainScreen implements GuiInterface
 		}
 	}
 
-
-
 	@Override
 	public void OperationInSync(Channel ch)
 	{
@@ -535,33 +505,34 @@ public class MainScreen implements GuiInterface
 						return;
 					}
 					break;
-					
+
 				case INPUT2:
 					if (txtIn2.getBackground() == Color.GREEN)
 					{
 						return;
 					}
 					break;
-					
+
 				case OUTPUT1:
 					if (txtOut1.getBackground() == Color.GREEN)
 					{
 						return;
 					}
 					break;
-					
+
 				case OUTPUT2:
 					if (txtOut2.getBackground() == Color.GREEN)
 					{
 						return;
 					}
 					break;
-					
+
 				default:
 					return;
 				}
 				SwingUtilities.invokeLater(new Runnable()
 				{
+
 					@Override
 					public void run()
 					{
@@ -571,28 +542,28 @@ public class MainScreen implements GuiInterface
 				return;
 			}
 			// Now edit your gui objects
-			//if (System.currentTimeMillis() - lastUpdateTimeSync > 200)
+			// if (System.currentTimeMillis() - lastUpdateTimeSync > 200)
 			{
 				switch (ch)
 				{
 				case INPUT1:
 					txtIn1.setBackground(Color.GREEN);
 					break;
-					
+
 				case INPUT2:
 					txtIn2.setBackground(Color.GREEN);
 					break;
-					
+
 				case OUTPUT1:
 					txtOut1.setBackground(Color.GREEN);
 					UpdateStatus("CIC-1 is synchronized\n\r");
 					break;
-					
+
 				case OUTPUT2:
 					txtOut2.setBackground(Color.GREEN);
 					UpdateStatus("CIC-2 is synchronized\n\r");
 					break;
-					
+
 				default:
 					return;
 				}
@@ -601,7 +572,6 @@ public class MainScreen implements GuiInterface
 		}
 	}
 
-	
 	@Override
 	public void OperationOutOfSync(Channel ch)
 	{
@@ -615,33 +585,34 @@ public class MainScreen implements GuiInterface
 					return;
 				}
 				break;
-				
+
 			case INPUT2:
 				if (!(txtIn2.getBackground() != Color.RED))
 				{
 					return;
 				}
 				break;
-				
+
 			case OUTPUT1:
 				if (!(txtOut1.getBackground() != Color.RED))
 				{
 					return;
 				}
 				break;
-				
+
 			case OUTPUT2:
 				if (!(txtOut2.getBackground() != Color.RED))
 				{
 					return;
 				}
 				break;
-				
+
 			default:
 				return;
 			}
 			SwingUtilities.invokeLater(new Runnable()
 			{
+
 				@Override
 				public void run()
 				{
@@ -650,29 +621,29 @@ public class MainScreen implements GuiInterface
 			});
 			return;
 		}
-		//if (System.currentTimeMillis() - lastUpdateTimeOutofSync > 200)
+		// if (System.currentTimeMillis() - lastUpdateTimeOutofSync > 200)
 		{
-		// Now edit your gui objects
+			// Now edit your gui objects
 			switch (ch)
 			{
 			case INPUT1:
 				txtIn1.setBackground(Color.RED);
 				break;
-				
+
 			case INPUT2:
 				txtIn2.setBackground(Color.RED);
 				break;
-				
+
 			case OUTPUT1:
 				txtOut1.setBackground(Color.RED);
 				UpdateStatus("CIC-1 is out of synchronized\n\r");
 				break;
-				
+
 			case OUTPUT2:
 				txtOut2.setBackground(Color.RED);
 				UpdateStatus("CIC-2 is out of synchronized\n\r");
 				break;
-				
+
 			default:
 				return;
 			}
@@ -681,16 +652,15 @@ public class MainScreen implements GuiInterface
 
 	}
 
-
-
 	@Override
 	public void SetEncapsulation(ENCAPSULATION encap)
 	{
-		
+
 		if (!SwingUtilities.isEventDispatchThread())
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
+
 				@Override
 				public void run()
 				{
@@ -706,11 +676,11 @@ public class MainScreen implements GuiInterface
 			cmbEncap.setSelectedIndex(Index);
 		}
 	}
-	
+
 	public int Encapsulation2Index(ENCAPSULATION EncapsolationName)
 	{
 		int index = -1;
-	
+
 		switch (EncapsolationName)
 		{
 		case DI:
@@ -767,8 +737,6 @@ public class MainScreen implements GuiInterface
 		}
 		return index;
 	}
-
-
 
 	@Override
 	public void UpdateCounters(Statistics stat)

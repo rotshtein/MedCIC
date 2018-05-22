@@ -13,16 +13,16 @@ import tcc.Parameters;
 public class ProcMon implements Runnable
 {
 
-	final static Logger	logger	= Logger.getLogger("ProcMon");
-	private Process		_proc;
-	String processName = null;
+	final static Logger			logger		= Logger.getLogger("ProcMon");
+	private Process				_proc;
+	String						processName	= null;
 	private volatile boolean	_complete	= false;
 	public String				description	= "";
 
-	/*public ProcMon(String[] vars, String description) throws Exception
-	{
-		this(Runtime.getRuntime().exec(vars, null), description);
-	}*/
+	/*
+	 * public ProcMon(String[] vars, String description) throws Exception {
+	 * this(Runtime.getRuntime().exec(vars, null), description); }
+	 */
 
 	public ProcMon(Process proc)
 	{
@@ -32,7 +32,7 @@ public class ProcMon implements Runnable
 	public ProcMon(Process proc, String description)
 	{
 		_proc = proc;
-		
+
 		this.description = description;
 		Thread t = new Thread(this);
 		t.start();
@@ -46,7 +46,7 @@ public class ProcMon implements Runnable
 	public Boolean Kill()
 	{
 		SendStop();
-				
+
 		if (!_complete)
 		{
 			int i = 0;
@@ -87,7 +87,7 @@ public class ProcMon implements Runnable
 		_complete = true;
 		logger.info("Exiting procMon thread");
 	}
-	
+
 	public static void SendStop()
 	{
 		try
@@ -100,10 +100,10 @@ public class ProcMon implements Runnable
 			logger.error("Failed to stop path", e);
 		}
 	}
-	
+
 	public static void SendStop(String Path) throws Exception
 	{
-		ConfigurationMessage cm = new ConfigurationMessage(Path,ConfigurationMessage.ISSUE_MSG_DONE);
+		ConfigurationMessage cm = new ConfigurationMessage(Path, ConfigurationMessage.ISSUE_MSG_DONE);
 		cm.module = "udpserver";
 		byte[] message = cm.toJson().getBytes();
 		try
@@ -112,12 +112,12 @@ public class ProcMon implements Runnable
 			int Port = UdpServer.getPort();
 			if (Port > 0)
 			{
-				DatagramPacket packet = new DatagramPacket(message, message.length, address, Port );
+				DatagramPacket packet = new DatagramPacket(message, message.length, address, Port);
 				DatagramSocket dsocket = new DatagramSocket();
-			    dsocket.send(packet);
-			    logger.debug("Sending Done to path " + Path + " => " + new String(packet.getData()) );
-			    //String s = new String(packet.getData());
-			    dsocket.close();
+				dsocket.send(packet);
+				logger.debug("Sending Done to path " + Path + " => " + new String(packet.getData()));
+				// String s = new String(packet.getData());
+				dsocket.close();
 			}
 		}
 		catch (UnknownHostException e)
@@ -125,23 +125,24 @@ public class ProcMon implements Runnable
 			logger.error("UnknownHostException", e);
 		}
 	}
-	
+
 	public static void KillAll(String ProcessName)
 	{
-		 String command = "killall " + ProcessName;
-		 
-		 if (System.getProperty ("os.name").indexOf("win") >= 0) 
-		 {
-			 command = "taskkill /IM " + ProcessName + ".exe";
-         } 
-		 
-		 Process p = null;
+		String command = "killall " + ProcessName;
+
+		if (System.getProperty("os.name").indexOf("win") >= 0)
+		{
+			command = "taskkill /IM " + ProcessName + ".exe";
+		}
+
+		Process p = null;
 		try
 		{
 			p = Runtime.getRuntime().exec(command);
 		}
 		catch (IOException e)
 		{
+			logger.error("Faild to start kill", e);
 		}
 		if (p != null)
 		{

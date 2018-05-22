@@ -16,29 +16,26 @@ public class Mediate extends Operation
 	{
 		this(MediateExe, gui, "Production");
 	}
-	
+
 	public Mediate(String MediateExe, GuiInterface gui, String description)
 	{
 		super(MediateExe, gui, description);
 	}
 
-
-	public ProcMon Start(ENCAPSULATION encap, 
-			String InputUrl1, String OutputUrl1,
-			String InputUrl2, String OutputUrl2, 
-			String ConfigFilename)
-			throws Exception
+	public ProcMon Start(ENCAPSULATION encap, String InputUrl1, String OutputUrl1, String InputUrl2, String OutputUrl2,
+			String ConfigFilename) throws Exception
 	{
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
 		{
-			ScriptFile sf = new ScriptFile(ConfigFilename, Parameters.Get("ManagementHost", "127.0.0.1"),Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
+			ScriptFile sf = new ScriptFile(ConfigFilename, Parameters.Get("ManagementHost", "127.0.0.1"),
+					Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
 			if (sf.BuildProductionScript(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2) == false)
 			{
 				throw new Exception("Unknown encapsulation");
 			}
 			sf.Write();
-			sf.Write("c:\\bin\\lego\\config\\script.lego"); //$$$$
+			sf.Write("c:\\bin\\lego\\config\\script.lego"); // $$$$
 			try
 			{
 				String[] vars =
@@ -47,6 +44,7 @@ public class Mediate extends Operation
 			}
 			catch (Exception ex)
 			{
+				logger.error("Failed to run mediation. Throwigg exception", ex);
 				throw ex;
 			}
 		}

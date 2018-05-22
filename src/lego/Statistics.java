@@ -1,27 +1,26 @@
 package lego;
 
-
 public class Statistics
 {
-	
-	private long cic1In = 0;
-	private long cic2In = 0;
-	private long cic1Out = 0;
-	private long cic2Out = 0;
-	
-	public Statistics() 
+
+	private long	cic1In	= 0;
+	private long	cic2In	= 0;
+	private long	cic1Out	= 0;
+	private long	cic2Out	= 0;
+
+	public Statistics()
 	{
-		this(0,0,0,0);
+		this(0, 0, 0, 0);
 	}
 
-	public Statistics(long in1, long in2, long out1, long out2) 
+	public Statistics(long in1, long in2, long out1, long out2)
 	{
 		cic1In = in1;
 		cic2In = in2;
 		cic1Out = out1;
 		cic2Out = out2;
 	}
-	
+
 	public void Clear()
 	{
 		cic1In = 0;
@@ -29,7 +28,7 @@ public class Statistics
 		cic1Out = 0;
 		cic2Out = 0;
 	}
-	
+
 	public long getCic1In()
 	{
 		return cic1In;

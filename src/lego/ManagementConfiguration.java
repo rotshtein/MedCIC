@@ -33,7 +33,7 @@ public class ManagementConfiguration
 	{
 		String host = Parameters.Get("ManagementHost");
 		int port = Integer.parseInt(Parameters.Get("ManagementPort"));
-		
+
 		if ((port > 0) & (host != null) & (host != ""))
 		{
 			server = host;
@@ -42,7 +42,7 @@ public class ManagementConfiguration
 		else
 		{
 			server = "127.0.0.1";
-			port=11001;
+			port = 11001;
 		}
 	}
 

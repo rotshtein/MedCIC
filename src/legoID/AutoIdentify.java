@@ -1,7 +1,5 @@
 package legoID;
 
-
-
 import java.io.File;
 import java.net.URI;
 
@@ -20,12 +18,14 @@ import tcc.Parameters;
 
 public class AutoIdentify implements GuiInterface
 {
-	final static Logger logger = Logger.getLogger("AutoIdentify");
-	String inputUri, configFilename, sampleFilename, managemntHost;
-	int managementPort;
-	ProcMon procMon = null;
-	
-	public AutoIdentify (String InputUri, String ConfigFilename, String SampleFilename, String ManagemntHost, int ManagementPort)
+
+	final static Logger	logger	= Logger.getLogger("AutoIdentify");
+	String				inputUri, configFilename, sampleFilename, managemntHost;
+	int					managementPort;
+	ProcMon				procMon	= null;
+
+	public AutoIdentify(String InputUri, String ConfigFilename, String SampleFilename, String ManagemntHost,
+			int ManagementPort)
 	{
 		inputUri = InputUri;
 		configFilename = ConfigFilename;
@@ -33,11 +33,11 @@ public class AutoIdentify implements GuiInterface
 		managemntHost = ManagemntHost;
 		managementPort = ManagementPort;
 	}
-	
+
 	public void Start() throws Exception
 	{
 		String ServerUri = Parameters.Get("ServerUri");
-		
+
 		ManagementClient client = new ManagementClient(new URI(ServerUri), this);
 		try
 		{
@@ -45,28 +45,29 @@ public class AutoIdentify implements GuiInterface
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to connect to server",e);
+			logger.error("Failed to connect to server", e);
 		}
-		
+
 		GetSamples gs = new GetSamples(this);
-		
+
 		procMon = gs.Start(inputUri, sampleFilename, configFilename, managemntHost, managementPort);
-		
+
 		long StartTimr = System.currentTimeMillis();
 		while (!procMon.isComplete())
 		{
-			if ( (System.currentTimeMillis() - StartTimr) > (10*1000) )
+			if ((System.currentTimeMillis() - StartTimr) > (10 * 1000))
 			{
 				break;
 			}
 			Thread.sleep(50);
-		};
-		
+		}
+		;
+
 		if (!procMon.isComplete())
 		{
 			procMon.Kill();
 		}
-		
+
 		if (new File(sampleFilename).length() == 0)
 		{
 			if (client.isOpen())
@@ -76,32 +77,32 @@ public class AutoIdentify implements GuiInterface
 			logger.error("Sample file is 0 in size");
 			throw new Exception("Can not capture sample file");
 		}
-		
-		
+
 		client.SendStatus("Finish to get Sample file. Starting identefication phase");
-		
+
 		Identify id = new Identify(this);
-		
+
 		new File("c:\\bin\\lego\\config\\id.lego").delete();
-		
+
 		procMon = id.Start(inputUri, sampleFilename, "id.lego", managemntHost, managementPort);
-		
+
 		while (!procMon.isComplete())
 		{
 			Thread.sleep(50);
 		}
-		
+
 		if (!(new File("c:\\bin\\lego\\config\\id.lego").exists()))
 		{
 			client.SendStatus("Failed to Identify the encasulation");
 			return;
 		}
-		
+
 		ScriptFile sf = new ScriptFile("c:\\bin\\lego\\config\\id.lego");
-		
+
 		ENCAPSULATION encap = sf.getEncapsolation();
 		IdentifiedEncapsulation ie = IdentifiedEncapsulation.newBuilder().setEncapsulation(encap).build();
-		Header h = Header.newBuilder().setOpcode(OPCODE.IDENTYPIED_ENCAPSULATION).setMessageData(ie.toByteString()).build();
+		Header h = Header.newBuilder().setOpcode(OPCODE.IDENTYPIED_ENCAPSULATION).setMessageData(ie.toByteString())
+				.build();
 		if (client.isOpen())
 		{
 			client.send(h.toByteArray());
@@ -122,7 +123,7 @@ public class AutoIdentify implements GuiInterface
 			logger.debug("UpdateStatus: " + status);
 			System.out.println(status);
 		}
-		
+
 	}
 
 	@Override
@@ -137,7 +138,7 @@ public class AutoIdentify implements GuiInterface
 	{
 		logger.debug("OperationStarted");
 		System.out.println("Operation started");
-		
+
 	}
 
 	@Override
@@ -162,13 +163,13 @@ public class AutoIdentify implements GuiInterface
 	public void SetEncapsulation(ENCAPSULATION encap)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void UpdateCounters(Statistics statistics)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 }

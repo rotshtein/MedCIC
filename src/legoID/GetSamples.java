@@ -8,7 +8,8 @@ import tcc.Parameters;
 
 public class GetSamples extends Operation
 {
-	static String	Exe	= Parameters.Get("GetSamplesExe", "C:\\programs\\lego\\bin\\ProcesssBlock.exe");
+
+	static String Exe = Parameters.Get("GetSamplesExe", "C:\\programs\\lego\\bin\\ProcesssBlock.exe");
 
 	public GetSamples(GuiInterface gui)
 	{
@@ -20,13 +21,15 @@ public class GetSamples extends Operation
 		super(Exe, gui, Description);
 	}
 
-	public ProcMon Start(	String SourceUri, String SampleFile, String ConfigFile, String Server, int Port) throws Exception
+	public ProcMon Start(String SourceUri, String SampleFile, String ConfigFile, String Server, int Port)
+			throws Exception
 	{
 		ScriptFile scriptFile = new ScriptFile(ConfigFile, Server, Port);
-		
+
 		scriptFile.BuildRecordToFileScript(SourceUri, SampleFile);
 		scriptFile.Write();
-		
-		return StartAction(new String[]	{ Exe, ConfigFile });
+
+		return StartAction(new String[]
+		{ Exe, ConfigFile });
 	}
 }

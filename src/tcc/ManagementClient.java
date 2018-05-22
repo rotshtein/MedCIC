@@ -32,36 +32,36 @@ public class ManagementClient extends WebSocketClient
 	Boolean				connectionStatus	= false;
 	Boolean				gotAck				= false;
 	Boolean				gotNck				= false;
-	Boolean				operationStarted 	= false;
-	Boolean 			syncTimeout		 = false;
-	long 				lastSyncTime			 = 0;
-	Thread 				syncTimeoutThread = null;
-	Boolean 			runThread = true;
-	long cic1LastLostSync = 0;
-	long cic2LastLostSync = 0;
+	Boolean				operationStarted	= false;
+	Boolean				syncTimeout			= false;
+	long				lastSyncTime		= 0;
+	Thread				syncTimeoutThread	= null;
+	Boolean				runThread			= true;
+	long				cic1LastLostSync	= 0;
+	long				cic2LastLostSync	= 0;
 
 	public ManagementClient(URI serverUri, GuiInterface gui)
 	{
 		super(serverUri);
 		this.gui = gui;
 		this.connect();
-		syncTimeoutThread = new Thread( () -> SyncTimeoutThread());
+		syncTimeoutThread = new Thread(() -> SyncTimeoutThread());
 		syncTimeoutThread.start();
 		logger.debug("ManagementClient and the SyncTimeoutThread started");
 	}
 
 	public void Stop()
 	{
-		//syncTimeoutThread.stop();
+		// syncTimeoutThread.stop();
 		runThread = false;
 		logger.debug("Stop ManagementClient and the SyncTimeoutThread");
 		this.close();
 	}
-	
+
 	void SyncTimeoutThread()
 	{
 		runThread = true;
-		while (runThread) 
+		while (runThread)
 		{
 			try
 			{
@@ -88,7 +88,7 @@ public class ManagementClient extends WebSocketClient
 			}
 		}
 	}
-	
+
 	@Override
 	public void onOpen(ServerHandshake handshakedata)
 	{
@@ -141,7 +141,7 @@ public class ManagementClient extends WebSocketClient
 				lastSyncTime = System.currentTimeMillis();
 				StatusReplay sr = StatusReplay.parseFrom(h.getMessageData());
 
-				//gui.UpdateStatus(sr.getStatusDescription());
+				// gui.UpdateStatus(sr.getStatusDescription());
 
 				if (sr.getError())
 				{
@@ -154,21 +154,21 @@ public class ManagementClient extends WebSocketClient
 
 				if (sr.getStatus() == STATUS.STOP)
 				{
-					//gui.UpdateStatus(sr.getStatusDescription());
+					// gui.UpdateStatus(sr.getStatusDescription());
 					gui.OperationCompleted();
 					operationStarted = false;
-					
+
 				}
 				else if (sr.getStatus() == STATUS.RUN)
 				{
-					//gui.UpdateStatus(sr.getStatusDescription());
+					// gui.UpdateStatus(sr.getStatusDescription());
 					if (operationStarted == false)
 					{
 						gui.OperationStarted();
 						operationStarted = true;
 					}
 				}
-				
+
 				if (sr.getCic1Input() == CHANEL_STATUS.SYNC)
 				{
 					gui.OperationInSync(Channel.INPUT1);
@@ -177,7 +177,7 @@ public class ManagementClient extends WebSocketClient
 				{
 					gui.OperationOutOfSync(Channel.INPUT1);
 				}
-				
+
 				if (sr.getCic2Input() == CHANEL_STATUS.SYNC)
 				{
 					gui.OperationInSync(Channel.INPUT2);
@@ -223,15 +223,13 @@ public class ManagementClient extends WebSocketClient
 				IdentifiedEncapsulation ie = IdentifiedEncapsulation.parseFrom(h.getMessageData());
 				gui.SetEncapsulation(ie.getEncapsulation());
 				break;
-				
+
 			case STATISTICS_REPLAY:
 				StatisticsReplay stat = StatisticsReplay.parseFrom(h.getMessageData());
-				gui.UpdateCounters(new Statistics(	stat.getCic1InputByteCounter(),
-													stat.getCic2InputByteCounter(),
-													stat.getCic1OutputByteCounter(),
-													stat.getCic2OutputByteCounter()));
+				gui.UpdateCounters(new Statistics(stat.getCic1InputByteCounter(), stat.getCic2InputByteCounter(),
+						stat.getCic1OutputByteCounter(), stat.getCic2OutputByteCounter()));
 				break;
-				
+
 			default:
 				logger.error("Unknown command.");
 				break;
@@ -264,15 +262,15 @@ public class ManagementClient extends WebSocketClient
 	{
 		try
 		{
-			AutomaticStartCommand sc = AutomaticStartCommand.newBuilder().setInput1Url(input1_url).setInput2Url(input2_url)
-					.setOutput1Url(output1_url).setOutput2Url(output2_url).build();
-	
+			AutomaticStartCommand sc = AutomaticStartCommand.newBuilder().setInput1Url(input1_url)
+					.setInput2Url(input2_url).setOutput1Url(output1_url).setOutput2Url(output2_url).build();
+
 			send(0, OPCODE.AUTO_START_CMD, sc.toByteString());
 			return true;
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to send Automatic start command",e);
+			logger.error("Failed to send Automatic start command", e);
 		}
 		return false;
 	}
@@ -284,13 +282,13 @@ public class ManagementClient extends WebSocketClient
 		{
 			StartCommand sc = StartCommand.newBuilder().setEncapsulation(encap).setInput1Url(input1_url)
 					.setInput2Url(input2_url).setOutput1Url(output1_url).setOutput2Url(output2_url).build();
-	
+
 			send(0, OPCODE.START_CMD, sc.toByteString());
 			return true;
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to send Start command",e);
+			logger.error("Failed to send Start command", e);
 		}
 		return false;
 	}
@@ -319,7 +317,8 @@ public class ManagementClient extends WebSocketClient
 		try
 		{
 			StatusMessage sm = StatusMessage.newBuilder().setMessage(status).build();
-			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE).setMessageData(sm.toByteString()).build();
+			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
+					.setMessageData(sm.toByteString()).build();
 
 			if (this.isOpen())
 			{
@@ -333,6 +332,7 @@ public class ManagementClient extends WebSocketClient
 		}
 		return true;
 	}
+
 	public void send(int Sequence, OPCODE opcode, ByteString data)
 	{
 		gotAck = false;

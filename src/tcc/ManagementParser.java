@@ -12,6 +12,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import lego.MessageParser;
 import lego.ProcMon;
 import lego.Statistics;
+import legoID.GetSampleAndIdentify;
 import legoID.GetSamples;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
@@ -25,7 +26,6 @@ import medcic_proto.MedCic.StatisticsReplay;
 import medcic_proto.MedCic.StatusMessage;
 import medcic_proto.MedCic.StatusReplay;
 
-
 public class ManagementParser extends Thread implements GuiInterface
 {
 
@@ -38,16 +38,15 @@ public class ManagementParser extends Thread implements GuiInterface
 	Thread														Cic1Thread			= null;
 	Thread														Cic2Thread			= null;
 	MessageParser												messageParser		= null;
-	WebSocket													currentConn = null;
-	String AutoCic1Input = null;
-	String AutoCic2Input = null; 
-	String AutoCic1Output = null; 
-	String AutoCic2Output = null;
-	
-	String UdpServerHost = null;
-	int UdpServerPort = 0;
-	
-	
+	WebSocket													currentConn			= null;
+	String														AutoCic1Input		= null;
+	String														AutoCic2Input		= null;
+	String														AutoCic1Output		= null;
+	String														AutoCic2Output		= null;
+
+	String	UdpServerHost	= null;
+	int		UdpServerPort	= 0;
+
 	public ManagementParser(BlockingQueue<AbstractMap.SimpleEntry<byte[], WebSocket>> queue, ManagementServer server)
 			throws Exception
 	{
@@ -62,7 +61,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			{
 				Stop();
 			}
- 			messageParser = new MessageParser(this, ManagementPort);
+			messageParser = new MessageParser(this, ManagementPort);
 			messageParser.start();
 		}
 		catch (Exception e1)
@@ -118,8 +117,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	public void Parse(byte[] buffer, WebSocket conn)
 	{
 		currentConn = conn;
-		
-		
+
 		Header h = getHeader(buffer);
 		if (h == null)
 		{
@@ -133,7 +131,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			case HEADER:
 				SendNck(h, conn);
 				break;
-	
+
 			case AUTO_START_CMD:
 				AutomaticStartCommand ar = null;
 				try
@@ -149,21 +147,19 @@ public class ManagementParser extends Thread implements GuiInterface
 				AutoCic2Input = ar.getInput2Url();
 				AutoCic1Output = ar.getOutput1Url();
 				AutoCic2Output = ar.getOutput2Url();
-				
+
 				try
 				{
 					GetSampleAndIdentify gsi = new GetSampleAndIdentify(this);
-					procMon = gsi.Start(ar.getInput1Url(), "c:\\d\\id.bin", "id.lego" , "127.0.0.1", 11001);
+					procMon = gsi.Start(ar.getInput1Url(), "c:\\d\\id.bin", "id.lego", "127.0.0.1", 11001);
 				}
 				catch (Exception e)
 				{
 					logger.error("Java", e);
 				}
-				
-			
 
 				break;
-	
+
 			case IDENTYPIED_ENCAPSULATION:
 				IdentifiedEncapsulation ie = null;
 				try
@@ -175,7 +171,7 @@ public class ManagementParser extends Thread implements GuiInterface
 					logger.error("Failed to parse Start Command", e);
 					SendNck(h, conn);
 				}
-				
+
 				if (ie.getEncapsulation() != ENCAPSULATION.UNRECOGNIZED)
 				{
 					try
@@ -183,10 +179,9 @@ public class ManagementParser extends Thread implements GuiInterface
 						BroadcastMessage(h.toByteString());
 						Thread.sleep(500);
 						String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-						StartProduction(ie.getEncapsulation(), AutoCic1Input, AutoCic1Output,
-															   AutoCic2Input, AutoCic2Output,
-															   Paths.get(ScriptPath, "cicScript.lego").toString());
-						
+						StartProduction(ie.getEncapsulation(), AutoCic1Input, AutoCic1Output, AutoCic2Input,
+								AutoCic2Output, Paths.get(ScriptPath, "cicScript.lego").toString());
+
 						SendStatusMessage("Starting ...", conn);
 						logger.info("Starting...");
 						SendAck(h, conn);
@@ -202,9 +197,9 @@ public class ManagementParser extends Thread implements GuiInterface
 						}
 					}
 				}
-				
+
 				break;
-				
+
 			case START_CMD:
 				StartCommand p = null;
 				try
@@ -216,14 +211,14 @@ public class ManagementParser extends Thread implements GuiInterface
 					logger.error("Failed to parse Start Command", e);
 					SendNck(h, conn);
 				}
-				
+
 				try
 				{
 					Thread.sleep(500);
 					String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
 					StartProduction(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
 							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
-					
+
 					SendStatusMessage("Starting ...", conn);
 					logger.info("Starting...");
 					SendAck(h, conn);
@@ -239,7 +234,7 @@ public class ManagementParser extends Thread implements GuiInterface
 					}
 				}
 				break;
-	
+
 			case STOP_CMD:
 				SendAck(h, conn);
 				ProcMon.SendStop();
@@ -248,7 +243,7 @@ public class ManagementParser extends Thread implements GuiInterface
 					SendStatusMessage("Process not running", conn);
 					return;
 				}
-	
+
 				if (!procMon.isComplete())
 				{
 					logger.warn("Killing process. [ " + procMon.description + " ]");
@@ -258,13 +253,13 @@ public class ManagementParser extends Thread implements GuiInterface
 				}
 				else
 				{
-					
+
 					SendStatusMessage("Process not running", conn);
 				}
 				SendProcessStopMessage();
 				procMon = null;
 				break;
-	
+
 			case STATUS_REQUEST:
 				StatusReplay sr = null;
 				if (procMon != null)
@@ -278,10 +273,10 @@ public class ManagementParser extends Thread implements GuiInterface
 				}
 				Header hh = Header.newBuilder().setSequence(h.getSequence()).setMessageData(sr.getErrorMMessageBytes())
 						.build();
-				
+
 				SendMessage(hh.toByteString(), conn);
 				break;
-				
+
 			case STATUS_MESSAGE:
 				BroadcastMessage(h.toByteString());
 			default:
@@ -291,36 +286,33 @@ public class ManagementParser extends Thread implements GuiInterface
 		}
 		catch (Exception e)
 		{
-			logger.error("Something want wrong in the parser" , e);
+			logger.error("Something want wrong in the parser", e);
 		}
 		currentConn = null;
 	}
 
-	public void StartProduction (ENCAPSULATION encap, 
-			String InputUrl1, String OutputUrl1,
-			String InputUrl2, String OutputUrl2, 
-			String ConfigFilename) throws Exception
+	public void StartProduction(ENCAPSULATION encap, String InputUrl1, String OutputUrl1, String InputUrl2,
+			String OutputUrl2, String ConfigFilename) throws Exception
 	{
 		Kill();
 		String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
 		Mediate med = new Mediate(MediationExe, this, "CIC Production");
 
 		String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-		procMon = med.Start(encap, 	InputUrl1, OutputUrl1, 
-									InputUrl2, OutputUrl2, 
-									Paths.get(ScriptPath, "cicScript.lego").toString());
+		procMon = med.Start(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2,
+				Paths.get(ScriptPath, "cicScript.lego").toString());
 	}
-	
-	
-	public void Identify (String InputUrl, String SampleFilename, String ConfigFile) throws Exception
+
+	public void Identify(String InputUrl, String SampleFilename, String ConfigFile) throws Exception
 	{
 		Kill();
 		GetSamples getSamples = new GetSamples(this, "Getting Sample File");
 		String ScriptPath = Parameters.Get("ScriptPath", "C:\\bin\\lego\\legoFiles");
-		//String SourceUri, String IdFile, String ConfigFile, String Server, int Port
-		procMon = getSamples.Start(InputUrl, 	SampleFilename, Paths.get(ScriptPath, ConfigFile).toString(), UdpServerHost, UdpServerPort); 
+		// String SourceUri, String IdFile, String ConfigFile, String Server, int Port
+		procMon = getSamples.Start(InputUrl, SampleFilename, Paths.get(ScriptPath, ConfigFile).toString(),
+				UdpServerHost, UdpServerPort);
 	}
-	
+
 	private void SendAck(Header h, WebSocket conn)
 	{
 		try
@@ -367,12 +359,12 @@ public class ManagementParser extends Thread implements GuiInterface
 	private void SendProcessStopMessage()
 	{
 		StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.STOP).build();
-		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
-				.setMessageData(r.toByteString()).build();
+		Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE).setMessageData(r.toByteString())
+				.build();
 
 		BroadcastMessage(h.toByteString());
 	}
-	
+
 	private void SendProcessStartMessage()
 	{
 		try
@@ -380,7 +372,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			StatusReplay r = StatusReplay.newBuilder().setStatus(STATUS.RUN).build();
 			Header h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_MESSAGE)
 					.setMessageData(r.toByteString()).build();
-	
+
 			BroadcastMessage(h.toByteString());
 		}
 		catch (Exception e)
@@ -388,7 +380,7 @@ public class ManagementParser extends Thread implements GuiInterface
 			logger.error("Failed to send StatusMessage when process starts", e);
 		}
 	}
-	
+
 	private void SendStatusMessage(String message, WebSocket conn)
 	{
 		try
@@ -405,16 +397,7 @@ public class ManagementParser extends Thread implements GuiInterface
 		}
 	}
 
-/*
-	private void SendMessage(ByteString buffer)
-	{
-		if (currentConn != null)
-		{
-			SendMessage(buffer, currentConn );
-		}
-	}
-*/
-	private void SendMessage(ByteString buffer, WebSocket conn )
+	private void SendMessage(ByteString buffer, WebSocket conn)
 	{
 		try
 		{
@@ -428,14 +411,14 @@ public class ManagementParser extends Thread implements GuiInterface
 			logger.error("Failed to send Message to a connection", e);
 		}
 	}
-	
+
 	private void BroadcastMessage(ByteString buffer)
 	{
-		//SendMessage(buffer);
-		
+		// SendMessage(buffer);
+
 		try
 		{
-			for (WebSocket conn : server.connections() )
+			for (WebSocket conn : server.connections())
 			{
 				if (conn.isOpen())
 				{
@@ -506,7 +489,6 @@ public class ManagementParser extends Thread implements GuiInterface
 		BroadcastMessage(h.toByteString());
 	}
 
-
 	@Override
 	public void UpdateStatus(String status)
 	{
@@ -540,51 +522,38 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			switch (ch)
 			{
-			case  INPUT1:
-				s = StatusReplay.newBuilder()
-					.setCic1Input(CHANEL_STATUS.SYNC)
-					.setCic1Output(CHANEL_STATUS.UNKNOWN)
-					.setCic2Input(CHANEL_STATUS.UNKNOWN)
-					.setCic2Output(CHANEL_STATUS.UNKNOWN)
-					.setStatusDescription("CIC 1 input synchronized").build();
-				
+			case INPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.SYNC).setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN).setCic2Output(CHANEL_STATUS.UNKNOWN)
+						.setStatusDescription("CIC 1 input synchronized").build();
+
 				break;
-			case  INPUT2:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.UNKNOWN)
-						.setCic2Input(CHANEL_STATUS.SYNC)
-						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+			case INPUT2:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN).setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.SYNC).setCic2Output(CHANEL_STATUS.UNKNOWN)
 						.setStatusDescription("CIC 2 input synchronized").build();
 				break;
-			case  OUTPUT1:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.SYNC)
-						.setCic2Input(CHANEL_STATUS.UNKNOWN)
-						.setCic2Output(CHANEL_STATUS.UNKNOWN)
-				.setStatusDescription("CIC 1 output synchronized").build();
+			case OUTPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN).setCic1Output(CHANEL_STATUS.SYNC)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN).setCic2Output(CHANEL_STATUS.UNKNOWN)
+						.setStatusDescription("CIC 1 output synchronized").build();
 				break;
-			case  OUTPUT2:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.UNKNOWN)
-						.setCic2Input(CHANEL_STATUS.UNKNOWN)
-						.setCic2Output(CHANEL_STATUS.SYNC)
+			case OUTPUT2:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN).setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN).setCic2Output(CHANEL_STATUS.SYNC)
 						.setStatusDescription("CIC 2 output synchronized").build();
 				break;
 			default:
 				return;
 			}
-			
-			
-			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
-					.setMessageData(s.toByteString()).build();
-			BroadcastMessage(h.toByteString() );
-		}	
+
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
+					.build();
+			BroadcastMessage(h.toByteString());
+		}
 		catch (Exception e)
 		{
-			logger.error("Failed to send StatusReplay in sync",e);
+			logger.error("Failed to send StatusReplay in sync", e);
 		}
 	}
 
@@ -597,49 +566,37 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			switch (ch)
 			{
-			case  INPUT1:
-				s = StatusReplay.newBuilder()
-					.setCic1Input(CHANEL_STATUS.OUT_OF_SYNC)
-					.setCic1Output(CHANEL_STATUS.UNKNOWN)
-					.setCic2Input(CHANEL_STATUS.UNKNOWN)
-					.setCic2Output(CHANEL_STATUS.UNKNOWN)
-					.setStatusDescription("CIC 1 input NOT synchronized").build();
-				
+			case INPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.OUT_OF_SYNC)
+						.setCic1Output(CHANEL_STATUS.UNKNOWN).setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN).setStatusDescription("CIC 1 input NOT synchronized")
+						.build();
+
 				break;
-			case  INPUT2:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.UNKNOWN)
-						.setCic2Input(CHANEL_STATUS.OUT_OF_SYNC)
-						.setCic2Output(CHANEL_STATUS.UNKNOWN)
+			case INPUT2:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN).setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.OUT_OF_SYNC).setCic2Output(CHANEL_STATUS.UNKNOWN)
 						.setStatusDescription("CIC 2 input NOT synchronized").build();
 				break;
-			case  OUTPUT1:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.OUT_OF_SYNC)
-						.setCic2Input(CHANEL_STATUS.UNKNOWN)
-						.setCic2Output(CHANEL_STATUS.UNKNOWN)
-				.setStatusDescription("CIC 1 output NOT synchronized").build();
+			case OUTPUT1:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN)
+						.setCic1Output(CHANEL_STATUS.OUT_OF_SYNC).setCic2Input(CHANEL_STATUS.UNKNOWN)
+						.setCic2Output(CHANEL_STATUS.UNKNOWN).setStatusDescription("CIC 1 output NOT synchronized")
+						.build();
 				break;
-			case  OUTPUT2:
-				s = StatusReplay.newBuilder()
-						.setCic1Input(CHANEL_STATUS.UNKNOWN)
-						.setCic1Output(CHANEL_STATUS.UNKNOWN)
-						.setCic2Input(CHANEL_STATUS.UNKNOWN)
-						.setCic2Output(CHANEL_STATUS.OUT_OF_SYNC)
+			case OUTPUT2:
+				s = StatusReplay.newBuilder().setCic1Input(CHANEL_STATUS.UNKNOWN).setCic1Output(CHANEL_STATUS.UNKNOWN)
+						.setCic2Input(CHANEL_STATUS.UNKNOWN).setCic2Output(CHANEL_STATUS.OUT_OF_SYNC)
 						.setStatusDescription("CIC 2 output NOT synchronized").build();
 				break;
 			default:
 				return;
 			}
-			
-			
-			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY)
-					.setMessageData(s.toByteString()).build();
-			BroadcastMessage(h.toByteString() );
-			
-			
+
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATUS_REPLAY).setMessageData(s.toByteString())
+					.build();
+			BroadcastMessage(h.toByteString());
+
 		}
 		catch (Exception e)
 		{
@@ -651,7 +608,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	public void SetEncapsulation(ENCAPSULATION encap)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -661,16 +618,13 @@ public class ManagementParser extends Thread implements GuiInterface
 		{
 			StatisticsReplay s = null;
 			Header h = null;
-			
-			s = StatisticsReplay.newBuilder()
-					.setCic1InputByteCounter(stat.getCic1In())
-					.setCic2InputByteCounter(stat.getCic1In())
-					.setCic1OutputByteCounter(stat.getCic1In())
-					.setCic2OutputByteCounter(stat.getCic1In())
+
+			s = StatisticsReplay.newBuilder().setCic1InputByteCounter(stat.getCic1In())
+					.setCic2InputByteCounter(stat.getCic1In()).setCic1OutputByteCounter(stat.getCic1In())
+					.setCic2OutputByteCounter(stat.getCic1In()).build();
+			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATISTICS_REPLAY).setMessageData(s.toByteString())
 					.build();
-			h = Header.newBuilder().setSequence(0).setOpcode(OPCODE.STATISTICS_REPLAY)
-				.setMessageData(s.toByteString()).build();
-			BroadcastMessage(h.toByteString() );
+			BroadcastMessage(h.toByteString());
 		}
 		catch (Exception e)
 		{

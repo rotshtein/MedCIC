@@ -37,15 +37,6 @@ public final class Parameters
 		}
 	}
 
-	/*
-	 * public Parameters(String Filename) throws Exception { configFile = new
-	 * File(Filename); if (!configFile.exists()) { if (!configFile.createNewFile())
-	 * { throw (new Exception("No configuration file")); }
-	 * 
-	 * } FileReader config = new FileReader(configFile); props = new Properties();
-	 * props.load(config); config.close(); }
-	 */
-
 	public static String Get(String name)
 	{
 		return Get(name, "");
@@ -65,6 +56,7 @@ public final class Parameters
 		}
 		catch (Exception e)
 		{
+			logger.error("Error getting property", e);
 		}
 
 		if (value == null)
@@ -76,8 +68,7 @@ public final class Parameters
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Error setting property", e);
 			}
 		}
 		return value;
