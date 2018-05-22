@@ -15,6 +15,7 @@ import tcc.ManagementClient;
 import tcc.ManagementServer;
 import tcc.Parameters;
 
+import javax.swing.BorderFactory;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -35,6 +36,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextArea;
 import java.awt.Toolkit;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JPanel;
+import java.awt.FlowLayout;
 
 public class MainScreen implements GuiInterface
 {
@@ -61,6 +66,10 @@ public class MainScreen implements GuiInterface
 	Boolean					isRunning				= false;
 	long					lastUpdateTimeSync		= System.currentTimeMillis();
 	long					lastUpdateTimeOutofSync	= System.currentTimeMillis();
+	private final JPanel pnlCounters = new JPanel();
+	private JLabel lblCicInpoutbytes;
+	private JLabel lblIn1Counter;
+	private final JPanel pnlSetup = new JPanel();
 
 	/**
 	 * Launch the application.
@@ -107,43 +116,43 @@ public class MainScreen implements GuiInterface
 		// txtIn1.setFormatterFactory(forrmatter);
 
 		txtIn1.setText(Parameters.Get("url-in-1", "udp://127.0.0.1:5001"));
-		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
-		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
-		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
-		btnStop.setBounds(328, 55, 57, 23);
-		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnStop.addActionListener(new ActionListener()
-		{
+				txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
+						txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
+								btnStop.setBounds(311, 60, 57, 23);
+								pnlSetup.add(btnStop);
+								btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
+										txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
+								btnStop.addActionListener(new ActionListener()
+								{
 
-			public void actionPerformed(ActionEvent e)
-			{
-				if (client != null)
-				{
-					client.send(0, OPCODE.STOP_CMD, null);
-					try
-					{
-						Thread.sleep(200);
-					}
-					catch (InterruptedException e1)
-					{
-						logger.error("Faild to stop", e1);
-					}
-					client.Stop();
-					client = null;
-				}
-				isRunning = false;
-				OperationCompleted();
-				btnStart.setEnabled(true);
-			}
-		});
-		frame.getContentPane().add(btnStop);
+									public void actionPerformed(ActionEvent e)
+									{
+										if (client != null)
+										{
+											client.send(0, OPCODE.STOP_CMD, null);
+											try
+											{
+												Thread.sleep(200);
+											}
+											catch (InterruptedException e1)
+											{
+												logger.error("Faild to stop", e1);
+											}
+											client.Stop();
+											client = null;
+										}
+										isRunning = false;
+										OperationCompleted();
+										btnStart.setEnabled(true);
+									}
+								});
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 89, 597, 215);
+		scrollPane.setBounds(10, 118, 597, 234);
 		frame.getContentPane().add(scrollPane);
 		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
-		btnClear.setBounds(81, 315, 74, 23);
+		btnClear.setBounds(148, 469, 74, 23);
 		btnClear.addActionListener(new ActionListener()
 		{
 
@@ -155,11 +164,25 @@ public class MainScreen implements GuiInterface
 		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
 		frame.getContentPane().add(btnClear);
-		btnSave.setBounds(465, 315, 89, 23);
+		btnSave.setBounds(373, 469, 89, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
 		frame.getContentPane().add(btnSave);
+		pnlCounters.setForeground(Color.LIGHT_GRAY);
+		pnlCounters.setBounds(10, 363, 597, 95);
+		
+		frame.getContentPane().add(pnlCounters);
+		pnlCounters.setLayout(null);
+		pnlCounters.setBorder(BorderFactory.createTitledBorder("Couters"));
+		
+		lblCicInpoutbytes = new JLabel("CIC1 Inpout [Bytes]");
+		lblCicInpoutbytes.setBounds(10, 11, 116, 20);
+		pnlCounters.add(lblCicInpoutbytes);
+		
+		lblIn1Counter = new JLabel("0");
+		lblIn1Counter.setBounds(136, 11, 129, 20);
+		pnlCounters.add(lblIn1Counter);
 		// frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("ListenAddress", "127.0.0.1");
@@ -276,64 +299,68 @@ public class MainScreen implements GuiInterface
 				Stop();
 			}
 		});
-		frame.setBounds(100, 100, 633, 384);
+		frame.setBounds(100, 100, 633, 539);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		pnlSetup.setBounds(10, 11, 597, 96);
+		pnlSetup.setBorder(BorderFactory.createTitledBorder("Setup"));
+		frame.getContentPane().add(pnlSetup);
+		pnlSetup.setLayout(null);
+		
+				txtOut2 = new JFormattedTextField();
+				txtOut2.setBounds(400, 63, 187, 20);
+				pnlSetup.add(txtOut2);
+				txtOut2.setToolTipText("test tooltip");
+				txtOut2.setText("udp://127.0.0.0.4:1000");
+				txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+				txtOut2.setInputVerifier(new UrlVerifier());
+		
+				txtIn2 = new JFormattedTextField();
+				txtIn2.setBounds(10, 63, 197, 20);
+				pnlSetup.add(txtIn2);
+				txtIn2.setToolTipText("test tooltip");
+				txtIn2.setText("udp://127.0.0.0.2:1000");
+				txtIn2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+				txtIn2.setInputVerifier(new UrlVerifier());
+		
+				btnStart = new JButton("Start");
+				btnStart.setBounds(233, 60, 57, 23);
+				pnlSetup.add(btnStart);
+				btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
+				btnStart.addActionListener(new StartAction());
+		
+				cmbEncap = new JComboBox<String>();
+				cmbEncap.setBounds(233, 16, 135, 22);
+				pnlSetup.add(cmbEncap);
+				
+						cmbEncap.addItem("Auto Detect");
+						cmbEncap.addItem("D&I++");
+						cmbEncap.addItem("EDMAC");
+						cmbEncap.addItem("EDMAC-2 (2928)");
+						cmbEncap.addItem("EDMAC-2 (3072)");
+						cmbEncap.addItem("ESC++        (532)");
+						cmbEncap.addItem("ESC++        (551)");
+						cmbEncap.addItem("ESC++        (874)");
+						cmbEncap.addItem("ESC++      (1104)");
+						cmbEncap.addItem("ESC++      (1792)");
+						cmbEncap.addItem("E2");
+		
+				txtOut1 = new JFormattedTextField();
+				txtOut1.setBounds(400, 18, 187, 20);
+				pnlSetup.add(txtOut1);
+				txtOut1.setToolTipText("test tooltip");
+				txtOut1.setText("udp://127.0.0.0.3:1000");
+				txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+				txtOut1.setInputVerifier(new UrlVerifier());
 
 		txtIn1 = new JFormattedTextField();
+		txtIn1.setBounds(10, 18, 197, 20);
+		pnlSetup.add(txtIn1);
 		txtIn1.setBackground(Color.WHITE);
-		txtIn1.setBounds(10, 13, 197, 20);
 		txtIn1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtIn1.setToolTipText("test tooltip");
 		txtIn1.setText("udp://127.0.0.0.1:1000");
-		frame.getContentPane().add(txtIn1);
 		txtIn1.setInputVerifier(new UrlVerifier());
-
-		txtIn2 = new JFormattedTextField();
-		txtIn2.setBounds(10, 56, 197, 20);
-		txtIn2.setToolTipText("test tooltip");
-		txtIn2.setText("udp://127.0.0.0.2:1000");
-		txtIn2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		frame.getContentPane().add(txtIn2);
-		txtIn2.setInputVerifier(new UrlVerifier());
-
-		txtOut1 = new JFormattedTextField();
-		txtOut1.setBounds(420, 11, 187, 20);
-		txtOut1.setToolTipText("test tooltip");
-		txtOut1.setText("udp://127.0.0.0.3:1000");
-		txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		frame.getContentPane().add(txtOut1);
-		txtOut1.setInputVerifier(new UrlVerifier());
-
-		txtOut2 = new JFormattedTextField();
-		txtOut2.setBounds(420, 56, 187, 20);
-		txtOut2.setToolTipText("test tooltip");
-		txtOut2.setText("udp://127.0.0.0.4:1000");
-		txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		frame.getContentPane().add(txtOut2);
-		txtOut2.setInputVerifier(new UrlVerifier());
-
-		cmbEncap = new JComboBox<String>();
-		cmbEncap.setBounds(250, 11, 135, 22);
-		frame.getContentPane().add(cmbEncap);
-
-		btnStart = new JButton("Start");
-		btnStart.setBounds(250, 55, 57, 23);
-		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnStart.addActionListener(new StartAction());
-		frame.getContentPane().add(btnStart);
-
-		cmbEncap.addItem("Auto Detect");
-		cmbEncap.addItem("D&I++");
-		cmbEncap.addItem("EDMAC");
-		cmbEncap.addItem("EDMAC-2 (2928)");
-		cmbEncap.addItem("EDMAC-2 (3072)");
-		cmbEncap.addItem("ESC++        (532)");
-		cmbEncap.addItem("ESC++        (551)");
-		cmbEncap.addItem("ESC++        (874)");
-		cmbEncap.addItem("ESC++      (1104)");
-		cmbEncap.addItem("ESC++      (1792)");
-		cmbEncap.addItem("E2");
 		frame.setVisible(true);
 		// create the status bar panel and shove it down the bottom of the frame
 
