@@ -10,6 +10,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import lego.Statistics;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;
 import medcic_proto.MedCic.ENCAPSULATION;

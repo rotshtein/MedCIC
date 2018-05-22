@@ -1,5 +1,6 @@
 package tcc;
 
+import lego.Statistics;
 import medcic_proto.MedCic.ENCAPSULATION;
 
 public interface GuiInterface

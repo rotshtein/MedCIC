@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import lego.ProcMon;
 import lego.ScriptFile;
+import lego.Statistics;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.Header;
 import medcic_proto.MedCic.IdentifiedEncapsulation;
@@ -16,7 +17,6 @@ import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
 import tcc.ManagementClient;
 import tcc.Parameters;
-import tcc.Statistics;
 
 public class AutoIdentify implements GuiInterface
 {

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import tcc.GuiInterface;
 import tcc.GuiInterface.Channel;
 import tcc.Parameters;
-import tcc.Statistics;
 
 
 public class MessageParser extends Thread

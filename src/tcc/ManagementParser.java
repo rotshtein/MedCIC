@@ -11,6 +11,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import lego.MessageParser;
 import lego.ProcMon;
+import lego.Statistics;
 import legoID.GetSamples;
 import medcic_proto.MedCic.AutomaticStartCommand;
 import medcic_proto.MedCic.CHANEL_STATUS;

@@ -7,13 +7,13 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import lego.Statistics;
 import medcic_proto.MedCic.ENCAPSULATION;
 import medcic_proto.MedCic.OPCODE;
 import tcc.GuiInterface;
 import tcc.ManagementClient;
 import tcc.ManagementServer;
 import tcc.Parameters;
-import tcc.Statistics;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
