@@ -28,7 +28,7 @@ public class UdpServer extends Thread
 		if (socket == null)
 		{
 			socket = new DatagramSocket(null);
-			String ListenAddress = Parameters.Get("ListenAddress", "127.0.0.1");
+			String ListenAddress = Parameters.Get("WebSocketListenAddress", "127.0.0.1");
 			socket.bind(new InetSocketAddress(ListenAddress, Port));
 			socket.setSoTimeout(500);
 			port = Port;

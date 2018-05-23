@@ -38,6 +38,8 @@ import javax.swing.JTextArea;
 import java.awt.Toolkit;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 public class MainScreen implements GuiInterface
 {
@@ -122,6 +124,7 @@ public class MainScreen implements GuiInterface
 		txtIn1.setText(Parameters.Get("url-in-1", "udp://127.0.0.1:5001"));
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
 		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
+		btnStop.setToolTipText("Stop de-encapsulation process.");
 		btnStop.setBounds(311, 60, 57, 23);
 		pnlSetup.add(btnStop);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -152,8 +155,13 @@ public class MainScreen implements GuiInterface
 		});
 
 		scrollPane = new JScrollPane();
+		scrollPane.setForeground(new Color(0, 0, 128));
+		scrollPane.setEnabled(false);
 		scrollPane.setBounds(10, 118, 597, 234);
 		frame.getContentPane().add(scrollPane);
+		textArea.setFocusable(false);
+		textArea.setForeground(new Color(0, 0, 255));
+		textArea.setToolTipText("Clear the message logger");
 		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 		btnClear.setBounds(151, 457, 74, 23);
@@ -168,6 +176,7 @@ public class MainScreen implements GuiInterface
 		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
 		frame.getContentPane().add(btnClear);
+		btnSave.setToolTipText("Save the message logger to a file");
 		btnSave.setBounds(376, 457, 89, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -180,39 +189,48 @@ public class MainScreen implements GuiInterface
 		pnlCounters.setLayout(null);
 		pnlCounters.setBorder(BorderFactory.createTitledBorder("Couters"));
 
-		lblCicInpoutbytes = new JLabel("CIC1 Inpout [Bytes]");
+		lblCicInpoutbytes = new JLabel("CIC 1 Inpout [Bytes]");
 		lblCicInpoutbytes.setBounds(10, 22, 116, 20);
 		pnlCounters.add(lblCicInpoutbytes);
 
 		lblIn1Counter = new JLabel("0");
-		lblIn1Counter.setBounds(136, 22, 129, 20);
+		lblCicInpoutbytes.setLabelFor(lblIn1Counter);
+		lblIn1Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblIn1Counter.setHorizontalAlignment(SwingConstants.CENTER);
+		lblIn1Counter.setBounds(122, 22, 129, 20);
 		pnlCounters.add(lblIn1Counter);
 		lblCic2InpoutBytes.setBounds(10, 53, 116, 20);
 
 		pnlCounters.add(lblCic2InpoutBytes);
-		lblIn2Counter.setBounds(136, 53, 129, 20);
+		lblIn2Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblIn2Counter.setHorizontalAlignment(SwingConstants.CENTER);
+		lblIn2Counter.setBounds(122, 53, 129, 20);
 
 		pnlCounters.add(lblIn2Counter);
-		lblCic1OutpoutBytes.setBounds(324, 22, 124, 20);
+		lblCic1OutpoutBytes.setBounds(336, 22, 124, 20);
 
 		pnlCounters.add(lblCic1OutpoutBytes);
+		lblOut1Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblOut1Counter.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOut1Counter.setBounds(458, 22, 129, 20);
 
 		pnlCounters.add(lblOut1Counter);
+		lblCic2OutpoutBytes.setBounds(336, 53, 124, 20);
+		
+				pnlCounters.add(lblCic2OutpoutBytes);
+		lblOut2Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblOut2Counter.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOut2Counter.setBounds(458, 53, 129, 20);
 
 		pnlCounters.add(lblOut2Counter);
-		lblCic2OutpoutBytes.setBounds(324, 53, 124, 20);
-
-		pnlCounters.add(lblCic2OutpoutBytes);
 		// frame.getContentPane().add(scroll);
 
-		String host = Parameters.Get("ListenAddress", "127.0.0.1");
-		int port = Integer.parseInt(Parameters.Get("ListenPort", "8887"));
+		String host = Parameters.Get("WebSocketListenAddress", "127.0.0.1");
+		int port = Integer.parseInt(Parameters.Get("WebSocketListenPort", "8887"));
 
 		server = new ManagementServer(new InetSocketAddress(host, port));
 		server.start();
-		serverUri = Parameters.Get("ServerUri", "ws://127.0.0.1:8887");
+		serverUri = Parameters.Get("WebSocketServerUri", "ws://127.0.0.1:8887");
 		client = null;// new ManagementClient(new URI(serverUri), this);
 	}
 
@@ -333,7 +351,7 @@ public class MainScreen implements GuiInterface
 		txtOut2 = new JFormattedTextField();
 		txtOut2.setBounds(400, 63, 187, 20);
 		pnlSetup.add(txtOut2);
-		txtOut2.setToolTipText("test tooltip");
+		txtOut2.setToolTipText("CIC 2 de-encapsulated signal destination URI in the form of udp://<ip address>:<port>");
 		txtOut2.setText("udp://127.0.0.0.4:1000");
 		txtOut2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtOut2.setInputVerifier(new UrlVerifier());
@@ -341,18 +359,20 @@ public class MainScreen implements GuiInterface
 		txtIn2 = new JFormattedTextField();
 		txtIn2.setBounds(10, 63, 197, 20);
 		pnlSetup.add(txtIn2);
-		txtIn2.setToolTipText("test tooltip");
+		txtIn2.setToolTipText("CIC 2 signal source URI in the form of udp://<ip address>:<port>");
 		txtIn2.setText("udp://127.0.0.0.2:1000");
 		txtIn2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtIn2.setInputVerifier(new UrlVerifier());
 
 		btnStart = new JButton("Start");
+		btnStart.setToolTipText("Start de-encapsulation process.");
 		btnStart.setBounds(233, 60, 57, 23);
 		pnlSetup.add(btnStart);
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStart.addActionListener(new StartAction());
 
 		cmbEncap = new JComboBox<String>();
+		cmbEncap.setToolTipText("Choose encapsulation type. \"AUTO DETECT\" will initate detection process first and than start production");
 		cmbEncap.setBounds(233, 17, 135, 22);
 		pnlSetup.add(cmbEncap);
 
@@ -371,7 +391,7 @@ public class MainScreen implements GuiInterface
 		txtOut1 = new JFormattedTextField();
 		txtOut1.setBounds(400, 18, 187, 20);
 		pnlSetup.add(txtOut1);
-		txtOut1.setToolTipText("test tooltip");
+		txtOut1.setToolTipText("CIC 1 de-encapsulated signal destination URI in the form of udp://<ip address>:<port>");
 		txtOut1.setText("udp://127.0.0.0.3:1000");
 		txtOut1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		txtOut1.setInputVerifier(new UrlVerifier());
@@ -381,7 +401,7 @@ public class MainScreen implements GuiInterface
 		pnlSetup.add(txtIn1);
 		txtIn1.setBackground(Color.WHITE);
 		txtIn1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		txtIn1.setToolTipText("test tooltip");
+		txtIn1.setToolTipText("CIC 1 signal source URI in the form of udp://<ip address>:<port>");
 		txtIn1.setText("udp://127.0.0.0.1:1000");
 		txtIn1.setInputVerifier(new UrlVerifier());
 		frame.setVisible(true);

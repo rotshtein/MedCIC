@@ -29,7 +29,7 @@ public class Mediate extends Operation
 		if (new File(super.exe_file).exists())
 		{
 			ScriptFile sf = new ScriptFile(ConfigFilename, Parameters.Get("ManagementHost", "127.0.0.1"),
-					Integer.parseInt(Parameters.Get("ManagementPort", "11001")));
+					Integer.parseInt(Parameters.Get("LegoManagementPort", "11001")));
 			if (sf.BuildProductionScript(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2) == false)
 			{
 				throw new Exception("Unknown encapsulation");

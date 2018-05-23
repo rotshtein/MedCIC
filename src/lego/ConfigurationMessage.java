@@ -1,61 +1,139 @@
+/*
+ * 
+ */
 package lego;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ConfigurationMessage.
+ * 
+ * serialise and deserialise lego jason based status messages
+ */
 public class ConfigurationMessage
 {
 
-	/*
-	 * public final String ISSUE_MSG_ACTIVE_STRING = "Active"; public final String
-	 * ISSUE_MSG_START_STRING = "Start"; public final String ISSUE_MSG_PAUSE_STRING
-	 * = "Pause"; public final String ISSUE_MSG_DONE_STRING = "Done"; public final
-	 * String ISSUE_MSG_RESTART_STRING = "Restart"; public final String
-	 * ISSUE_MSG_PING_STRING = "Ping"; public final String ISSUE_MSG_UNPAUSE_STRING
-	 * = "Unpause"; public final String ISSUE_MSG_SYNC_STRING = "Sync"; public final
-	 * String ISSUE_MSG_LOST_SYNC_STRING = "LostSync";
-	 */
+	/** The logger. */
 	Logger logger = Logger.getLogger("ConfigurationMessage");
 
-	public String	path;
-	public String	module;
-	public int		issue;
-	public String	issuestring;
-	public String	message;
-	public long		input;
-	public long		output;
-	public int		percent;
-	public int		good;
-	public int		bad;
-	public int		isinput;
-	public int		isoutput;
+	/** The path as string of numbers 1.1.1 for instance. */
+	public String path;
 
-	public static final int	ISSUE_MSG_ACTIVE	= 1;
-	public static final int	ISSUE_MSG_START		= 2;
-	public static final int	ISSUE_MSG_PAUSE		= 3;
-	public static final int	ISSUE_MSG_DONE		= 4;
-	public static final int	ISSUE_MSG_RESTART	= 5;
-	public static final int	ISSUE_MSG_PING		= 6;
-	public static final int	ISSUE_MSG_UNPAUSE	= 7;
-	public static final int	ISSUE_MSG_SYNC		= 8;
-	public static final int	ISSUE_MSG_LOST_SYNC	= 9;
-	public static final int	ISSUE_MSG_FATAL		= 100;
-	public static final int	ISSUE_MSG_ERROR		= 110;
-	public static final int	ISSUE_MSG_WARNING	= 120;
-	public static final int	ISSUE_MSG_NOTICE	= 130;
-	public static final int	ISSUE_MSG_INFO		= 140;
-	public static final int	ISSUE_MSG_DEBUG		= 150;
-	public static final int	ISSUE_MSG_TRACE		= 160;
+	/** The module name */
+	public String module;
 
+	/** The issue number. */
+	public int issue;
+
+	/** The issue description string. */
+	public String issuestring;
+
+	/** The status message. */
+	public String message;
+
+	/** The number of input bytes. */
+	public long input;
+
+	/** The number of output bytes. */
+	public long output;
+
+	/** The percent completed of a file. */
+	public int percent;
+
+	/** The number of good bytes. */
+	public int good;
+
+	/** The number of bad bytes. */
+	public int bad;
+
+	/** Boolean - True if this is an input port. */
+	public int isinput;
+
+	/** Boolean - True id this is an output port. */
+	public int isoutput;
+
+	/** The Constant ISSUE_MSG_ACTIVE. */
+	public static final int ISSUE_MSG_ACTIVE = 1;
+
+	/** The Constant ISSUE_MSG_START. */
+	public static final int ISSUE_MSG_START = 2;
+
+	/** The Constant ISSUE_MSG_PAUSE. */
+	public static final int ISSUE_MSG_PAUSE = 3;
+
+	/** The Constant ISSUE_MSG_DONE. */
+	public static final int ISSUE_MSG_DONE = 4;
+
+	/** The Constant ISSUE_MSG_RESTART. */
+	public static final int ISSUE_MSG_RESTART = 5;
+
+	/** The Constant ISSUE_MSG_PING. */
+	public static final int ISSUE_MSG_PING = 6;
+
+	/** The Constant ISSUE_MSG_UNPAUSE. */
+	public static final int ISSUE_MSG_UNPAUSE = 7;
+
+	/** The Constant ISSUE_MSG_SYNC. */
+	public static final int ISSUE_MSG_SYNC = 8;
+
+	/** The Constant ISSUE_MSG_LOST_SYNC. */
+	public static final int ISSUE_MSG_LOST_SYNC = 9;
+
+	/** The Constant ISSUE_MSG_FATAL. */
+	public static final int ISSUE_MSG_FATAL = 100;
+
+	/** The Constant ISSUE_MSG_ERROR. */
+	public static final int ISSUE_MSG_ERROR = 110;
+
+	/** The Constant ISSUE_MSG_WARNING. */
+	public static final int ISSUE_MSG_WARNING = 120;
+
+	/** The Constant ISSUE_MSG_NOTICE. */
+	public static final int ISSUE_MSG_NOTICE = 130;
+
+	/** The Constant ISSUE_MSG_INFO. */
+	public static final int ISSUE_MSG_INFO = 140;
+
+	/** The Constant ISSUE_MSG_DEBUG. */
+	public static final int ISSUE_MSG_DEBUG = 150;
+
+	/** The Constant ISSUE_MSG_TRACE. */
+	public static final int ISSUE_MSG_TRACE = 160;
+
+	/**
+	 * Instantiates a new configuration message.
+	 */
 	public ConfigurationMessage()
 	{
 	}
 
+	/**
+	 * Instantiates a new configuration message.
+	 *
+	 * @param Path
+	 *            the module path
+	 * @param issue
+	 *            the issue number
+	 */
 	public ConfigurationMessage(String Path, int issue)
 	{
 		this(Path, "", issue, GetIssueString(issue));
 	}
 
+	/**
+	 * Instantiates a new configuration message.
+	 *
+	 * @param Path
+	 *            the module path
+	 * @param Module
+	 *            the module name
+	 * @param issue
+	 *            the issue number
+	 * @param IssueString
+	 *            the issue string
+	 */
 	public ConfigurationMessage(String Path, String Module, int issue, String IssueString)
 	{
 		if (Path == null) Path = "1";
@@ -74,6 +152,13 @@ public class ConfigurationMessage
 		this.isoutput = 0;
 	}
 
+	/**
+	 * To json.
+	 *
+	 * @return the string
+	 * @throws Exception
+	 *             the exception
+	 */
 	public String toJson() throws Exception
 	{
 		ObjectMapper mapper = new ObjectMapper();
@@ -81,6 +166,15 @@ public class ConfigurationMessage
 		return object;
 	}
 
+	/**
+	 * From json.
+	 *
+	 * @param JasonString
+	 *            the jason string
+	 * @return the configuration message
+	 * @throws Exception
+	 *             the exception
+	 */
 	public static ConfigurationMessage fromJson(String JasonString) throws Exception
 	{
 		ObjectMapper mapper = new ObjectMapper();
@@ -88,6 +182,11 @@ public class ConfigurationMessage
 		return object;
 	}
 
+	/**
+	 * Reformat the status string by adding severity.
+	 *
+	 * @return the new string. Null represents unknown issue number
+	 */
 	public String StatusMessage()
 	{
 		String issuePrefix = "";
@@ -137,6 +236,14 @@ public class ConfigurationMessage
 		return status;
 	}
 
+	/**
+	 * Gets the issue string name.
+	 *
+	 * @param issue
+	 *            as int with the issue number
+	 * @return the string containing the issue name. Empty string represents unknown
+	 *         issue number
+	 */
 	public static String GetIssueString(int issue)
 	{
 		switch (issue)
