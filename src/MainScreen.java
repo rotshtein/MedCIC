@@ -76,6 +76,7 @@ public class MainScreen implements GuiInterface
 	private final JLabel	lblOut1Counter			= new JLabel("0");
 	private final JLabel	lblOut2Counter			= new JLabel("0");
 	private final JLabel	lblCic2OutpoutBytes		= new JLabel("CIC 2 Outpout [Bytes]");
+	private final String	Version					= "1.0";
 
 	/**
 	 * Launch the application.
@@ -129,6 +130,7 @@ public class MainScreen implements GuiInterface
 		pnlSetup.add(btnStop);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
+		
 		btnStop.addActionListener(new ActionListener()
 		{
 
@@ -404,6 +406,7 @@ public class MainScreen implements GuiInterface
 		txtIn1.setToolTipText("CIC 1 signal source URI in the form of udp://<ip address>:<port>");
 		txtIn1.setText("udp://127.0.0.0.1:1000");
 		txtIn1.setInputVerifier(new UrlVerifier());
+		frame.setTitle("MedCic Version " + Version);
 		frame.setVisible(true);
 		// create the status bar panel and shove it down the bottom of the frame
 
