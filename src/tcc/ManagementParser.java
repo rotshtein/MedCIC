@@ -1,5 +1,6 @@
 package tcc;
 
+
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.concurrent.BlockingQueue;
@@ -150,7 +151,9 @@ public class ManagementParser extends Thread implements GuiInterface
 				try
 				{
 					GetSampleAndIdentify gsi = new GetSampleAndIdentify(this);
-					procMon = gsi.Start(ar.getInput1Url(), "c:\\d\\id.bin", "id.lego", "127.0.0.1", 11001);
+					java.nio.file.Path LegoFilepath = Paths.get(Parameters.Get("LegoConfigPath", "C\\:\\MedCic\\lego\\config"), "id.lego");
+					String legoFile = LegoFilepath.toAbsolutePath().toString();
+					procMon = gsi.Start(ar.getInput1Url(), "id.bin", legoFile, "127.0.0.1", Integer.parseInt(Parameters.Get("LegoManagementPort")));
 				}
 				catch (Exception e)
 				{
@@ -306,7 +309,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	{
 		Kill();
 		GetSamples getSamples = new GetSamples(this, "Getting Sample File");
-		String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
+		String ScriptPath = Parameters.Get("LegoConfigPath", "C:\\bin\\lego\\config");
 		// String SourceUri, String IdFile, String ConfigFile, String Server, int Port
 		procMon = getSamples.Start(InputUrl, SampleFilename, Paths.get(ScriptPath, ConfigFile).toString(),
 				UdpServerHost, UdpServerPort);

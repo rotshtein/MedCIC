@@ -82,7 +82,7 @@ public class AutoIdentify implements GuiInterface
 
 		Identify id = new Identify(this);
 
-		new File("c:\\bin\\lego\\config\\id.lego").delete();
+		new File(configFilename).delete();
 
 		procMon = id.Start(inputUri, sampleFilename, "id.lego", managemntHost, managementPort);
 
@@ -91,13 +91,13 @@ public class AutoIdentify implements GuiInterface
 			Thread.sleep(50);
 		}
 
-		if (!(new File("c:\\bin\\lego\\config\\id.lego").exists()))
+		if (!(new File(configFilename).exists()))
 		{
 			client.SendStatus("Failed to Identify the encasulation");
 			return;
 		}
 
-		ScriptFile sf = new ScriptFile("c:\\bin\\lego\\config\\id.lego");
+		ScriptFile sf = new ScriptFile(configFilename);
 
 		ENCAPSULATION encap = sf.getEncapsolation();
 		IdentifiedEncapsulation ie = IdentifiedEncapsulation.newBuilder().setEncapsulation(encap).build();
