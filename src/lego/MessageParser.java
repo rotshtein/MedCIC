@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import tcc.GuiInterface;
@@ -155,7 +156,7 @@ public class MessageParser extends Thread
 				DatagramPacket pkt = null;
 				try
 				{
-					pkt = queue.take();
+					pkt = queue.poll(1500, TimeUnit.MILLISECONDS);
 				}
 				catch (InterruptedException e)
 				{
@@ -164,6 +165,15 @@ public class MessageParser extends Thread
 
 				if (pkt == null)
 				{
+					//send sync status request
+					try
+					{
+						syncMessageFilter.SendSyncStatusRequest();
+					}
+					catch (Exception e)
+					{
+						logger.error("Failed to send sync request",e);
+					}
 					continue;
 				}
 
@@ -182,6 +192,13 @@ public class MessageParser extends Thread
 					logger.warn("Failed to parse message");
 					continue;
 				}
+				
+				if (cm.clientserver != 0)
+				{
+					//message sent from the server
+					continue;
+				}
+				
 				logger.debug("Lego message" + new String(pkt.getData()));
 
 				if (gui != null)
@@ -197,7 +214,7 @@ public class MessageParser extends Thread
 							cic1.Clear();
 							cic2.Clear();
 						}
-						gui.UpdateStatus(cm.path + "-" + cm.module + ": " + cm.StatusMessage());
+						gui.UpdateStatus(cm.path + " > " + cm.StatusMessage());
 						break;
 
 					case ConfigurationMessage.ISSUE_MSG_ACTIVE:

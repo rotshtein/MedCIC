@@ -1,13 +1,19 @@
 package lego;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
+
 import tcc.GuiInterface;
+import tcc.Parameters;
 import tcc.GuiInterface.Channel;
 
 public class SyncMessageFilter extends Thread
 {
-
-	final Logger	logger			= Logger.getLogger("SyncMessageFilter");
+	static final Logger	logger			= Logger.getLogger("SyncMessageFilter");
 	GuiInterface	gui				= null;
 	Boolean			cic1PrevSync	= false;
 	Boolean			cic2PrevSync	= false;
@@ -15,6 +21,8 @@ public class SyncMessageFilter extends Thread
 	Boolean			cic2Sync		= false;
 	Boolean			stopThread		= false;
 	long			duration		= 500;
+	InetAddress		legoAddress;
+
 
 	public SyncMessageFilter(GuiInterface Gui)
 	{
@@ -25,6 +33,14 @@ public class SyncMessageFilter extends Thread
 	{
 		gui = Gui;
 		duration = Duration;
+		try
+		{
+			legoAddress = InetAddress.getByName(Parameters.Get("ManagementHost", "127.0.0.1"));
+		}
+		catch (UnknownHostException e)
+		{
+			logger.error("Can't get the server IP",e);
+		}
 		this.start();
 	}
 
@@ -69,6 +85,35 @@ public class SyncMessageFilter extends Thread
 		return cic2Sync;
 	}
 
+	public void SendSyncStatusRequest() throws Exception
+	{
+		SendSyncStatusRequest("1.1.1");
+		SendSyncStatusRequest("2.1.1");
+	}
+
+	public void SendSyncStatusRequest(String Path) throws Exception
+	{
+		ConfigurationMessage cm = new ConfigurationMessage(Path, ConfigurationMessage.ISSUE_MSG_IS_SYNC);
+		cm.module = "";
+		byte[] message = cm.toJson().getBytes();
+		try
+		{
+			
+			if (UdpServer.getPort() > 0)
+			{
+				DatagramPacket packet = new DatagramPacket(message, message.length, legoAddress, UdpServer.getPort());
+				DatagramSocket dsocket = new DatagramSocket();
+				dsocket.send(packet);
+				logger.debug("Sending sync status request to path " + Path + " => " + new String(packet.getData()));
+				dsocket.close();
+			}
+		}
+		catch (UnknownHostException e)
+		{
+			logger.error("UnknownHostException", e);
+		}
+	}
+	
 	@Override
 	public void run()
 	{

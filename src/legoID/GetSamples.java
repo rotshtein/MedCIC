@@ -9,7 +9,7 @@ import tcc.Parameters;
 public class GetSamples extends Operation
 {
 
-	static String Exe = Parameters.Get("GetSamplesExe", "C:\\nedcic\\lego\\bin\\ProcesssBlock.exe");
+	static String Exe = Parameters.Get("GetSamplesExe", "C:\\medcic\\lego\\bin\\ProcesssBlock.exe");
 
 	public GetSamples(GuiInterface gui)
 	{

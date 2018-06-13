@@ -51,8 +51,11 @@ public class ConfigurationMessage
 	/** Boolean - True if this is an input port. */
 	public int isinput;
 
-	/** Boolean - True id this is an output port. */
+	/** Boolean - True if this is an output port. */
 	public int isoutput;
+	
+	/** Boolean - True (!0) - sent from the server. */
+	public int clientserver; 
 
 	/** The Constant ISSUE_MSG_ACTIVE. */
 	public static final int ISSUE_MSG_ACTIVE = 1;
@@ -80,6 +83,8 @@ public class ConfigurationMessage
 
 	/** The Constant ISSUE_MSG_LOST_SYNC. */
 	public static final int ISSUE_MSG_LOST_SYNC = 9;
+	
+	public static final int  ISSUE_MSG_IS_SYNC = 10;
 
 	/** The Constant ISSUE_MSG_FATAL. */
 	public static final int ISSUE_MSG_FATAL = 100;
@@ -150,6 +155,7 @@ public class ConfigurationMessage
 		this.bad = 0;
 		this.isinput = 0;
 		this.isoutput = 0;
+		this.clientserver = 1;
 	}
 
 	/**
@@ -208,6 +214,7 @@ public class ConfigurationMessage
 		case ISSUE_MSG_DONE:
 		case ISSUE_MSG_SYNC:
 		case ISSUE_MSG_LOST_SYNC:
+		case ISSUE_MSG_IS_SYNC:
 			break;
 
 		case ISSUE_MSG_NOTICE:
@@ -266,6 +273,8 @@ public class ConfigurationMessage
 			return "Sync";
 		case ISSUE_MSG_LOST_SYNC:
 			return "Lost sync";
+		case ISSUE_MSG_IS_SYNC:
+			return "IsSync";
 		case ISSUE_MSG_FATAL:
 			return "Fatal";
 		case ISSUE_MSG_ERROR:
