@@ -85,13 +85,7 @@ public class SyncMessageFilter extends Thread
 		return cic2Sync;
 	}
 
-	public void SendSyncStatusRequest() throws Exception
-	{
-		SendSyncStatusRequest("1.1.1");
-		SendSyncStatusRequest("2.1.1");
-	}
-
-	public void SendSyncStatusRequest(String Path) throws Exception
+	public void SendSyncStatusRequest(String Path, int port) throws Exception
 	{
 		ConfigurationMessage cm = new ConfigurationMessage(Path, ConfigurationMessage.ISSUE_MSG_IS_SYNC);
 		cm.module = "";
@@ -101,7 +95,7 @@ public class SyncMessageFilter extends Thread
 			
 			if (UdpServer.getPort() > 0)
 			{
-				DatagramPacket packet = new DatagramPacket(message, message.length, legoAddress, UdpServer.getPort());
+				DatagramPacket packet = new DatagramPacket(message, message.length, legoAddress, port);
 				DatagramSocket dsocket = new DatagramSocket();
 				dsocket.send(packet);
 				logger.debug("Sending sync status request to path " + Path + " => " + new String(packet.getData()));

@@ -2,6 +2,7 @@ package lego;
 
 import java.net.DatagramPacket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,8 @@ public class MessageParser extends Thread
 	public static Boolean			Cic1SendSync		= true;
 	public static Boolean			Cic2SendSync		= true;
 	Statistics						stat				= null;
-
+	HashMap<String, Integer> clientAddressMmap = new HashMap<String, Integer>();
+	
 	class CicChanel
 	{
 
@@ -120,6 +122,7 @@ public class MessageParser extends Thread
 
 	public MessageParser(GuiInterface Gui, int Port) throws Exception
 	{
+		clientAddressMmap.clear();
 		stat = new Statistics();
 		cic1 = new CicChanel();
 		cic2 = new CicChanel();
@@ -166,14 +169,22 @@ public class MessageParser extends Thread
 				if (pkt == null)
 				{
 					//send sync status request
-					try
+					final String [] clients = {"1.1.1", "2.1.1"};
+					for (String client : clients)
 					{
-						syncMessageFilter.SendSyncStatusRequest();
+						try
+						{
+							if (clientAddressMmap.containsKey(client))
+							{
+								syncMessageFilter.SendSyncStatusRequest(client, clientAddressMmap.get(client));
+							}
+						}
+						catch (Exception e)
+						{
+							logger.error("Failed to send sync request",e);
+						}
 					}
-					catch (Exception e)
-					{
-						logger.error("Failed to send sync request",e);
-					}
+					
 					continue;
 				}
 
@@ -206,7 +217,10 @@ public class MessageParser extends Thread
 					switch (cm.issue)
 					{
 					case ConfigurationMessage.ISSUE_MSG_START:
-
+						if (!clientAddressMmap.containsKey(cm.path))
+						{
+							(clientAddressMmap).put(cm.path, pkt.getPort());
+						}
 						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
 						{
 							syncMessageFilter.Restart();
