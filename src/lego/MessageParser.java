@@ -27,6 +27,7 @@ public class MessageParser extends Thread
 	public static Boolean			Cic2SendSync		= true;
 	Statistics						stat				= null;
 	HashMap<String, Integer> clientAddressMmap = new HashMap<String, Integer>();
+	long timeMillis = System.currentTimeMillis();
 	
 	class CicChanel
 	{
@@ -88,11 +89,17 @@ public class MessageParser extends Thread
 
 		public Boolean IsAlive()
 		{
-			return alive;
+			if (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timeMillis) < 2)
+			{
+				return alive;
+			}
+			else
+				return false;
 		}
 
 		public void setInputByte(long Bytes)
 		{
+			timeMillis = System.currentTimeMillis();
 			if (Bytes == 0)
 			{
 				Clear();
@@ -169,22 +176,7 @@ public class MessageParser extends Thread
 				if (pkt == null)
 				{
 					//send sync status request
-					final String [] clients = {"1.1.1", "2.1.1"};
-					for (String client : clients)
-					{
-						try
-						{
-							if (clientAddressMmap.containsKey(client))
-							{
-								syncMessageFilter.SendSyncStatusRequest(client, clientAddressMmap.get(client));
-							}
-						}
-						catch (Exception e)
-						{
-							logger.error("Failed to send sync request",e);
-						}
-					}
-					
+					SendIsSync();
 					continue;
 				}
 
@@ -219,7 +211,14 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_START:
 						if (!clientAddressMmap.containsKey(cm.path))
 						{
-							(clientAddressMmap).put(cm.path, pkt.getPort());
+							clientAddressMmap.put(cm.path, pkt.getPort());
+						}
+						else
+						{
+							if (clientAddressMmap.get(cm.path) != pkt.getPort())
+							{
+								clientAddressMmap.replace(cm.path, pkt.getPort());
+							}
 						}
 						if ((cm.path.equals("0")) && (cm.StatusMessage() != null))
 						{
@@ -236,6 +235,7 @@ public class MessageParser extends Thread
 						{
 							if (cm.path.startsWith("1"))
 							{
+								SendIsSync("1.1.1");
 								cic1.setInputByte(cm.output);
 								if (cic1.IsAlive())
 								{
@@ -244,11 +244,13 @@ public class MessageParser extends Thread
 								else
 								{
 									gui.OperationOutOfSync(Channel.INPUT1);
+									
 								}
 								stat.setCic1In(cm.output);
 							}
 							else if (cm.path.startsWith("2"))
 							{
+								SendIsSync("2.1.1");
 								cic2.setInputByte(cm.output);
 								if (cic2.IsAlive())
 								{
@@ -258,6 +260,7 @@ public class MessageParser extends Thread
 								else
 								{
 									gui.OperationOutOfSync(Channel.INPUT2);
+									syncMessageFilter.setCic2Sync(false);
 								}
 								stat.setCic2In(cm.output);
 							}
@@ -278,13 +281,19 @@ public class MessageParser extends Thread
 					case ConfigurationMessage.ISSUE_MSG_SYNC:
 						if (cm.path.startsWith("1.1.1"))
 						{
-							syncMessageFilter.setCic1Sync(true);
+							if (cic1.IsAlive())
+								syncMessageFilter.setCic1Sync(true);
+							else
+								syncMessageFilter.setCic1Sync(false);
 						}
 
 						else if (cm.path.startsWith("2.1.1"))
 						{
-							syncMessageFilter.setCic2Sync(true);
-						}
+							if (cic2.IsAlive())
+								syncMessageFilter.setCic2Sync(true);
+							else
+								syncMessageFilter.setCic2Sync(false);
+						}	
 						stat.setCic1Out(cm.output);
 						break;
 
@@ -312,5 +321,29 @@ public class MessageParser extends Thread
 			}
 		}
 		logger.debug("Message Parser thread exit");
+	}
+	
+	void SendIsSync()
+	{
+		final String [] clients = {"1.1.1", "2.1.1"};
+		for (String client : clients)
+		{
+			SendIsSync(client);
+		}
+	}
+	
+	void SendIsSync(String client)
+	{
+		try
+		{
+			if (clientAddressMmap.containsKey(client))
+			{
+				syncMessageFilter.SendSyncStatusRequest(client, clientAddressMmap.get(client));
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send sync request",e);
+			}
 	}
 }

@@ -123,7 +123,7 @@ public class SyncMessageFilter extends Thread
 				logger.error("Failed to sleep", e);
 			}
 
-			if (cic1Sync != cic1PrevSync)
+			if (cic1Sync)// != cic1PrevSync)
 			{
 				cic1PrevSync = cic1Sync;
 				MessageParser.Cic1SendSync = true;
@@ -131,7 +131,7 @@ public class SyncMessageFilter extends Thread
 				else gui.OperationOutOfSync(Channel.OUTPUT1);
 			}
 
-			if (!cic2Sync.equals(cic2PrevSync))
+			if (cic2Sync)//.equals(cic2PrevSync))
 			{
 				cic2PrevSync = cic2Sync;
 				MessageParser.Cic2SendSync = true;
