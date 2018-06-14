@@ -122,7 +122,7 @@ public class ScriptFile
 		return true;
 	}
 
-	public Boolean BuildProductionScript(String Path, ENCAPSULATION Encapsolation, String SourceUri, String DestUri)
+	private Boolean BuildProductionScript(String Path, ENCAPSULATION Encapsolation, String SourceUri, String DestUri)
 	{
 		AddModule(new ModuleConfiguration(Path, "udpserver", ModuleConfiguration.UriToParam(SourceUri), Path + ".1"));
 
@@ -222,7 +222,6 @@ public class ScriptFile
 		case ESC_551: // "ESC++ (551)":
 			module = "escplusplus";
 			parameters = "synclength=12,syncword=0xe8c0,width=551,mode=cut,0-12,21-29,36-45,311-320";
-			logger.warn("ESC_551 - encapsulation not supporeted");
 			break;
 
 		case E2:// "E2":

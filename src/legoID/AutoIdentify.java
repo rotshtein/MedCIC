@@ -84,7 +84,7 @@ public class AutoIdentify implements GuiInterface
 
 		new File(configFilename).delete();
 
-		procMon = id.Start(inputUri, sampleFilename, "id.lego", managemntHost, managementPort);
+		procMon = id.Start(inputUri, new File(sampleFilename).getAbsolutePath(),configFilename, managemntHost, managementPort); 
 
 		while (!procMon.isComplete())
 		{
