@@ -126,7 +126,7 @@ public class MainScreen implements GuiInterface
 		txtOut1.setText(Parameters.Get("url-out-1", "udp://127.0.0.1:5003"));
 		txtOut2.setText(Parameters.Get("url-out-2", "udp://127.0.0.1:5004"));
 		btnStop.setToolTipText("Stop de-encapsulation process.");
-		btnStop.setBounds(311, 60, 57, 23);
+		btnStop.setBounds(305, 60, 63, 23);
 		pnlSetup.add(btnStop);
 		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
@@ -368,7 +368,7 @@ public class MainScreen implements GuiInterface
 
 		btnStart = new JButton("Start");
 		btnStart.setToolTipText("Start de-encapsulation process.");
-		btnStart.setBounds(233, 60, 57, 23);
+		btnStart.setBounds(233, 60, 68, 23);
 		pnlSetup.add(btnStart);
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		btnStart.addActionListener(new StartAction());
