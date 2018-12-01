@@ -19,6 +19,9 @@ public class ConfigurationMessage
 	Logger logger = Logger.getLogger("ConfigurationMessage");
 
 	/** The path as string of numbers 1.1.1 for instance. */
+	public String address;
+	
+	/** The path as string of numbers 1.1.1 for instance. */
 	public String path;
 
 	/** The module name */
