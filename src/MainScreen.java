@@ -167,7 +167,7 @@ public class MainScreen implements GuiInterface
 		textArea.setToolTipText("Clear the message logger");
 		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
-		btnClear.setBounds(261, 457, 95, 23);
+		btnClear.setBounds(247, 457, 123, 23);
 		btnClear.addActionListener(new ActionListener()
 		{
 
@@ -180,7 +180,7 @@ public class MainScreen implements GuiInterface
 
 		frame.getContentPane().add(btnClear);
 		btnSave.setToolTipText("Save the message logger to a file");
-		btnSave.setBounds(439, 457, 95, 23);
+		btnSave.setBounds(432, 457, 123, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
@@ -236,7 +236,7 @@ public class MainScreen implements GuiInterface
 			
 		});
 		btnClearCounter.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		btnClearCounter.setBounds(83, 457, 95, 23);
+		btnClearCounter.setBounds(62, 457, 123, 23);
 		
 		frame.getContentPane().add(btnClearCounter);
 		// frame.getContentPane().add(scroll);
