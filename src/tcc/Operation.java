@@ -39,7 +39,7 @@ public abstract class Operation implements Runnable
 						.redirectError(Redirect.INHERIT);
 
 				builder.redirectOutput(new File(f.getName() + "_output_" + Thread.currentThread().getId() + ".txt"));
-				builder.redirectError(new File(f.getName()+"_error_" + Thread.currentThread().getId() + ".txt"));
+				//builder.redirectError(new File(f.getName()+"_error_" + Thread.currentThread().getId() + ".txt"));
 				String s = "";
 				for (String v : vars)
 				{

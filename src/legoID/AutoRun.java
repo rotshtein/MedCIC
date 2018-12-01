@@ -32,7 +32,7 @@ public class AutoRun
 		}
 		catch (Exception e)
 		{
-			logger.error("Error during Autoidentification process", e);
+			logger.error("Error during Auto-identification process", e);
 		}
 	}
 
