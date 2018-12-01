@@ -151,9 +151,10 @@ public class ManagementParser extends Thread implements GuiInterface
 				try
 				{
 					GetSampleAndIdentify gsi = new GetSampleAndIdentify(this);
-					java.nio.file.Path LegoFilepath = Paths.get(Parameters.Get("LegoConfigPath", "C\\:\\MedCic\\lego\\config"), "id.lego");
+					java.nio.file.Path LegoFilepath = Paths.get(Parameters.Get("LegoScriptPath", "C\\:\\MedCic\\lego\\legofiles"), "id.lego");
 					String legoFile = LegoFilepath.toAbsolutePath().toString();
-					procMon = gsi.Start(ar.getInput1Url(), "id.bin", legoFile, "127.0.0.1", Integer.parseInt(Parameters.Get("LegoManagementPort")));
+					String LegoPath = Parameters.Get("LegoPath", "C\\:\\MedCic\\lego");
+					procMon = gsi.Start(ar.getInput1Url(), "id.bin", legoFile, "127.0.0.1", Integer.parseInt(Parameters.Get("LegoManagementPort")), LegoPath);
 				}
 				catch (Exception e)
 				{
@@ -181,8 +182,9 @@ public class ManagementParser extends Thread implements GuiInterface
 						BroadcastMessage(h.toByteString());
 						Thread.sleep(500);
 						String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
+						String LegoPath = Parameters.Get("LegoPath", "C\\:\\MedCic\\lego");
 						StartProduction(ie.getEncapsulation(), AutoCic1Input, AutoCic1Output, AutoCic2Input,
-								AutoCic2Output, Paths.get(ScriptPath, "cicScript.lego").toString());
+								AutoCic2Output, Paths.get(ScriptPath, "cicScript.lego").toString(),LegoPath);
 
 						SendStatusMessage("Starting ...", conn);
 						logger.info("Starting...");
@@ -218,8 +220,9 @@ public class ManagementParser extends Thread implements GuiInterface
 				{
 					Thread.sleep(500);
 					String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
+					String LegoPath = Parameters.Get("LegoPath", "C\\:\\MedCic\\lego");
 					StartProduction(p.getEncapsulation(), p.getInput1Url(), p.getOutput1Url(), p.getInput2Url(),
-							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString());
+							p.getOutput2Url(), Paths.get(ScriptPath, "cicScript.lego").toString(), LegoPath);
 
 					SendStatusMessage("Starting ...", conn);
 					logger.info("Starting...");
@@ -294,7 +297,7 @@ public class ManagementParser extends Thread implements GuiInterface
 	}
 
 	public void StartProduction(ENCAPSULATION encap, String InputUrl1, String OutputUrl1, String InputUrl2,
-			String OutputUrl2, String ConfigFilename) throws Exception
+			String OutputUrl2, String ConfigFilename, String LegoDirectory) throws Exception
 	{
 		Kill();
 		String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
@@ -302,7 +305,7 @@ public class ManagementParser extends Thread implements GuiInterface
 
 		String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
 		procMon = med.Start(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2,
-				Paths.get(ScriptPath, "cicScript.lego").toString());
+				Paths.get(ScriptPath, "cicScript.lego").toString(), LegoDirectory);
 	}
 
 	public void Identify(String InputUrl, String SampleFilename, String ConfigFile) throws Exception
@@ -310,9 +313,10 @@ public class ManagementParser extends Thread implements GuiInterface
 		Kill();
 		GetSamples getSamples = new GetSamples(this, "Getting Sample File");
 		String ScriptPath = Parameters.Get("LegoConfigPath", "C:\\bin\\lego\\config");
+		String LegoPath = Parameters.Get("LegoPath", "C:\\bin\\lego");
 		// String SourceUri, String IdFile, String ConfigFile, String Server, int Port
 		procMon = getSamples.Start(InputUrl, SampleFilename, Paths.get(ScriptPath, ConfigFile).toString(),
-				UdpServerHost, UdpServerPort);
+				UdpServerHost, UdpServerPort, LegoPath);
 	}
 
 	private void SendAck(Header h, WebSocket conn)

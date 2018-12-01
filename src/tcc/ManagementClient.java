@@ -257,7 +257,7 @@ public class ManagementClient extends WebSocketClient
 		logger.error("Wensocket error", ex);
 	}
 
-	public Boolean SendAutomatucStartCommand(String input1_url, String input2_url, String output1_url,
+	public Boolean SendAutomaticStartCommand(String input1_url, String input2_url, String output1_url,
 			String output2_url)
 	{
 		try

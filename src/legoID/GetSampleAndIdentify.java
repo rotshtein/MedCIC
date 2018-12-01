@@ -23,7 +23,7 @@ public class GetSampleAndIdentify extends Operation
 		super(Exe, gui, Description);
 	}
 
-	public ProcMon Start(String InputUri, String SampleFilename, String ConfigFile, String Server, int Port)
+	public ProcMon Start(String InputUri, String SampleFilename, String ConfigFile, String Server, int Port, String LegoPath)
 			throws Exception
 	{
 		// scriptFile = new ScriptFile();
@@ -32,6 +32,6 @@ public class GetSampleAndIdentify extends Operation
 		URI uri = new URI(InputUri);
 		return StartAction(new String[]
 		{ IdetifyExe, "-jar", "AutoRun.jar", "-i", uri.getHost() + "," + uri.getPort(), "-c", ConfigFile, "-s",
-				SampleFilename, "-m", Server, "-p", String.valueOf(Port) });
+				SampleFilename, "-m", Server, "-p", String.valueOf(Port), "-l", LegoPath });
 	}
 }

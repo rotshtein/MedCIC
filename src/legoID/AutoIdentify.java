@@ -20,18 +20,19 @@ public class AutoIdentify implements GuiInterface
 {
 
 	final static Logger	logger	= Logger.getLogger("AutoIdentify");
-	String				inputUri, configFilename, sampleFilename, managemntHost;
+	String				inputUri, configFilename, sampleFilename, managemntHost, legoDirectiry;
 	int					managementPort;
 	ProcMon				procMon	= null;
 
 	public AutoIdentify(String InputUri, String ConfigFilename, String SampleFilename, String ManagemntHost,
-			int ManagementPort)
+			int ManagementPort, String LegoDirectory)
 	{
 		inputUri = InputUri;
 		configFilename = ConfigFilename;
 		sampleFilename = SampleFilename;
 		managemntHost = ManagemntHost;
 		managementPort = ManagementPort;
+		legoDirectiry = LegoDirectory;
 	}
 
 	public void Start() throws Exception
@@ -50,7 +51,7 @@ public class AutoIdentify implements GuiInterface
 
 		GetSamples gs = new GetSamples(this);
 
-		procMon = gs.Start(inputUri, sampleFilename, configFilename, managemntHost, managementPort);
+		procMon = gs.Start(inputUri, sampleFilename, configFilename, managemntHost, managementPort, legoDirectiry);
 
 		long StartTimr = System.currentTimeMillis();
 		while (!procMon.isComplete())

@@ -26,7 +26,7 @@ public class AutoRun
 		{
 			AutoIdentify ai = new AutoIdentify(cmd.getOptionValue("input"), cmd.getOptionValue("config"),
 					cmd.getOptionValue("sample"), cmd.getOptionValue("host"),
-					Integer.parseInt(cmd.getOptionValue("port")));
+					Integer.parseInt(cmd.getOptionValue("port")),cmd.getOptionValue("lego"));
 
 			ai.Start();
 		}
@@ -43,6 +43,7 @@ public class AutoRun
 		Option input = new Option("i", "input", true, "input URI");
 		Option config = new Option("c", "config", true, "configuration file location");
 		Option sample = new Option("s", "sample", true, "sample file path");
+		Option lego = new Option("l", "lego", true, "lego directory path [/home/user/lego]");
 
 		Option host = new Option("m", "host", true, "Management host ip address");
 		Option port = new Option("p", "port", true, "Management port");
@@ -61,7 +62,10 @@ public class AutoRun
 
 		port.setRequired(true);
 		options.addOption(port);
-
+		
+		lego.setRequired(true);
+		options.addOption(lego);
+		
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;

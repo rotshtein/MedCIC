@@ -23,7 +23,7 @@ public class Mediate extends Operation
 	}
 
 	public ProcMon Start(ENCAPSULATION encap, String InputUrl1, String OutputUrl1, String InputUrl2, String OutputUrl2,
-			String ConfigFilename) throws Exception
+			String ConfigFilename, String LegoDirectory) throws Exception
 	{
 		ProcMon p = null;
 		if (new File(super.exe_file).exists())
@@ -39,7 +39,7 @@ public class Mediate extends Operation
 			try
 			{
 				String[] vars =
-				{ super.exe_file, ConfigFilename };
+				{ super.exe_file, ConfigFilename, LegoDirectory };
 				p = super.StartAction(vars);
 			}
 			catch (Exception ex)

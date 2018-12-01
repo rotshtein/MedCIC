@@ -77,6 +77,7 @@ public class MainScreen implements GuiInterface
 	private final JLabel	lblOut2Counter			= new JLabel("0");
 	private final JLabel	lblCic2OutpoutBytes		= new JLabel("CIC 2 Outpout [Bytes]");
 	private final String	Version					= "1.0";
+	private final JButton btnClearCounter = new JButton("Clear Counter");
 
 	/**
 	 * Launch the application.
@@ -166,7 +167,7 @@ public class MainScreen implements GuiInterface
 		textArea.setToolTipText("Clear the message logger");
 		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
-		btnClear.setBounds(151, 457, 74, 23);
+		btnClear.setBounds(261, 457, 95, 23);
 		btnClear.addActionListener(new ActionListener()
 		{
 
@@ -179,7 +180,7 @@ public class MainScreen implements GuiInterface
 
 		frame.getContentPane().add(btnClear);
 		btnSave.setToolTipText("Save the message logger to a file");
-		btnSave.setBounds(376, 457, 89, 23);
+		btnSave.setBounds(439, 457, 95, 23);
 		btnSave.setEnabled(false);
 		btnSave.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
@@ -225,6 +226,19 @@ public class MainScreen implements GuiInterface
 		lblOut2Counter.setBounds(458, 53, 129, 20);
 
 		pnlCounters.add(lblOut2Counter);
+		btnClearCounter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lblIn1Counter.setText("0");
+				lblIn2Counter.setText("0");
+				lblOut1Counter.setText("0");
+				lblOut2Counter.setText("0");
+			}
+			
+		});
+		btnClearCounter.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnClearCounter.setBounds(83, 457, 95, 23);
+		
+		frame.getContentPane().add(btnClearCounter);
 		// frame.getContentPane().add(scroll);
 
 		String host = Parameters.Get("WebSocketListenAddress", "127.0.0.1");
@@ -272,7 +286,7 @@ public class MainScreen implements GuiInterface
 
 			if (((String) (cmbEncap.getSelectedItem())).toLowerCase().startsWith("auto"))
 			{
-				client.SendAutomatucStartCommand(input1, input2, output1, output2);
+				client.SendAutomaticStartCommand(input1, input2, output1, output2);
 			}
 			else
 			{
@@ -898,5 +912,4 @@ public class MainScreen implements GuiInterface
 		}
 		lblOut2Counter.setText(String.valueOf(counter));
 	}
-
 }

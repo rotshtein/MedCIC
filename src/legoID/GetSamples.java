@@ -21,15 +21,16 @@ public class GetSamples extends Operation
 		super(Exe, gui, Description);
 	}
 
-	public ProcMon Start(String SourceUri, String SampleFile, String ConfigFile, String Server, int Port)
+	public ProcMon Start(String SourceUri, String SampleFile, String ConfigFile, String Server, int Port, String LegoDirectory)
 			throws Exception
 	{
 		ScriptFile scriptFile = new ScriptFile(ConfigFile, Server, Port);
 
 		scriptFile.BuildRecordToFileScript(SourceUri, SampleFile);
 		scriptFile.Write();
-
+		
+		//TODO: Add lego path as 3rd parameter
 		return StartAction(new String[]
-		{ Exe, ConfigFile });
+		{ Exe, ConfigFile, LegoDirectory });
 	}
 }

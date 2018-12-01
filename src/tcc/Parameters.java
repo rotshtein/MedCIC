@@ -18,7 +18,14 @@ public final class Parameters
 	{
 		try
 		{
-			configFile = new File("config.properties");
+			if (System.getProperty("os.name").startsWith("Windows"))
+			{
+				configFile = new File("config.properties");
+			}
+			else
+			{
+				configFile = new File("linux.config.properties");
+			}
 			if (!configFile.exists())
 			{
 				if (!configFile.createNewFile())

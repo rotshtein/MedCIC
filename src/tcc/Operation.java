@@ -29,7 +29,8 @@ public abstract class Operation implements Runnable
 
 	public ProcMon StartAction(String[] vars) throws Exception
 	{
-		if (new File(exe_file).exists())
+		File f = new File(exe_file); 
+		if (f.exists())
 		{
 			try
 			{
@@ -37,8 +38,8 @@ public abstract class Operation implements Runnable
 				builder.redirectInput(Redirect.INHERIT).redirectOutput(Redirect.INHERIT)
 						.redirectError(Redirect.INHERIT);
 
-				builder.redirectOutput(new File("ProcessBlock_out-" + Thread.currentThread().getId() + ".txt"));
-				builder.redirectError(new File("ProcessBlock_error-" + Thread.currentThread().getId() + ".txt"));
+				builder.redirectOutput(new File(f.getName() + "_output_" + Thread.currentThread().getId() + ".txt"));
+				builder.redirectError(new File(f.getName()+"_error_" + Thread.currentThread().getId() + ".txt"));
 				String s = "";
 				for (String v : vars)
 				{

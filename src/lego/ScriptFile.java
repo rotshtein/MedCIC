@@ -18,7 +18,7 @@ public class ScriptFile
 	static final Logger			logger			= Logger.getLogger("ScriptFile");
 	List<ModuleConfiguration>	moduleList		= new ArrayList<ModuleConfiguration>();
 	ManagementConfiguration		management		= null;
-	String						configFilename	= "cobfig.lego";
+	String						configFilename	= "config.lego";
 
 	public ScriptFile()
 	{
