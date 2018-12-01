@@ -35,10 +35,14 @@ public abstract class Operation implements Runnable
 			try
 			{
 				ProcessBuilder builder = new ProcessBuilder(vars);
-				builder.redirectInput(Redirect.INHERIT).redirectOutput(Redirect.INHERIT)
-						.redirectError(Redirect.INHERIT);
+				builder.redirectInput(Redirect.INHERIT).redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
 
-				builder.redirectOutput(new File(f.getName() + "_output_" + Thread.currentThread().getId() + ".txt"));
+				 File directory = new File("logs");
+				    if (! directory.exists())
+				    {
+				        directory.mkdir();
+				    }
+				builder.redirectOutput(new File("./logs/" + f.getName() + "_output_" + Thread.currentThread().getId() + ".txt"));
 				//builder.redirectError(new File(f.getName()+"_error_" + Thread.currentThread().getId() + ".txt"));
 				String s = "";
 				for (String v : vars)
