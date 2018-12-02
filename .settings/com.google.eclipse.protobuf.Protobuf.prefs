@@ -1,7 +1,8 @@
-compiler.descriptorFilePath=C\:\\D\\protobuf\\include\\google\\protobuf\\descriptor.proto
-compiler.enableProjectSettings=true
+compiler.compileProtoFiles=true
+compiler.descriptorFilePath=/home/x300/eclipse-workspace/medcic/src/descriptor.proto
+compiler.javaCodeGenerationEnabled=true
 compiler.protocFilePath=C\:\\D\\protobuf\\bin\\protoc.exe
 eclipse.preferences.version=1
-paths.directoryPaths=${workspace_loc\:/${project}/src/tcc}
+paths.directoryPaths=${workspace_loc\:/${project}/src}
 paths.filesInMultipleDirectories=true
 paths.filesInOneDirectoryOnly=false
