@@ -29,6 +29,7 @@ public class GetSampleAndIdentify extends Operation
 		// scriptFile = new ScriptFile();
 
 		String IdetifyExe = Parameters.Get("AutoIdentificationExe", "java");
+		String autoIdentificationJar = Parameters.Get("AutoIdentificationJar", "./AutoRun.jar");
 		URI uri = new URI(InputUri);
 		return StartAction(new String[]
 		{ IdetifyExe, "-jar", "AutoRun.jar", "-i", uri.getHost() + "," + uri.getPort(), "-c", ConfigFile, "-s",

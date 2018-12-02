@@ -246,7 +246,8 @@ public class MainScreen implements GuiInterface
 
 		server = new ManagementServer(new InetSocketAddress(host, port));
 		server.start();
-		serverUri = Parameters.Get("WebSocketServerUri", "ws://127.0.0.1:8887");
+		serverUri = Parameters.Get("WebSocketServerUri", "ws://127.0.0.1") + ":" + Parameters.Get("WebSocketListenPort");
+		
 		client = null;// new ManagementClient(new URI(serverUri), this);
 	}
 
@@ -403,6 +404,7 @@ public class MainScreen implements GuiInterface
 		cmbEncap.addItem("ESC++      (1104)");
 		cmbEncap.addItem("ESC++      (1792)");
 		cmbEncap.addItem("E2");
+		cmbEncap.addItem("PLANE");
 
 		txtOut1 = new JFormattedTextField();
 		txtOut1.setBounds(400, 18, 187, 20);
@@ -459,9 +461,10 @@ public class MainScreen implements GuiInterface
 
 		case "E2":
 			return ENCAPSULATION.E2;
-
+			
+		case "PLANE":
 		default:
-			return ENCAPSULATION.DI_PLUS;
+			return ENCAPSULATION.UNKNOWN_ENCAPSULATION;
 		}
 	}
 

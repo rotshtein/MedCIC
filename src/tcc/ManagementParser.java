@@ -181,8 +181,8 @@ public class ManagementParser extends Thread implements GuiInterface
 					{
 						BroadcastMessage(h.toByteString());
 						Thread.sleep(500);
-						String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
-						String LegoPath = Parameters.Get("LegoPath", "C\\:\\MedCic\\lego");
+						String ScriptPath = Parameters.Get("LegoScriptPath");
+						String LegoPath = Parameters.Get("LegoPath");
 						StartProduction(ie.getEncapsulation(), AutoCic1Input, AutoCic1Output, AutoCic2Input,
 								AutoCic2Output, Paths.get(ScriptPath, "cicScript.lego").toString(),LegoPath);
 
@@ -300,10 +300,10 @@ public class ManagementParser extends Thread implements GuiInterface
 			String OutputUrl2, String ConfigFilename, String LegoDirectory) throws Exception
 	{
 		Kill();
-		String MediationExe = Parameters.Get("MediationExe", "c:\\bin\\lego\\bin\\ProcessBlock.exe");
+		String MediationExe = Parameters.Get("MediationExe");
 		Mediate med = new Mediate(MediationExe, this, "CIC Production");
 
-		String ScriptPath = Parameters.Get("LegoScriptPath", "C:\\bin\\lego\\legoFiles");
+		String ScriptPath = Parameters.Get("LegoScriptPath");
 		procMon = med.Start(encap, InputUrl1, OutputUrl1, InputUrl2, OutputUrl2,
 				Paths.get(ScriptPath, "cicScript.lego").toString(), LegoDirectory);
 	}

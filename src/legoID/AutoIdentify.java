@@ -37,9 +37,10 @@ public class AutoIdentify implements GuiInterface
 
 	public void Start() throws Exception
 	{
-		String ServerUri = Parameters.Get("WebSocketServerUri");
+		String ServerUri = Parameters.Get("WebSocketServerUri", "ws://127.0.0.1");
+		String ServerPort = Parameters.Get("WebSocketListenPort", "8887");
 
-		ManagementClient client = new ManagementClient(new URI(ServerUri), this);
+		ManagementClient client = new ManagementClient(new URI(ServerUri + ":" + ServerPort), this);
 		try
 		{
 			client.connect();

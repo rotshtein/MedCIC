@@ -248,6 +248,7 @@ public class ManagementClient extends WebSocketClient
 	{
 		logger.info("Disconnected");
 		gui.UpdateStatus("Connection to the server closed!");
+		//this.closeConnection(0, "Closing ASAP");
 	}
 
 	@Override

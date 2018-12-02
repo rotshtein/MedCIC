@@ -229,6 +229,12 @@ public class ScriptFile
 			module = null;
 			break;
 
+		case UNKNOWN_ENCAPSULATION:
+			logger.warn("UNKNOWN ENCAPSULATION - Working plane");
+			module = "bwshaper";
+			parameters = "10000";
+			break; 
+			
 		case UNRECOGNIZED:
 		default:
 			logger.warn("UNRECOGNIZED - encapsulation not supporeted");
