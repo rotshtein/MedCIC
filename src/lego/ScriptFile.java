@@ -165,7 +165,7 @@ public class ScriptFile
 				return encap;
 			}
 		}
-		return null;
+		return ENCAPSULATION.UNKNOWN_ENCAPSULATION;
 	}
 
 	public static Pair<String, String> Encapsulation2Module(ENCAPSULATION EncapsolationName)

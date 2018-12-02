@@ -51,7 +51,7 @@ public class AutoIdentify implements GuiInterface
 
 		GetSamples gs = new GetSamples(this);
 
-		procMon = gs.Start(inputUri, sampleFilename, configFilename, managemntHost, managementPort, legoDirectiry);
+		procMon = gs.Start(inputUri, sampleFilename, configFilename+"_capture", managemntHost, managementPort, legoDirectiry);
 
 		long StartTimr = System.currentTimeMillis();
 		while (!procMon.isComplete())
