@@ -193,24 +193,24 @@ public class MainScreen implements GuiInterface
 		pnlCounters.setBorder(BorderFactory.createTitledBorder("Couters"));
 
 		lblCicInpoutbytes = new JLabel("CIC 1 Inpout [Bytes]");
-		lblCicInpoutbytes.setBounds(10, 22, 116, 20);
+		lblCicInpoutbytes.setBounds(10, 22, 136, 20);
 		pnlCounters.add(lblCicInpoutbytes);
 
 		lblIn1Counter = new JLabel("0");
 		lblCicInpoutbytes.setLabelFor(lblIn1Counter);
 		lblIn1Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblIn1Counter.setHorizontalAlignment(SwingConstants.CENTER);
-		lblIn1Counter.setBounds(122, 22, 129, 20);
+		lblIn1Counter.setBounds(156, 22, 129, 20);
 		pnlCounters.add(lblIn1Counter);
-		lblCic2InpoutBytes.setBounds(10, 53, 116, 20);
+		lblCic2InpoutBytes.setBounds(10, 53, 136, 20);
 
 		pnlCounters.add(lblCic2InpoutBytes);
 		lblIn2Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblIn2Counter.setHorizontalAlignment(SwingConstants.CENTER);
-		lblIn2Counter.setBounds(122, 53, 129, 20);
+		lblIn2Counter.setBounds(156, 53, 129, 20);
 
 		pnlCounters.add(lblIn2Counter);
-		lblCic1OutpoutBytes.setBounds(336, 22, 124, 20);
+		lblCic1OutpoutBytes.setBounds(318, 22, 141, 20);
 
 		pnlCounters.add(lblCic1OutpoutBytes);
 		lblOut1Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -218,7 +218,7 @@ public class MainScreen implements GuiInterface
 		lblOut1Counter.setBounds(458, 22, 129, 20);
 
 		pnlCounters.add(lblOut1Counter);
-		lblCic2OutpoutBytes.setBounds(336, 53, 124, 20);
+		lblCic2OutpoutBytes.setBounds(318, 53, 141, 20);
 		
 				pnlCounters.add(lblCic2OutpoutBytes);
 		lblOut2Counter.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -760,7 +760,7 @@ public class MainScreen implements GuiInterface
 			return;
 		}
 		// Now edit your gui objects
-		int Index = Encapsulation2Index(encap);
+		int Index = encap.getNumber();
 		if (Index > 0)
 		{
 			cmbEncap.setSelectedIndex(Index);
@@ -818,6 +818,10 @@ public class MainScreen implements GuiInterface
 			logger.warn("E2 - encapsulation not supporeted");
 			index = 10;
 			break;
+			
+		case UNKNOWN_ENCAPSULATION:
+			logger.warn("Unkow encapsulation");
+			index = 11;
 
 		case UNRECOGNIZED:
 		default:

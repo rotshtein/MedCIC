@@ -152,6 +152,7 @@ public class MessageParser extends Thread
 	@Override
 	public void run()
 	{
+		String s; 
 		stopThread = false;
 		while (!stopThread)
 		{
@@ -183,6 +184,7 @@ public class MessageParser extends Thread
 				ConfigurationMessage cm = null;
 				try
 				{
+					s = new String(pkt.getData());
 					cm = ConfigurationMessage.fromJson(new String(pkt.getData()));
 				}
 				catch (Exception e)

@@ -3,6 +3,8 @@
  */
 package lego;
 
+import java.util.Optional;
+
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,7 +26,7 @@ public class ConfigurationMessage
 
 	/** The path as string of numbers 1.1.1 for instance. */
 	@JsonIgnore
-	public String address;
+	public Optional<String> address;
 	
 	/** The path as string of numbers 1.1.1 for instance. */
 	public String path;
