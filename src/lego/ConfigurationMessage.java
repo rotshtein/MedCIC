@@ -4,7 +4,10 @@
 package lego;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -12,6 +15,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * 
  * serialise and deserialise lego jason based status messages
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConfigurationMessage
 {
 
@@ -19,6 +23,7 @@ public class ConfigurationMessage
 	Logger logger = Logger.getLogger("ConfigurationMessage");
 
 	/** The path as string of numbers 1.1.1 for instance. */
+	@JsonIgnore
 	public String address;
 	
 	/** The path as string of numbers 1.1.1 for instance. */

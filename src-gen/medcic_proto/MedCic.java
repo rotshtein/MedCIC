@@ -646,7 +646,6 @@ public final class MedCic {
   }
   /**
    * <pre>
-   *
    * </pre>
    *
    * Protobuf type {@code medcic_proto.Header}
@@ -655,6 +654,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.Header)
       HeaderOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Header.newBuilder() to construct.
     private Header(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -668,14 +668,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private Header(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -685,7 +690,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -714,6 +720,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -792,6 +799,7 @@ public final class MedCic {
       if (!messageData_.isEmpty()) {
         output.writeBytes(3, messageData_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -811,11 +819,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, messageData_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -832,6 +840,7 @@ public final class MedCic {
       result = result && opcode_ == other.opcode_;
       result = result && getMessageData()
           .equals(other.getMessageData());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -853,6 +862,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.Header parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.Header parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.Header parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -932,7 +952,6 @@ public final class MedCic {
     }
     /**
      * <pre>
-     *
      * </pre>
      *
      * Protobuf type {@code medcic_proto.Header}
@@ -1010,7 +1029,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1023,12 +1042,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1051,6 +1070,7 @@ public final class MedCic {
         if (other.getMessageData() != com.google.protobuf.ByteString.EMPTY) {
           setMessageData(other.getMessageData());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -1197,12 +1217,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -1225,7 +1245,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Header(input, extensionRegistry);
+        return new Header(input, extensionRegistry);
       }
     };
 
@@ -1331,6 +1351,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.AutomaticStartCommand)
       AutomaticStartCommandOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AutomaticStartCommand.newBuilder() to construct.
     private AutomaticStartCommand(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -1345,14 +1366,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private AutomaticStartCommand(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -1362,7 +1388,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -1399,6 +1426,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -1606,6 +1634,7 @@ public final class MedCic {
       if (!getOutput2UrlBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, output2Url_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -1625,11 +1654,11 @@ public final class MedCic {
       if (!getOutput2UrlBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, output2Url_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -1649,6 +1678,7 @@ public final class MedCic {
           .equals(other.getOutput1Url());
       result = result && getOutput2Url()
           .equals(other.getOutput2Url());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -1672,6 +1702,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.AutomaticStartCommand parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.AutomaticStartCommand parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.AutomaticStartCommand parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1832,7 +1873,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1845,12 +1886,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1880,6 +1921,7 @@ public final class MedCic {
           output2Url_ = other.output2Url_;
           onChanged();
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -2263,12 +2305,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -2291,7 +2333,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AutomaticStartCommand(input, extensionRegistry);
+        return new AutomaticStartCommand(input, extensionRegistry);
       }
     };
 
@@ -2406,6 +2448,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StartCommand)
       StartCommandOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StartCommand.newBuilder() to construct.
     private StartCommand(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -2421,14 +2464,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StartCommand(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -2438,7 +2486,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -2481,6 +2530,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -2707,6 +2757,7 @@ public final class MedCic {
       if (encapsulation_ != medcic_proto.MedCic.ENCAPSULATION.DI.getNumber()) {
         output.writeEnum(5, encapsulation_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -2730,11 +2781,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(5, encapsulation_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -2755,6 +2806,7 @@ public final class MedCic {
       result = result && getOutput2Url()
           .equals(other.getOutput2Url());
       result = result && encapsulation_ == other.encapsulation_;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -2780,6 +2832,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StartCommand parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StartCommand parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StartCommand parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2943,7 +3006,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -2956,12 +3019,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -2994,6 +3057,7 @@ public final class MedCic {
         if (other.encapsulation_ != 0) {
           setEncapsulationValue(other.getEncapsulationValue());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -3421,12 +3485,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -3449,7 +3513,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StartCommand(input, extensionRegistry);
+        return new StartCommand(input, extensionRegistry);
       }
     };
 
@@ -3483,6 +3547,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StopCommand)
       StopCommandOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StopCommand.newBuilder() to construct.
     private StopCommand(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3493,13 +3558,18 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StopCommand(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -3509,7 +3579,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -3522,6 +3593,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -3549,6 +3621,7 @@ public final class MedCic {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -3556,11 +3629,11 @@ public final class MedCic {
       if (size != -1) return size;
 
       size = 0;
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -3572,6 +3645,7 @@ public final class MedCic {
       medcic_proto.MedCic.StopCommand other = (medcic_proto.MedCic.StopCommand) obj;
 
       boolean result = true;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -3587,6 +3661,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StopCommand parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StopCommand parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StopCommand parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3735,7 +3820,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -3748,12 +3833,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -3767,6 +3852,7 @@ public final class MedCic {
 
       public Builder mergeFrom(medcic_proto.MedCic.StopCommand other) {
         if (other == medcic_proto.MedCic.StopCommand.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -3794,12 +3880,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -3822,7 +3908,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StopCommand(input, extensionRegistry);
+        return new StopCommand(input, extensionRegistry);
       }
     };
 
@@ -3856,6 +3942,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.Ack)
       AckOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Ack.newBuilder() to construct.
     private Ack(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3866,13 +3953,18 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private Ack(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -3882,7 +3974,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -3895,6 +3988,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -3922,6 +4016,7 @@ public final class MedCic {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -3929,11 +4024,11 @@ public final class MedCic {
       if (size != -1) return size;
 
       size = 0;
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -3945,6 +4040,7 @@ public final class MedCic {
       medcic_proto.MedCic.Ack other = (medcic_proto.MedCic.Ack) obj;
 
       boolean result = true;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -3960,6 +4056,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.Ack parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.Ack parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.Ack parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4108,7 +4215,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -4121,12 +4228,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4140,6 +4247,7 @@ public final class MedCic {
 
       public Builder mergeFrom(medcic_proto.MedCic.Ack other) {
         if (other == medcic_proto.MedCic.Ack.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -4167,12 +4275,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -4195,7 +4303,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Ack(input, extensionRegistry);
+        return new Ack(input, extensionRegistry);
       }
     };
 
@@ -4229,6 +4337,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.Nack)
       NackOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Nack.newBuilder() to construct.
     private Nack(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -4239,13 +4348,18 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private Nack(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -4255,7 +4369,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -4268,6 +4383,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -4295,6 +4411,7 @@ public final class MedCic {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -4302,11 +4419,11 @@ public final class MedCic {
       if (size != -1) return size;
 
       size = 0;
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -4318,6 +4435,7 @@ public final class MedCic {
       medcic_proto.MedCic.Nack other = (medcic_proto.MedCic.Nack) obj;
 
       boolean result = true;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -4333,6 +4451,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.Nack parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.Nack parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.Nack parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4481,7 +4610,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -4494,12 +4623,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4513,6 +4642,7 @@ public final class MedCic {
 
       public Builder mergeFrom(medcic_proto.MedCic.Nack other) {
         if (other == medcic_proto.MedCic.Nack.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -4540,12 +4670,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -4568,7 +4698,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Nack(input, extensionRegistry);
+        return new Nack(input, extensionRegistry);
       }
     };
 
@@ -4602,6 +4732,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StatusRequest)
       StatusRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StatusRequest.newBuilder() to construct.
     private StatusRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -4612,13 +4743,18 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StatusRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -4628,7 +4764,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -4641,6 +4778,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -4668,6 +4806,7 @@ public final class MedCic {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -4675,11 +4814,11 @@ public final class MedCic {
       if (size != -1) return size;
 
       size = 0;
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -4691,6 +4830,7 @@ public final class MedCic {
       medcic_proto.MedCic.StatusRequest other = (medcic_proto.MedCic.StatusRequest) obj;
 
       boolean result = true;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -4706,6 +4846,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StatusRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StatusRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StatusRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4854,7 +5005,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -4867,12 +5018,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4886,6 +5037,7 @@ public final class MedCic {
 
       public Builder mergeFrom(medcic_proto.MedCic.StatusRequest other) {
         if (other == medcic_proto.MedCic.StatusRequest.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -4913,12 +5065,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -4941,7 +5093,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StatusRequest(input, extensionRegistry);
+        return new StatusRequest(input, extensionRegistry);
       }
     };
 
@@ -5070,6 +5222,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StatusReplay)
       StatusReplayOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StatusReplay.newBuilder() to construct.
     private StatusReplay(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -5092,14 +5245,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StatusReplay(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -5109,7 +5267,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -5190,6 +5349,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -5471,6 +5631,7 @@ public final class MedCic {
       if (errorNumber_ != 0) {
         output.writeInt32(12, errorNumber_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -5523,11 +5684,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(12, errorNumber_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -5558,6 +5719,7 @@ public final class MedCic {
           .equals(other.getErrorMMessage());
       result = result && (getErrorNumber()
           == other.getErrorNumber());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -5599,6 +5761,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StatusReplay parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StatusReplay parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StatusReplay parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -5783,7 +5956,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -5796,12 +5969,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -5854,6 +6027,7 @@ public final class MedCic {
         if (other.getErrorNumber() != 0) {
           setErrorNumber(other.getErrorNumber());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -6412,12 +6586,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -6440,7 +6614,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StatusReplay(input, extensionRegistry);
+        return new StatusReplay(input, extensionRegistry);
       }
     };
 
@@ -6484,6 +6658,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StatusMessage)
       StatusMessageOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StatusMessage.newBuilder() to construct.
     private StatusMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -6495,14 +6670,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StatusMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -6512,7 +6692,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -6531,6 +6712,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -6595,6 +6777,7 @@ public final class MedCic {
       if (!getMessageBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, message_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -6605,11 +6788,11 @@ public final class MedCic {
       if (!getMessageBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, message_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -6623,6 +6806,7 @@ public final class MedCic {
       boolean result = true;
       result = result && getMessage()
           .equals(other.getMessage());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -6640,6 +6824,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StatusMessage parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StatusMessage parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StatusMessage parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -6791,7 +6986,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -6804,12 +6999,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -6827,6 +7022,7 @@ public final class MedCic {
           message_ = other.message_;
           onChanged();
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -6923,12 +7119,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -6951,7 +7147,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StatusMessage(input, extensionRegistry);
+        return new StatusMessage(input, extensionRegistry);
       }
     };
 
@@ -7030,6 +7226,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.GetSampleFile)
       GetSampleFileOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use GetSampleFile.newBuilder() to construct.
     private GetSampleFile(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -7043,14 +7240,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private GetSampleFile(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -7060,7 +7262,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -7090,6 +7293,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -7223,6 +7427,7 @@ public final class MedCic {
       if (duration_ != 0) {
         output.writeInt32(3, duration_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -7240,11 +7445,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, duration_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -7262,6 +7467,7 @@ public final class MedCic {
           .equals(other.getFilename());
       result = result && (getDuration()
           == other.getDuration());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -7283,6 +7489,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.GetSampleFile parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.GetSampleFile parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.GetSampleFile parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -7440,7 +7657,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -7453,12 +7670,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -7483,6 +7700,7 @@ public final class MedCic {
         if (other.getDuration() != 0) {
           setDuration(other.getDuration());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -7726,12 +7944,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -7754,7 +7972,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new GetSampleFile(input, extensionRegistry);
+        return new GetSampleFile(input, extensionRegistry);
       }
     };
 
@@ -7797,6 +8015,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.IdentifiedEncapsulation)
       IdentifiedEncapsulationOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use IdentifiedEncapsulation.newBuilder() to construct.
     private IdentifiedEncapsulation(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -7808,14 +8027,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private IdentifiedEncapsulation(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -7825,7 +8049,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -7844,6 +8069,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -7890,6 +8116,7 @@ public final class MedCic {
       if (encapsulation_ != medcic_proto.MedCic.ENCAPSULATION.DI.getNumber()) {
         output.writeEnum(1, encapsulation_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -7901,11 +8128,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, encapsulation_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -7918,6 +8145,7 @@ public final class MedCic {
 
       boolean result = true;
       result = result && encapsulation_ == other.encapsulation_;
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -7935,6 +8163,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.IdentifiedEncapsulation parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.IdentifiedEncapsulation parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.IdentifiedEncapsulation parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -8086,7 +8325,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -8099,12 +8338,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -8121,6 +8360,7 @@ public final class MedCic {
         if (other.encapsulation_ != 0) {
           setEncapsulationValue(other.getEncapsulationValue());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -8192,12 +8432,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -8220,7 +8460,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new IdentifiedEncapsulation(input, extensionRegistry);
+        return new IdentifiedEncapsulation(input, extensionRegistry);
       }
     };
 
@@ -8274,6 +8514,7 @@ public final class MedCic {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:medcic_proto.StatisticsReplay)
       StatisticsReplayOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StatisticsReplay.newBuilder() to construct.
     private StatisticsReplay(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -8288,14 +8529,19 @@ public final class MedCic {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private StatisticsReplay(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -8305,7 +8551,8 @@ public final class MedCic {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -8338,6 +8585,7 @@ public final class MedCic {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -8413,6 +8661,7 @@ public final class MedCic {
       if (cic2OutputByteCounter_ != 0L) {
         output.writeInt64(4, cic2OutputByteCounter_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -8436,11 +8685,11 @@ public final class MedCic {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(4, cic2OutputByteCounter_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -8460,6 +8709,7 @@ public final class MedCic {
           == other.getCic1OutputByteCounter());
       result = result && (getCic2OutputByteCounter()
           == other.getCic2OutputByteCounter());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -8487,6 +8737,17 @@ public final class MedCic {
       return hash;
     }
 
+    public static medcic_proto.MedCic.StatisticsReplay parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static medcic_proto.MedCic.StatisticsReplay parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static medcic_proto.MedCic.StatisticsReplay parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -8647,7 +8908,7 @@ public final class MedCic {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -8660,12 +8921,12 @@ public final class MedCic {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -8691,6 +8952,7 @@ public final class MedCic {
         if (other.getCic2OutputByteCounter() != 0L) {
           setCic2OutputByteCounter(other.getCic2OutputByteCounter());
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -8822,12 +9084,12 @@ public final class MedCic {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -8850,7 +9112,7 @@ public final class MedCic {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StatisticsReplay(input, extensionRegistry);
+        return new StatisticsReplay(input, extensionRegistry);
       }
     };
 
@@ -8947,7 +9209,7 @@ public final class MedCic {
       "\022\022\n\ninput1_url\030\001 \001(\t\022\022\n\ninput2_url\030\002 \001(\t" +
       "\022\023\n\013output1_url\030\003 \001(\t\022\023\n\013output2_url\030\004 \001" +
       "(\t\0222\n\rencapsulation\030\005 \001(\0162\033.medcic_proto" +
-      ".ENCAPSULATION\"\r\n\013StopCommand\"\005\n\003Ack\"\006\n\004",
+      ".ENCAPSULATION\"\r\n\013StopCommand\"\005\n\003Ack\"\006\n\004" +
       "Nack\"\017\n\rStatusRequest\"\221\003\n\014StatusReplay\022$" +
       "\n\006status\030\001 \001(\0162\024.medcic_proto.STATUS\022.\n\t" +
       "cic1Input\030\002 \001(\0162\033.medcic_proto.CHANEL_ST" +
@@ -8957,7 +9219,7 @@ public final class MedCic {
       "\0162\033.medcic_proto.CHANEL_STATUS\022\032\n\022status" +
       "_description\030\006 \001(\t\022\017\n\007warning\030\007 \001(\010\022\027\n\017w" +
       "arning_message\030\010 \001(\t\022\026\n\016warning_number\030\t" +
-      " \001(\005\022\r\n\005error\030\n \001(\010\022\026\n\016error_mMessage\030\013 ",
+      " \001(\005\022\r\n\005error\030\n \001(\010\022\026\n\016error_mMessage\030\013 " +
       "\001(\t\022\024\n\014error_number\030\014 \001(\005\" \n\rStatusMessa" +
       "ge\022\017\n\007message\030\001 \001(\t\"F\n\rGetSampleFile\022\021\n\t" +
       "input_url\030\001 \001(\t\022\020\n\010filename\030\002 \001(\t\022\020\n\010dur" +
@@ -8967,7 +9229,7 @@ public final class MedCic {
       "nputByteCounter\030\001 \001(\003\022\034\n\024Cic2InputByteCo" +
       "unter\030\002 \001(\003\022\035\n\025Cic1OutputByteCounter\030\003 \001" +
       "(\003\022\035\n\025Cic2OutputByteCounter\030\004 \001(\003*3\n\006STA" +
-      "TUS\022\007\n\003RUN\020\000\022\010\n\004STOP\020\001\022\t\n\005ERROR\020\002\022\013\n\007WAR",
+      "TUS\022\007\n\003RUN\020\000\022\010\n\004STOP\020\001\022\t\n\005ERROR\020\002\022\013\n\007WAR" +
       "NING\020\003*7\n\rCHANEL_STATUS\022\013\n\007UNKNOWN\020\000\022\017\n\013" +
       "OUT_OF_SYNC\020\001\022\010\n\004SYNC\020\002*\267\001\n\rENCAPSULATIO" +
       "N\022\006\n\002DI\020\000\022\013\n\007DI_PLUS\020\001\022\t\n\005EDMAC\020\002\022\017\n\013EDM" +
@@ -8977,7 +9239,7 @@ public final class MedCic {
       "ULATION\020\013*\335\001\n\006OPCODE\022\n\n\006HEADER\020\000\022\007\n\003ACK\020" +
       "\001\022\010\n\004NACK\020\002\022\022\n\016AUTO_START_CMD\020\003\022\r\n\tSTART" +
       "_CMD\020\004\022\014\n\010STOP_CMD\020\005\022\022\n\016STATUS_REQUEST\020\006" +
-      "\022\021\n\rSTATUS_REPLAY\020\007\022\022\n\016STATUS_MESSAGE\020\010\022",
+      "\022\021\n\rSTATUS_REPLAY\020\007\022\022\n\016STATUS_MESSAGE\020\010\022" +
       "\023\n\017GET_SAMPLE_FILE\020\t\022\034\n\030IDENTYPIED_ENCAP" +
       "SULATION\020\n\022\025\n\021STATISTICS_REPLAY\020\013b\006proto" +
       "3"

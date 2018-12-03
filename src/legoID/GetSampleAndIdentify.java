@@ -32,7 +32,7 @@ public class GetSampleAndIdentify extends Operation
 		String autoIdentificationJar = Parameters.Get("AutoIdentificationJar", "./AutoRun.jar");
 		URI uri = new URI(InputUri);
 		return StartAction(new String[]
-		{ IdetifyExe, "-jar", "AutoRun.jar", "-i", uri.getHost() + "," + uri.getPort(), "-c", ConfigFile, "-s",
+		{ IdetifyExe, "-jar", autoIdentificationJar, "-i", uri.getHost() + "," + uri.getPort(), "-c", ConfigFile, "-s",
 				SampleFilename, "-m", Server, "-p", String.valueOf(Port), "-l", LegoPath });
 	}
 }

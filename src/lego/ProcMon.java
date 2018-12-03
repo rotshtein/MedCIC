@@ -130,9 +130,13 @@ public class ProcMon implements Runnable
 	{
 		String command = "killall " + ProcessName;
 
-		if (System.getProperty("os.name").indexOf("win") >= 0)
+		if (System.getProperty("os.name").startsWith("Windows"))
 		{
-			command = "taskkill /IM " + ProcessName + ".exe";
+			command = "taskkill /F /IM " + ProcessName + ".exe";
+		}
+		else
+		{
+			command = "killall -9  " + ProcessName;
 		}
 
 		Process p = null;
