@@ -1,2 +1,2 @@
-c:\bin\lego
+/home/x300/lego
 

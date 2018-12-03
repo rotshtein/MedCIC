@@ -129,7 +129,7 @@ public class MainScreen implements GuiInterface
 		btnStop.setToolTipText("Stop de-encapsulation process.");
 		btnStop.setBounds(305, 60, 63, 23);
 		pnlSetup.add(btnStop);
-		btnStop.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnStop.setFont(new Font("Dialog", Font.PLAIN, 12));
 		txtIn2.setText(Parameters.Get("url-in-2", "udp://127.0.0.1:5002"));
 		
 		btnStop.addActionListener(new ActionListener()
@@ -176,7 +176,7 @@ public class MainScreen implements GuiInterface
 				textArea.setText("");
 			}
 		});
-		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnClear.setFont(new Font("Dialog", Font.PLAIN, 12));
 
 		frame.getContentPane().add(btnClear);
 		btnSave.setToolTipText("Save the message logger to a file");
@@ -193,6 +193,7 @@ public class MainScreen implements GuiInterface
 		pnlCounters.setBorder(BorderFactory.createTitledBorder("Couters"));
 
 		lblCicInpoutbytes = new JLabel("CIC 1 Inpout [Bytes]");
+		lblCicInpoutbytes.setFont(new Font("Dialog", Font.PLAIN, 12));
 		lblCicInpoutbytes.setBounds(10, 22, 136, 20);
 		pnlCounters.add(lblCicInpoutbytes);
 
@@ -202,6 +203,7 @@ public class MainScreen implements GuiInterface
 		lblIn1Counter.setHorizontalAlignment(SwingConstants.CENTER);
 		lblIn1Counter.setBounds(156, 22, 129, 20);
 		pnlCounters.add(lblIn1Counter);
+		lblCic2InpoutBytes.setFont(new Font("Dialog", Font.PLAIN, 12));
 		lblCic2InpoutBytes.setBounds(10, 53, 136, 20);
 
 		pnlCounters.add(lblCic2InpoutBytes);
@@ -210,6 +212,7 @@ public class MainScreen implements GuiInterface
 		lblIn2Counter.setBounds(156, 53, 129, 20);
 
 		pnlCounters.add(lblIn2Counter);
+		lblCic1OutpoutBytes.setFont(new Font("Dialog", Font.PLAIN, 12));
 		lblCic1OutpoutBytes.setBounds(318, 22, 141, 20);
 
 		pnlCounters.add(lblCic1OutpoutBytes);
@@ -218,6 +221,7 @@ public class MainScreen implements GuiInterface
 		lblOut1Counter.setBounds(458, 22, 129, 20);
 
 		pnlCounters.add(lblOut1Counter);
+		lblCic2OutpoutBytes.setFont(new Font("Dialog", Font.PLAIN, 12));
 		lblCic2OutpoutBytes.setBounds(318, 53, 141, 20);
 		
 				pnlCounters.add(lblCic2OutpoutBytes);
@@ -235,7 +239,7 @@ public class MainScreen implements GuiInterface
 			}
 			
 		});
-		btnClearCounter.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnClearCounter.setFont(new Font("Dialog", Font.PLAIN, 12));
 		btnClearCounter.setBounds(62, 457, 123, 23);
 		
 		frame.getContentPane().add(btnClearCounter);
@@ -385,7 +389,7 @@ public class MainScreen implements GuiInterface
 		btnStart.setToolTipText("Start de-encapsulation process.");
 		btnStart.setBounds(233, 60, 68, 23);
 		pnlSetup.add(btnStart);
-		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnStart.setFont(new Font("Dialog", Font.PLAIN, 12));
 		btnStart.addActionListener(new StartAction());
 
 		cmbEncap = new JComboBox<String>();
