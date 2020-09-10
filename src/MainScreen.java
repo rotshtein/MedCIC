@@ -76,7 +76,7 @@ public class MainScreen implements GuiInterface
 	private final JLabel	lblOut1Counter			= new JLabel("0");
 	private final JLabel	lblOut2Counter			= new JLabel("0");
 	private final JLabel	lblCic2OutpoutBytes		= new JLabel("CIC 2 Outpout [Bytes]");
-	private final String	Version					= "1.0";
+	private final String	Version					= "1.1";
 	private final JButton btnClearCounter = new JButton("Clear Counter");
 
 	/**
